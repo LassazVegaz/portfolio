@@ -1,4 +1,5 @@
 import { Box, Typography } from "@mui/material";
+import AnimateFillingTexts from "./components/AnimateFillingTexts";
 
 export default function Home() {
   return (
@@ -9,9 +10,13 @@ export default function Home() {
       <Typography variant="h4" ml="10vw" mt="5vh">
         Senior Software Engineer
       </Typography>
-      <Typography variant="h5" ml="10vw" mt="5vh">
-        Mobile Apps Developer
-      </Typography>
+      <AnimateFillingTexts
+        texts={[
+          "Web Apps Developer",
+          "Mobile Apps Developer",
+          "Desktop Apps Developer",
+        ]}
+      />
     </Box>
   );
 }
