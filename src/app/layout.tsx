@@ -12,6 +12,13 @@ const roboto = Roboto({
 export const metadata: Metadata = {
   title: "Lasindu the SSE",
   description: "Portfolio of Lasindu Nuwanga Weerasinghe",
+  keywords: [
+    "Lasindu",
+    "Nuwanga",
+    "Weerasinghe",
+    "Senior Software Engineer",
+    "Portfolio",
+  ],
 };
 
 export default function RootLayout({
