@@ -1,1 +1,1 @@
-export { default as SectionOne } from "./SectionOne";
+export { default as SectionIntro } from "./SectionIntro";

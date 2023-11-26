@@ -1,5 +1,5 @@
-import { SectionOne } from "./components/Sections";
+import { SectionIntro } from "./components/Sections";
 
 export default function Home() {
-  return <SectionOne />;
+  return <SectionIntro />;
 }

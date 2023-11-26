@@ -1,7 +1,7 @@
 import { Box, Typography } from "@mui/material";
 import AnimateFillingTexts from "../AnimateFillingTexts";
 
-const SectionOne = () => (
+const SectionIntro = () => (
   <Box height="100vh" display="flow-root">
     <Typography variant="h3" fontWeight={900} ml="10vw" mt="30vh">
       Lasindu Nuwanga Weerasinghe
@@ -19,4 +19,4 @@ const SectionOne = () => (
   </Box>
 );
 
-export default SectionOne;
+export default SectionIntro;
