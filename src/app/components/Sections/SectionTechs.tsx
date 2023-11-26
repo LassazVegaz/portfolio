@@ -1,6 +1,8 @@
 import { Box } from "@mui/material";
 import NextImage from "next/image";
 
+const imagesCount = 10;
+
 type TechImageProps = {
   src: React.ComponentProps<typeof NextImage>["src"];
 };
@@ -20,7 +22,7 @@ const SectionTechs = () => {
       alignItems="center"
       gap={8}
     >
-      {Array(10)
+      {Array(imagesCount)
         .fill(0)
         .map((_, i) => (
           <TechImage key={i} src={`/${i + 1}.png`} />
