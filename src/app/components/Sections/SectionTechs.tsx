@@ -1,4 +1,4 @@
-import { Box } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import NextImage from "next/image";
 import SectionTechsAnimator from "./SectionTechsAnimator";
 
@@ -38,12 +38,25 @@ const SectionTechs = () => {
         justifyContent="space-around"
         alignItems="center"
         gap={8}
+        position="relative"
       >
         {Array(imagesCount)
           .fill(0)
           .map((_, i) => (
             <TechImage key={i} src={`/${i + 1}.png`} />
           ))}
+
+        <Typography
+          id="techs-text"
+          position="absolute"
+          variant="h3"
+          fontWeight={900}
+          sx={{
+            transition: "0.5s ease-in-out",
+          }}
+        >
+          Technologies I Use
+        </Typography>
       </Box>
       <SectionTechsAnimator />
     </>

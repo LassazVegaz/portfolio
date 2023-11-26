@@ -33,7 +33,12 @@ const SectionTechsAnimator = () => {
       }
     };
 
-    let timer = setTimeout(startShow, interval);
+    let timer = setTimeout(() => {
+      const textEle = document.getElementById("techs-text")!;
+      textEle.style.opacity = "0.5";
+      textEle.style.fontSize = "1.5rem";
+      startShow();
+    }, interval);
 
     return () => {
       clearTimeout(timer);
