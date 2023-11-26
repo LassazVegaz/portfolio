@@ -1,3 +1,4 @@
+import "@/styles/global.scss";
 import { CssBaseline } from "@mui/material";
 import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
