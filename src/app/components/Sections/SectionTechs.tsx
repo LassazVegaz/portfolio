@@ -1,12 +1,5 @@
-"use client";
 import { Box } from "@mui/material";
-import NextImage, { StaticImageData } from "next/image";
-import dotnetImg from "@/assets/dotnet.png";
-import reactImg from "@/assets/react.png";
-import { useEffect, useRef, useState } from "react";
-
-const imageGap = 16;
-const originalImages: StaticImageData[] = [dotnetImg, reactImg];
+import NextImage from "next/image";
 
 type TechImageProps = {
   src: React.ComponentProps<typeof NextImage>["src"];
@@ -16,46 +9,22 @@ const TechImage = (props: TechImageProps) => (
 );
 
 const SectionTechs = () => {
-  const [images, setImages] = useState<StaticImageData[][]>([]);
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const containerWidth = containerRef.current?.offsetWidth || 0;
-    const imageWidth = 200;
-    const rowImageCount = Math.floor(containerWidth / (imageWidth + imageGap));
-    const rows = Math.ceil(originalImages.length / rowImageCount);
-    const newImages: StaticImageData[][] = [];
-    for (let i = 0; i < rows; i++) {
-      newImages.push(
-        originalImages.slice(i * rowImageCount, (i + 1) * rowImageCount)
-      );
-    }
-    setImages(newImages);
-  }, []);
-
   return (
     <Box
       id="techs-images-container"
-      ref={containerRef}
       height="100vh"
       p={2}
       display="flex"
-      flexDirection="column"
+      flexWrap="wrap"
       justifyContent="space-around"
+      alignItems="center"
+      gap={8}
     >
-      {images.map((row, i) => (
-        <Box
-          key={i}
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-          gap={2}
-        >
-          {row.map((image, j) => (
-            <TechImage key={j} src={image} />
-          ))}
-        </Box>
-      ))}
+      {Array(10)
+        .fill(0)
+        .map((_, i) => (
+          <TechImage key={i} src={`/${i + 1}.png`} />
+        ))}
     </Box>
   );
 };
