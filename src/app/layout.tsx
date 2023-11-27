@@ -12,6 +12,9 @@ const roboto = Roboto({
 export const metadata: Metadata = {
   title: "Lasindu the SSE",
   description: "Portfolio of Lasindu Nuwanga Weerasinghe",
+  applicationName: "Lasindu Nuwanga Portfolio",
+  creator: "Lasindu Nuwanga Weerasinghe",
+  authors: [{ name: "Lasindu Nuwanga Weerasinghe" }],
   keywords: [
     "Lasindu",
     "Nuwanga",
