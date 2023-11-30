@@ -39,7 +39,7 @@ const AnimateFillingTexts = (props: AnimateFillingTextProps) => {
   }, [props.texts, text.length]);
 
   return (
-    <Typography variant="h5" ml="10vw" mt="5vh" height={70}>
+    <Typography variant="h5" mt="5vh" height={70}>
       {text}
     </Typography>
   );
