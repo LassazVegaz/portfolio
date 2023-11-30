@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import { Box, Typography } from "@mui/material";
 import { MDXRemote } from "next-mdx-remote/rsc";
+import { Icons } from "../Icons";
 
 const aboutMeTextDir = path.join(process.cwd(), "src/assets/about-me.md");
 const aboutMeText = fs.readFileSync(aboutMeTextDir, "utf8");
@@ -19,7 +20,6 @@ export default function SectionMySelf() {
         border={1}
         maxWidth={800}
         borderRadius={5}
-        p={5}
         sx={{
           transitionDuration: "0.3s",
           ":hover": {
@@ -27,14 +27,18 @@ export default function SectionMySelf() {
           },
         }}
       >
-        <Typography textAlign="center" variant="h4">
-          About Me
-        </Typography>
-        <Typography textAlign="justify" component="div">
-          <div>
-            <MDXRemote source={aboutMeText} />
-          </div>
-        </Typography>
+        <Box p={5}>
+          <Typography textAlign="center" variant="h4">
+            About Me
+          </Typography>
+          <Typography textAlign="justify" component="div">
+            <div>
+              <MDXRemote source={aboutMeText} />
+            </div>
+          </Typography>
+        </Box>
+
+        <Icons display="flex" gap={5} justifyContent="center" />
       </Box>
     </Box>
   );
