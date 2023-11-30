@@ -1,6 +1,6 @@
 import { Box, Typography } from "@mui/material";
 import NextImage from "next/image";
-import SectionTechsAnimator from "./SectionTechsAnimator";
+import { SectionTechsAnimator } from "../AnimateFillingTexts";
 
 const imagesCount = 10;
 const imgSize = 200;
@@ -58,6 +58,7 @@ const SectionTechs = () => {
           Technologies I Use
         </Typography>
       </Box>
+
       <SectionTechsAnimator />
     </>
   );

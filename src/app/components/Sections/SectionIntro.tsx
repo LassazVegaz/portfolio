@@ -1,5 +1,5 @@
 import { Box, Typography } from "@mui/material";
-import AnimateFillingTexts from "../AnimateFillingTexts";
+import { AnimateFillingTexts } from "../AnimateFillingTexts";
 
 const SectionIntro = () => (
   <Box height="100vh" display="flow-root">
