@@ -1,10 +1,15 @@
-import { SectionIntro, SectionTechs } from "./components/Sections";
+import {
+  SectionIntro,
+  SectionMySelf,
+  SectionTechs,
+} from "./components/Sections";
 
 export default function Home() {
   return (
     <>
       <SectionIntro />
       <SectionTechs />
+      <SectionMySelf />
     </>
   );
 }
