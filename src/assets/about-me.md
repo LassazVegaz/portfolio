@@ -1,0 +1,5 @@
+Hi there, my name is Lasindu Nuwanga Weerasinghe and I am a **Senior Software Engineer** with four years of experience. My expertise lies in building **Web, Desktop, and Mobile Applications**. If you are looking for my services, feel free to check out my **Fiverr** account where I have completed around 25 projects with positive reviews from satisfied clients. For more information on my work experience, you can also check out my previous employers here.
+
+When it comes to web development, I specialize in using Fullstack frameworks such as **.NET Blazor** or **NextJS**. If the frontend and backend need to be separated, I use **React** or **Angular** for the frontend and **.NET API** or **NestJS** for the backend. For desktop applications, I use **Electron**. If the application is for Windows only, I use **.NET WinForms** or **WPF**. Additionally, I develop Mobile Apps, Web Apps, and Desktop Apps using **.NET MAUI** or **Flutter** in a single codebase.
+
+If you are interested in learning more about my work or my journey as a developer, feel free to read my story here. Thank you for your time!
