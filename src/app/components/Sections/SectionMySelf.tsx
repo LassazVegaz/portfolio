@@ -30,8 +30,10 @@ export default function SectionMySelf() {
         <Typography textAlign="center" variant="h4">
           About Me
         </Typography>
-        <Typography textAlign="justify">
-          <MDXRemote source={aboutMeText} />
+        <Typography textAlign="justify" component="div">
+          <div>
+            <MDXRemote source={aboutMeText} />
+          </div>
         </Typography>
       </Box>
     </Box>
