@@ -9,11 +9,31 @@ import discordIcon from "@/assets/icons/discord.svg";
 
 const Icons = (props: BoxProps) => (
   <Box {...props}>
-    <SocialIcon src={whatsappIcon} alt="WhatsApp" />
-    <SocialIcon src={githubIcon} alt="GitHub" />
-    <SocialIcon src={linkedinIcon} alt="LinkedIn" />
-    <SocialIcon src={twitterIcon} alt="Twitter" />
-    <SocialIcon src={discordIcon} alt="Discord" />
+    <SocialIcon
+      src={whatsappIcon}
+      alt="WhatsApp"
+      link="https://wa.me/+94774556607"
+    />
+    <SocialIcon
+      src={githubIcon}
+      alt="GitHub"
+      link="https://github.com/LassazVegaz"
+    />
+    <SocialIcon
+      src={linkedinIcon}
+      alt="LinkedIn"
+      link="https://www.linkedin.com/in/lasindu-w-abb08413a/"
+    />
+    <SocialIcon
+      src={twitterIcon}
+      alt="Twitter"
+      link="https://twitter.com/lassi2k"
+    />
+    <SocialIcon
+      src={discordIcon}
+      alt="Discord"
+      link="https://discordapp.com/users/7715"
+    />
     <SocialIcon
       src={fbIcon}
       alt="Facebook"
