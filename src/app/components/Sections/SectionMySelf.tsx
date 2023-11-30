@@ -18,7 +18,6 @@ export default function SectionMySelf() {
       <Box
         border={1}
         maxWidth={800}
-        height="72%"
         borderRadius={5}
         p={5}
         sx={{
