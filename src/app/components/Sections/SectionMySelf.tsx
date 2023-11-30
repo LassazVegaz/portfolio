@@ -15,8 +15,20 @@ export default function SectionMySelf() {
       alignItems="center"
       justifyContent="center"
     >
-      <Box border={1} maxWidth={800} height="70%" borderRadius={5} p={5}>
-        <Typography textAlign="center" variant="h4" mb={2}>
+      <Box
+        border={1}
+        maxWidth={800}
+        height="72%"
+        borderRadius={5}
+        p={5}
+        sx={{
+          transitionDuration: "0.3s",
+          ":hover": {
+            boxShadow: "0 0 11px rgba(33,33,33,.2)",
+          },
+        }}
+      >
+        <Typography textAlign="center" variant="h4">
           About Me
         </Typography>
         <Typography textAlign="justify">
