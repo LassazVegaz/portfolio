@@ -18,7 +18,7 @@ const TimelineItemBla = ({ data }: { data: TimelinePiece }) => (
   <TimelineItem className={styles["timeline-item"]}>
     <TimelineOppositeContent
       color="#000000"
-      className={styles["onhover-opacity"]}
+      className={styles["onhover-date-range"]}
       sx={{ opacity: 0.4 }}
     >
       {data.range}
