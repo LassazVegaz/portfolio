@@ -54,6 +54,9 @@ const TimelineItemBla = ({ data }: { data: TimelinePiece }) => (
 
 const SectionTimeline = () => (
   <Box py={5}>
+    <Typography variant="h4" align="center" mb={5}>
+      Career Timeline
+    </Typography>
     <Timeline>
       {timelineData.map((data, index) => (
         <TimelineItemBla key={index} data={data} />
