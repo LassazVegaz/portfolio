@@ -18,7 +18,7 @@ const AnimateFillingTexts = (props: AnimateFillingTextProps) => {
     if (props.texts.length === 0) return;
 
     let innerTimer: NodeJS.Timeout;
-    let targetText = props.texts[index.current];
+    const targetText = props.texts[index.current];
 
     const timer = setTimeout(() => {
       if (text.length < targetText.length) {
