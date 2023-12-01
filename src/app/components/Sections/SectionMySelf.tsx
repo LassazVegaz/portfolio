@@ -10,6 +10,7 @@ const aboutMeText = fs.readFileSync(aboutMeTextDir, "utf8");
 export default function SectionMySelf() {
   return (
     <Box
+      id="about-me"
       component="section"
       height="100vh"
       display="flex"
