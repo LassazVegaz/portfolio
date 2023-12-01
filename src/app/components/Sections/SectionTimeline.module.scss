@@ -1,0 +1,26 @@
+.timeline-item {
+  ul {
+    li {
+      margin-bottom: 15px;
+    }
+  }
+
+  .onhover-enlarge,
+  .onhover-opacity,
+  .onhover-glow {
+    transition-duration: 0.5s;
+  }
+
+  &:hover {
+    .onhover-enlarge {
+      transform: scale(1.01) translateX(1%);
+    }
+    .onhover-opacity {
+      opacity: 0.8;
+    }
+    .onhover-glow {
+      box-shadow: 0 0 10px 5px rgb(0, 0, 255);
+      background-color: transparent;
+    }
+  }
+}
