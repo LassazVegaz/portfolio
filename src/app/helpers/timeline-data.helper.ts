@@ -1,4 +1,4 @@
-type TimelinePiece = {
+export type TimelinePiece = {
   title: string;
   range: string;
   company: string;
