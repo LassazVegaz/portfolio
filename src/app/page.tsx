@@ -8,8 +8,8 @@ export default function Home() {
   return (
     <>
       <SectionIntro />
-      <SectionTechs />
       <SectionMySelf />
+      <SectionTechs />
     </>
   );
 }
