@@ -1,0 +1,45 @@
+.timeline-item {
+  ul {
+    li {
+      margin-bottom: 15px;
+    }
+  }
+
+  .onhover-enlarge,
+  .onhover-date-range,
+  .onhover-glow {
+    transition-duration: 0.5s;
+  }
+
+  &:hover {
+    .onhover-enlarge {
+      transform: scale(1.01) translateX(1%);
+    }
+    .onhover-date-range {
+      opacity: 0.8;
+      transform: translateX(-1%);
+    }
+    .onhover-glow {
+      box-shadow: 0 0 10px 5px rgb(0, 0, 255);
+      background-color: transparent;
+    }
+    .onhover-glow-ani {
+      animation: glow-animation 2s ease-in-out infinite alternate;
+    }
+    h5 {
+      font-weight: bold;
+    }
+  }
+}
+
+@keyframes glow-animation {
+  0% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+  50% {
+    box-shadow: 0 0 10px 5px rgba(0, 0, 255, 0.094);
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+}

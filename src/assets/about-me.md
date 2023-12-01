@@ -1,0 +1,7 @@
+Greetings! I'm Lasindu Nuwanga Weerasinghe, a seasoned Senior Software Engineer boasting four years of hands-on experience. My passion and proficiency revolve around crafting robust applications spanning **Web**, **Desktop**, and **Mobile** platforms. If you're in need of my services, my contacts details are given below. I also offer my services on **Fiverr**. With an impressive track record, I've successfully delivered 25 projects, earning stellar reviews and consistent 5-star ratings from satisfied clients. Check my Fiverr account <a href="https://www.fiverr.com/lassaz_vegaz" target="_blank">here</a>.
+
+For a comprehensive look at my professional journey, dive into my [Career Timeline](#career-timeline). Beyond coding, I share insights and experiences through my blogs, accessible <a href="https://medium.com/@lasindunuwangaweerasinghe" target="_blank">here</a>.
+
+In the realm of web development, I specialize in leveraging robust fullstack frameworks like **.NET Blazor** and **NextJS**. For frontend and backend separation, I turn to trusted technologies such as **React**, **Angular**, **.NET API**, and **NestJS**. When it comes to desktop applications, I harness the power of **Electron**, opting for **.NET WinForms** or **WPF** for Windows-exclusive projects. Furthermore, I seamlessly develop Mobile, Web, and Desktop Apps using versatile frameworks like **.NET MAUI** and **Flutter** within a single codebase.
+
+If you're curious to learn more about my work or follow my developer journey, dive into my story [here](/my-story). Thanks for stopping by!

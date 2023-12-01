@@ -18,7 +18,7 @@ const AnimateFillingTexts = (props: AnimateFillingTextProps) => {
     if (props.texts.length === 0) return;
 
     let innerTimer: NodeJS.Timeout;
-    let targetText = props.texts[index.current];
+    const targetText = props.texts[index.current];
 
     const timer = setTimeout(() => {
       if (text.length < targetText.length) {
@@ -39,7 +39,7 @@ const AnimateFillingTexts = (props: AnimateFillingTextProps) => {
   }, [props.texts, text.length]);
 
   return (
-    <Typography variant="h5" ml="10vw" mt="5vh">
+    <Typography variant="h5" mt="5vh" height={70}>
       {text}
     </Typography>
   );
