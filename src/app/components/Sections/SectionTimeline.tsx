@@ -30,7 +30,7 @@ const SectionTimeline = () => {
               sx={{ p: 0.8 }}
               className={styles["onhover-glow"]}
             />
-            <TimelineConnector />
+            <TimelineConnector className={styles["onhover-glow-ani"]} />
           </TimelineSeparator>
           <TimelineContent
             sx={{ px: 2, pt: 0, pb: 4 }}
