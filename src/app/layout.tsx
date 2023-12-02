@@ -11,6 +11,7 @@ const roboto = Roboto({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.METADATA_BASE!),
   title: "Lasindu the SSE",
   description: "Portfolio of Lasindu Nuwanga Weerasinghe",
   applicationName: "Lasindu Nuwanga Portfolio",
