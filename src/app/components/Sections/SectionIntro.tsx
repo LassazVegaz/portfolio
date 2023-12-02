@@ -12,7 +12,7 @@ const SectionIntro = () => (
   >
     <Box>
       <Typography variant="h3" fontWeight={900} mt="30vh">
-        Lasindu Nuwanga Weerasinghe
+        Lasindu Nuwanga Weerasinghe!!!!
       </Typography>
       <Typography variant="h4" mt="5vh">
         Senior Software Engineer
