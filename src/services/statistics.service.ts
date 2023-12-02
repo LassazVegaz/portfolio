@@ -1,5 +1,6 @@
 import { removeTimeFromDate } from "@/lib/datetime";
 import { PrismaClient } from "@prisma/client";
+import prisma from "@/lib/prisma";
 
 export class StatisticsService {
   constructor(private readonly prisma: PrismaClient) {}
@@ -21,3 +22,6 @@ export class StatisticsService {
     }
   }
 }
+
+const statisticsService = new StatisticsService(prisma);
+export default statisticsService;
