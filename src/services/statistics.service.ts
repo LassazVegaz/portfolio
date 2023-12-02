@@ -5,6 +5,11 @@ import prisma from "@/lib/prisma";
 export class StatisticsService {
   constructor(private readonly prisma: PrismaClient) {}
 
+  /**
+   * Adds a view to the statistics.
+   * If a statistics entry for the current date already exists, it increments the views count by 1.
+   * Otherwise, it creates a new statistics entry with a views count of 1.
+   */
   async addView() {
     const date = removeTimeFromDate(new Date());
     const view = await this.prisma.statistics.findUnique({
