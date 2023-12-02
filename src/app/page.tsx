@@ -5,6 +5,8 @@ import {
 } from "./components/Sections";
 import statisticsService from "@/services/statistics.service";
 
+export const dynamic = "force-dynamic";
+
 const increaseViewCount = async () => {
   try {
     await statisticsService.addView();

@@ -11,7 +11,6 @@ export class StatisticsService {
    * Otherwise, it creates a new statistics entry with a views count of 1.
    */
   async addView() {
-    console.log("Inside addView");
     const date = removeTimeFromDate(new Date());
     const view = await this.prisma.statistics.findUnique({
       where: { date },
