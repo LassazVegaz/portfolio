@@ -17,6 +17,8 @@ const increaseViewCount = async () => {
 };
 
 export default function Home() {
+  console.log("Home page rendered");
+
   increaseViewCount();
 
   return (
