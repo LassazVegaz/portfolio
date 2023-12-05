@@ -2,7 +2,6 @@ import "@/styles/global.scss";
 import { CssBaseline } from "@mui/material";
 import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
-import Footer from "./components/Footer";
 
 const roboto = Roboto({
   subsets: ["latin"],
@@ -37,8 +36,6 @@ export default function RootLayout({
         <CssBaseline />
 
         {children}
-
-        <Footer />
       </body>
     </html>
   );
