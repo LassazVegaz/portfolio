@@ -1,3 +1,4 @@
+import Footer from "./components/Footer";
 import {
   SectionIntro,
   SectionMySelf,
@@ -24,6 +25,7 @@ export default function Home() {
       <SectionIntro />
       <SectionMySelf />
       <SectionTimeline />
+      <Footer />
     </>
   );
 }
