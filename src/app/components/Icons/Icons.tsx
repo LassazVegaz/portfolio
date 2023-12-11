@@ -1,4 +1,3 @@
-import { Box, BoxProps } from "@mui/material";
 import SocialIcon from "./SocialIcon";
 import fbIcon from "@/assets/icons/facebook-f.svg";
 import whatsappIcon from "@/assets/icons/whatsapp.svg";
@@ -7,8 +6,8 @@ import linkedinIcon from "@/assets/icons/linkedin-in.svg";
 import twitterIcon from "@/assets/icons/x-twitter.svg";
 import discordIcon from "@/assets/icons/discord.svg";
 
-const Icons = (props: BoxProps) => (
-  <Box {...props}>
+const Icons = (props: React.ComponentProps<"div">) => (
+  <div {...props}>
     <SocialIcon
       src={whatsappIcon}
       alt="WhatsApp"
@@ -39,7 +38,7 @@ const Icons = (props: BoxProps) => (
       alt="Facebook"
       link="https://web.facebook.com/lasindu.nuwanga.5"
     />
-  </Box>
+  </div>
 );
 
 export default Icons;

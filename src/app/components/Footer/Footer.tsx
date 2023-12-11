@@ -1,14 +1,10 @@
-import { Box, Typography } from "@mui/material";
-
 const Footer = () => {
   const year = new Date().getFullYear();
 
   return (
-    <Box component="footer" py={5} borderTop="1px solid black">
-      <Typography textAlign="center">
-        Copyright {year} &copy; Lasindu Nuwanga Weerasinghe
-      </Typography>
-    </Box>
+    <footer className="py-10 text-center border-t-2 border-gray-300">
+      <p>&copy; {year} Lasindu Nuwanga Weerasinghe</p>
+    </footer>
   );
 };
 

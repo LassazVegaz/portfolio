@@ -8,7 +8,6 @@ import {
   Timeline,
   TimelineOppositeContent,
 } from "@mui/lab";
-import { Box, Typography } from "@mui/material";
 import timelineData, {
   TimelinePiece,
 } from "@/app/helpers/timeline-data.helper";
@@ -35,16 +34,12 @@ const TimelineItemBla = ({ data }: { data: TimelinePiece }) => (
       sx={{ px: 2, pt: 0, pb: 4 }}
       className={styles["onhover-enlarge"]}
     >
-      <Typography variant="h5">{data.title}</Typography>
-      <Typography variant="h6" mb={1}>
-        {data.company}
-      </Typography>
+      <h5 className="text-2xl">{data.title}</h5>
+      <h6 className="text-xl mb-5">{data.company}</h6>
       <ul>
         {data.points.map((point, index) => (
           <li key={index}>
-            <Typography variant="body1" maxWidth={500}>
-              {point}
-            </Typography>
+            <p className="max-w-[500px] text-base">{point}</p>
           </li>
         ))}
       </ul>
@@ -53,16 +48,14 @@ const TimelineItemBla = ({ data }: { data: TimelinePiece }) => (
 );
 
 const SectionTimeline = () => (
-  <Box py={5} id="career-timeline" component="section">
-    <Typography variant="h4" align="center" mb={5}>
-      Career Timeline
-    </Typography>
+  <section className="py-5" id="career-timeline">
+    <h4 className="text-4xl text-center mb-8">Career Timeline</h4>
     <Timeline>
       {timelineData.map((data, index) => (
         <TimelineItemBla key={index} data={data} />
       ))}
     </Timeline>
-  </Box>
+  </section>
 );
 
 export default SectionTimeline;
