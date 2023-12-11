@@ -1,6 +1,5 @@
 import fs from "fs";
 import path from "path";
-import { Box, Typography } from "@mui/material";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import { Icons } from "../Icons";
 
@@ -9,38 +8,21 @@ const aboutMeText = fs.readFileSync(aboutMeTextDir, "utf8");
 
 export default function SectionMySelf() {
   return (
-    <Box
+    <section
       id="about-me"
-      component="section"
-      height="100vh"
-      display="flex"
-      alignItems="center"
-      justifyContent="center"
+      className="h-screen flex items-center justify-center"
     >
-      <Box
-        border={1}
-        maxWidth={800}
-        borderRadius={5}
-        sx={{
-          transitionDuration: "0.3s",
-          ":hover": {
-            boxShadow: "0 0 11px rgba(33,33,33,.2)",
-          },
-        }}
-      >
-        <Box p={5}>
-          <Typography textAlign="center" variant="h4">
-            About Me
-          </Typography>
-          <Typography textAlign="justify" component="div">
-            <div>
-              <MDXRemote source={aboutMeText} />
-            </div>
-          </Typography>
-        </Box>
+      <div className="border-2 border-gray-300 rounded-lg shadow-lg max-w-[800px] transition duration-300 hover:shadow-xl">
+        <div className="p-10">
+          <h4 className="text-4xl text-center mb-4">About Me</h4>
 
-        <Icons display="flex" gap={5} justifyContent="center" />
-      </Box>
-    </Box>
+          <div className="text-justify [&>p]:my-2">
+            <MDXRemote source={aboutMeText} />
+          </div>
+        </div>
+
+        <Icons className="flex justify-center items-center gap-10 mb-2" />
+      </div>
+    </section>
   );
 }
