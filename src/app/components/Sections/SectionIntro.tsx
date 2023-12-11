@@ -1,15 +1,14 @@
-import { Box, Typography } from "@mui/material";
 import { AnimateFillingTexts } from "../AnimateFillingTexts";
 
 const SectionIntro = () => (
   <section id="intro" className="h-screen px-[10vw] grid grid-rows-[1fr,auto]">
-    <Box>
-      <Typography variant="h3" fontWeight={900} mt="30vh">
+    <div>
+      <h1 className="font-extrabold mt-[30vh] text-4xl sm:text-6xl">
         Lasindu Nuwanga Weerasinghe
-      </Typography>
-      <Typography variant="h4" mt="5vh">
+      </h1>
+      <h4 className="font-bold text-2xl sm:text-4xl mt-[5vh]">
         Senior Software Engineer
-      </Typography>
+      </h4>
 
       <AnimateFillingTexts
         texts={[
@@ -18,7 +17,7 @@ const SectionIntro = () => (
           "Desktop Apps Developer",
         ]}
       />
-    </Box>
+    </div>
   </section>
 );
 
