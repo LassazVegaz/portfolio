@@ -1,0 +1,10 @@
+{
+  "configurations": [
+    {
+      "command": "pnpm dev",
+      "name": "Debug NextJS",
+      "request": "launch",
+      "type": "node-terminal"
+    }
+  ]
+}
