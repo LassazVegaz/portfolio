@@ -16,7 +16,7 @@ export default function SectionMySelf() {
         <div className="p-10">
           <h4 className="text-4xl text-center mb-4">About Me</h4>
 
-          <div className="text-justify [&>p]:my-2">
+          <div className="text-justify [&_a]:transition-all [&_a]:duration-300 [&>p]:my-2 [&_a]:text-blue-500 [&_a]:hover:text-blue-700">
             <MDXRemote source={aboutMeText} />
           </div>
         </div>
