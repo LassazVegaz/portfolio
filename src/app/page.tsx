@@ -17,8 +17,8 @@ const increaseViewCount = async () => {
   }
 };
 
-export default function Home() {
-  increaseViewCount();
+export default async function Home() {
+  await increaseViewCount();
 
   return (
     <>

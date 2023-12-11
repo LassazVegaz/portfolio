@@ -1,5 +1,4 @@
 "use client";
-import { Typography } from "@mui/material";
 import { useState, useEffect, useRef } from "react";
 
 type AnimateFillingTextProps = {
@@ -38,11 +37,7 @@ const AnimateFillingTexts = (props: AnimateFillingTextProps) => {
     };
   }, [props.texts, text.length]);
 
-  return (
-    <Typography variant="h5" mt="5vh" height={70}>
-      {text}
-    </Typography>
-  );
+  return <h5 className="text-lg sm:text-2xl mt-[10vh]">{text}</h5>;
 };
 
 export default AnimateFillingTexts;
