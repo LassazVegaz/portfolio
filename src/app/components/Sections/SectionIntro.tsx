@@ -2,14 +2,7 @@ import { Box, Typography } from "@mui/material";
 import { AnimateFillingTexts } from "../AnimateFillingTexts";
 
 const SectionIntro = () => (
-  <Box
-    height="100vh"
-    px="10vw"
-    display="grid"
-    gridTemplateRows="1fr auto"
-    component="section"
-    id="intro"
-  >
+  <section id="intro" className="h-screen px-[10vw] grid grid-rows-[1fr,auto]">
     <Box>
       <Typography variant="h3" fontWeight={900} mt="30vh">
         Lasindu Nuwanga Weerasinghe
@@ -26,7 +19,7 @@ const SectionIntro = () => (
         ]}
       />
     </Box>
-  </Box>
+  </section>
 );
 
 export default SectionIntro;
