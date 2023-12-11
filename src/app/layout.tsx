@@ -1,5 +1,4 @@
 import "@/styles/global.scss";
-import { CssBaseline } from "@mui/material";
 import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
 
@@ -37,11 +36,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={roboto.className}>
-        <CssBaseline />
-
-        {children}
-      </body>
+      <body className={roboto.className}>{children}</body>
     </html>
   );
 }
