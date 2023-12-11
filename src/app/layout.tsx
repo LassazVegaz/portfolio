@@ -3,6 +3,11 @@ import { CssBaseline } from "@mui/material";
 import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
 
+const metadataBaseUrl =
+  process.env.NODE_ENV === "production"
+    ? `https://${process.env.VERCEL_URL}`
+    : process.env.METADATA_BASE!;
+
 const roboto = Roboto({
   subsets: ["latin"],
   display: "swap",
@@ -10,7 +15,7 @@ const roboto = Roboto({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.METADATA_BASE!),
+  metadataBase: new URL(metadataBaseUrl),
   title: "Lasindu the SSE",
   description: "Portfolio of Lasindu Nuwanga Weerasinghe",
   applicationName: "Lasindu Nuwanga Portfolio",
