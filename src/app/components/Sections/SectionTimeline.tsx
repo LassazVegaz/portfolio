@@ -48,7 +48,7 @@ const TimelineItemBla = ({ data }: { data: TimelinePiece }) => (
 );
 
 const SectionTimeline = () => (
-  <section className="py-5" id="career-timeline">
+  <section className="py-5 mt-28" id="career-timeline">
     <h4 className="text-4xl text-center mb-8">Career Timeline</h4>
     <Timeline>
       {timelineData.map((data, index) => (
