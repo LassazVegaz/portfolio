@@ -10,7 +10,7 @@ export default function SectionMySelf() {
   return (
     <section
       id="about-me"
-      className="h-screen flex items-center justify-center"
+      className="min-h-screen flex items-center justify-center"
     >
       <div className="border-2 border-gray-300 rounded-lg shadow-lg max-w-[800px] transition duration-300 hover:shadow-xl">
         <div className="p-10">
