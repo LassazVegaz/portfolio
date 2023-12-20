@@ -7,6 +7,7 @@ import {
   TimelineContent,
   Timeline,
   TimelineOppositeContent,
+  timelineOppositeContentClasses,
 } from "@mui/lab";
 import timelineData, {
   TimelinePiece,
@@ -17,7 +18,7 @@ const TimelineItemBla = ({ data }: { data: TimelinePiece }) => (
   <TimelineItem className={styles["timeline-item"]}>
     <TimelineOppositeContent
       color="#000000"
-      className={styles["onhover-date-range"]}
+      className={`text-sm lg:text-base text-center md:text-right ${styles["onhover-date-range"]}`}
       sx={{ opacity: 0.4 }}
     >
       {data.range}
@@ -50,7 +51,15 @@ const TimelineItemBla = ({ data }: { data: TimelinePiece }) => (
 const SectionTimeline = () => (
   <section className="py-5 mt-28" id="career-timeline">
     <h4 className="text-4xl text-center mb-8">Career Timeline</h4>
-    <Timeline>
+    <Timeline
+      sx={(theme) => ({
+        [theme.breakpoints.down("md")]: {
+          [`& .${timelineOppositeContentClasses.root}`]: {
+            flex: 0.2,
+          },
+        },
+      })}
+    >
       {timelineData.map((data, index) => (
         <TimelineItemBla key={index} data={data} />
       ))}
