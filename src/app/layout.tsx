@@ -1,5 +1,5 @@
 import "@/styles/global.scss";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Roboto } from "next/font/google";
 
 const roboto = Roboto({
@@ -21,6 +21,13 @@ export const metadata: Metadata = {
     "Weerasinghe",
     "Senior Software Engineer",
     "Portfolio",
+  ],
+};
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: dark)", color: "#000000" },
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
   ],
 };
 
