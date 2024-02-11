@@ -31,7 +31,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${roboto.className} dark:bg-black`}>{children}</body>
+      <body className={`${roboto.className} dark:bg-black dark:text-white`}>
+        {children}
+      </body>
     </html>
   );
 }
