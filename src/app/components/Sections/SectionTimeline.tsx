@@ -17,7 +17,6 @@ import styles from "./SectionTimeline.module.scss";
 const TimelineItemBla = ({ data }: { data: TimelinePiece }) => (
   <TimelineItem className={styles["timeline-item"]}>
     <TimelineOppositeContent
-      color="#000000"
       className={`text-sm lg:text-base text-center md:text-right ${styles["onhover-date-range"]}`}
       sx={{ opacity: 0.4 }}
     >
@@ -35,9 +34,9 @@ const TimelineItemBla = ({ data }: { data: TimelinePiece }) => (
       sx={{ px: 2, pt: 0, pb: 4 }}
       className={styles["onhover-enlarge"]}
     >
-      <h5 className="text-2xl">{data.title}</h5>
-      <h6 className="text-xl mb-5">{data.company}</h6>
-      <ul>
+      <h5 className="text-2xl dark:text-slate-50">{data.title}</h5>
+      <h6 className="text-xl mb-5 dark:text-slate-100">{data.company}</h6>
+      <ul className="dark:text-slate-300">
         {data.points.map((point, index) => (
           <li key={index}>
             <p className="max-w-[500px] text-base">{point}</p>
