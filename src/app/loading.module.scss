@@ -1,4 +1,5 @@
 .main-loader {
+  --shadow-color: #011654;
   position: fixed;
   top: 0;
   left: 0;
@@ -15,13 +16,19 @@
     width: 200px;
     height: 200px;
     border-radius: 50%;
-    box-shadow: 0 -6px 14px -4px #01165436;
+    box-shadow: 0 -6px 14px -4px var(--shadow-color);
     animation: spin 1s linear infinite;
   }
 
   .loader-text {
     font-size: 80px;
     font-weight: bold;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .main-loader {
+    --shadow-color: #5e99ff;
   }
 }
 
