@@ -37,7 +37,11 @@ const AnimateFillingTexts = (props: AnimateFillingTextProps) => {
     };
   }, [props.texts, text.length]);
 
-  return <h5 className="text-lg sm:text-2xl mt-[10vh]">{text}</h5>;
+  return (
+    <h5 className="text-lg sm:text-2xl mt-[10vh] dark:text-slate-300">
+      {text}
+    </h5>
+  );
 };
 
 export default AnimateFillingTexts;

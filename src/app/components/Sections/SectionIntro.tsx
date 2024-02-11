@@ -5,7 +5,7 @@ const SectionIntro = () => (
     <h1 className="font-extrabold mt-[30vh] text-4xl sm:text-6xl">
       Lasindu Nuwanga Weerasinghe
     </h1>
-    <h4 className="font-semibold text-xl sm:text-3xl mt-[4vh]">
+    <h4 className="font-semibold text-xl sm:text-3xl mt-[4vh] dark:text-slate-100">
       Senior Software Engineer
     </h4>
 
