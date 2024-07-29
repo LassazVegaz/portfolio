@@ -20,6 +20,8 @@ const increaseViewCount = async () => {
 export default async function Home() {
   await increaseViewCount();
 
+  return <h1>Hi! Sorry I am down for a while :)</h1>;
+
   return (
     <>
       <SectionIntro />
