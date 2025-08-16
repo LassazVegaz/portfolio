@@ -4,22 +4,8 @@ import {
   SectionMySelf,
   SectionTimeline,
 } from "./components/Sections";
-import statisticsService from "@/services/statistics.service";
 
-export const dynamic = "force-dynamic";
-
-const increaseViewCount = async () => {
-  try {
-    await statisticsService.addView();
-  } catch (err) {
-    console.error("Error adding a view statistic:");
-    console.error(err);
-  }
-};
-
-export default async function Home() {
-  await increaseViewCount();
-
+export default function Home() {
   return (
     <>
       <SectionIntro />
