@@ -1,25 +1,14 @@
-import { Box, Typography } from "@mui/material";
-
 const MyStoryPage = () => {
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        height: "100vh",
-        boxShadow: "inset 0 0 20px 2px rgb(0 0 0)",
-      }}
-    >
-      <Typography textAlign="center" variant="h3">
+    <div className="flex flex-col items-center justify-center h-screen shadow-[inset_0_0_20px_2px_rgb(0_0_0)]">
+      <h3 className="text-center">
         I am glad you are here.
         <br />
         Unfortunately, I am still working on this page.
         <br />
         Please come back later.
-      </Typography>
-    </Box>
+      </h3>
+    </div>
   );
 };
 
