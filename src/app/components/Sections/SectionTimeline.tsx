@@ -17,9 +17,7 @@ const TimelineItem = ({ data }: { data: TimelinePiece }) => (
         color="primary"
         className={`${styles["onhover-glow"]} w-4 h-4 inline-block bg-blue-600 rounded-full`}
       />
-      <span
-        className={`${styles["onhover-glow-ani"]}  w-0.5 inline-block bg-white opacity-70 rounded`}
-      />
+      <span className="w-0.5 inline-block bg-white opacity-70 rounded" />
     </div>
     <div className={`${styles["onhover-enlarge"]} pb-5`}>
       <h5 className="text-2xl dark:text-slate-50">{data.title}</h5>
