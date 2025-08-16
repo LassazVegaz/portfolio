@@ -5,7 +5,7 @@ import styles from "./SectionTimeline.module.scss";
 
 const TimelineItem = ({ data }: { data: TimelinePiece }) => (
   <div
-    className={`${styles["timeline-item"]} grid grid-cols-[auto_auto_1fr] sm:grid-cols-[4fr_auto_5fr] md:grid-cols-[1fr_auto_1fr] gap-4 2xl w-[95%]`}
+    className={`${styles["timeline-item"]} grid grid-cols-[60px_auto_1fr] sm:grid-cols-[3fr_auto_5fr] md:grid-cols-[1fr_auto_1fr] gap-4 2xl w-[95%]`}
   >
     <div
       className={`${styles["onhover-date-range"]} text-sm lg:text-base text-center sm:text-right opacity-40 pt-1`}
