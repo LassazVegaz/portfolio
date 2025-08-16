@@ -8,7 +8,7 @@ const TimelineItem = ({ data }: { data: TimelinePiece }) => (
     className={`${styles["timeline-item"]} grid grid-cols-[auto_auto_1fr] gap-4 w-[700px]`}
   >
     <div
-      className={`text-sm lg:text-base text-center md:text-right ${styles["onhover-date-range"]} opacity-40 pt-1`}
+      className={`${styles["onhover-date-range"]} text-sm lg:text-base text-center md:text-right opacity-40 pt-1`}
     >
       {data.range}
     </div>
