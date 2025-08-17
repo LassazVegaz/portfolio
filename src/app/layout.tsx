@@ -1,7 +1,7 @@
 import "@/styles/global.scss";
 import type { Metadata, Viewport } from "next";
 import { Roboto } from "next/font/google";
-import { Analytics } from "@vercel/analytics/react";
+import { Analytics } from "@vercel/analytics/next";
 
 const roboto = Roboto({
   subsets: ["latin"],
