@@ -1,9 +1,29 @@
+import { ChangeEventHandler } from "react";
 import { Label, TextBox, TextBoxBorderless } from "./FormsRelated";
 
-type TargetProps = { type: "profit" | "loss" };
+export type TargetInputs = {
+  totalTarget: string;
+  targetPU: string;
+  targetPercentage: string;
+  unitSellingPrice: string;
+  totalSellingPrice: string;
+};
 
-export default function Target(props: TargetProps) {
+type TargetProps = {
+  type: "profit" | "loss";
+  inputs: TargetInputs;
+  onChange: (name: keyof TargetInputs, value: string) => void;
+};
+
+export default function Target({ inputs, ...props }: TargetProps) {
   const isProfit = props.type === "profit";
+
+  const onFieldChange: ChangeEventHandler<HTMLInputElement> = (e) => {
+    const { name, value } = e.target;
+    if (name in inputs) {
+      props.onChange(name as keyof TargetInputs, value);
+    }
+  };
 
   return (
     <div
@@ -15,29 +35,49 @@ export default function Target(props: TargetProps) {
           <Label>
             {isProfit ? "Total expected profit" : "Total bearable loss"}
           </Label>
-          <TextBox />
+          <TextBox
+            name="totalTarget"
+            value={inputs.totalTarget}
+            onChange={onFieldChange}
+          />
         </div>
-        <TextBox />
+        <TextBox
+          name="targetPercentage"
+          value={inputs.targetPercentage}
+          onChange={onFieldChange}
+        />
         <Label>%</Label>
       </div>
       <div className="w-[400px] grid grid-cols-2 gap-y-2 items-center mt-2">
         <Label>{isProfit ? "Expected profit PU" : "Bearable loss PU"}</Label>
-        <TextBox />
+        <TextBox
+          name="targetPU"
+          value={inputs.targetPU}
+          onChange={onFieldChange}
+        />
         <Label>Unit selling price</Label>
-        <TextBox />
+        <TextBox
+          name="unitSellingPrice"
+          value={inputs.unitSellingPrice}
+          onChange={onFieldChange}
+        />
         <Label>Total selling price</Label>
-        <TextBox />
+        <TextBox
+          name="totalSellingPrice"
+          value={inputs.totalSellingPrice}
+          onChange={onFieldChange}
+        />
       </div>
 
       <div className="w-[400px] grid grid-cols-2 items-center mt-6">
         <Label>Cost</Label>
-        <TextBoxBorderless value={1.09} />
+        <TextBoxBorderless value={1.09} readOnly />
         <Label className="text-sm">Platform fees</Label>
-        <TextBoxBorderless value={0.99} className="text-sm" />
+        <TextBoxBorderless value={0.99} className="text-sm" readOnly />
         <Label className="text-sm">Settlement fees</Label>
-        <TextBoxBorderless value={0.003} className="text-sm" />
+        <TextBoxBorderless value={0.003} className="text-sm" readOnly />
         <Label>Total cost</Label>
-        <TextBoxBorderless value={1.09} />
+        <TextBoxBorderless value={1.09} readOnly />
       </div>
     </div>
   );

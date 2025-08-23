@@ -3,7 +3,6 @@ export const TextBox = ({
   ...props
 }: React.ComponentProps<"input">) => (
   <input
-    readOnly
     className={`border-2 border-blue-600 outline-none py-0.5 px-1 text-right ${className}`}
     {...props}
   />
