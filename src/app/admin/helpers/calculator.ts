@@ -50,9 +50,9 @@ export const calculateExpectedProfitPU: Record<
   targetPercentage: (changedValue, primaryValues) =>
     (changedValue * primaryValues.unitBuyingPrice) / 100,
   unitSellingPrice: (changedValue, primaryValues) =>
-    changedValue + primaryValues.unitBuyingPrice,
+    changedValue - primaryValues.unitBuyingPrice,
   totalSellingPrice: (changedValue, primaryValues) =>
-    changedValue + primaryValues.totalBuyingPrice,
+    (changedValue - primaryValues.totalBuyingPrice) / primaryValues.quantity,
   targetPU: (changedValue) => changedValue,
   totalTarget: (changedValue, primaryValues) =>
     changedValue / primaryValues.quantity,
