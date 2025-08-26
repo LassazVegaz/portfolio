@@ -7,7 +7,12 @@ import {
   calculatePrimaryValues,
   expectedProfitCalculator as profitCalculator,
 } from "./helpers/calculator";
-import { State, PrimaryValues } from "./types";
+import { State, PrimaryValues, Cost } from "./types";
+
+const defaultCost: Cost = {
+  cost: "0",
+  details: [],
+};
 
 export default function AdminPage() {
   const state = useRef<State>({
@@ -53,6 +58,10 @@ export default function AdminPage() {
     unitSellingPrice: "0",
     totalSellingPrice: "0",
   });
+
+  const [buyingCost, setBuyingCost] = useState(defaultCost);
+  const [profitCost, setProfitCost] = useState(defaultCost);
+  const [lossCost, setLossCost] = useState(defaultCost);
 
   const onProfitTargetChange = (name: keyof TargetInputs, value: string) => {
     state.current.profitTargetValues[name] = parseFloat(value);
@@ -179,7 +188,7 @@ export default function AdminPage() {
             onChange={onPrimaryFieldChange}
           />
           <Label>Cost </Label>
-          <TextBoxBorderless value={1.09} readOnly />
+          <TextBoxBorderless value={buyingCost.cost} readOnly />
         </div>
       </div>
 
@@ -187,9 +196,15 @@ export default function AdminPage() {
         <Target
           type="profit"
           inputs={profitTarget}
+          cost={profitCost}
           onChange={onProfitTargetChange}
         />
-        <Target type="loss" inputs={lossTarget} onChange={onLossTargetChange} />
+        <Target
+          type="loss"
+          inputs={lossTarget}
+          cost={lossCost}
+          onChange={onLossTargetChange}
+        />
       </div>
     </div>
   );

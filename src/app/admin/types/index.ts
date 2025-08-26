@@ -18,6 +18,11 @@ export type State = {
   lossTargetValues: TargetValues;
 };
 
+export type Cost = {
+  cost: string;
+  details: { name: string; value: number }[];
+};
+
 export type CostCalculator = {
   name: string;
   /**

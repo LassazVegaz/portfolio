@@ -1,16 +1,17 @@
 import { ChangeEventHandler } from "react";
 import { Label, TextBox, TextBoxBorderless } from "./FormsRelated";
-import { TargetValues } from "../types";
+import { Cost, TargetValues } from "../types";
 
 export type TargetInputs = { [k in keyof TargetValues]: string };
 
 type TargetProps = {
   type: "profit" | "loss";
   inputs: TargetInputs;
+  cost: Cost;
   onChange: (name: keyof TargetInputs, value: string) => void;
 };
 
-export default function Target({ inputs, ...props }: TargetProps) {
+export default function Target({ inputs, cost, ...props }: TargetProps) {
   const isProfit = props.type === "profit";
 
   const onFieldChange: ChangeEventHandler<HTMLInputElement> = (e) => {
@@ -66,13 +67,13 @@ export default function Target({ inputs, ...props }: TargetProps) {
 
       <div className="w-[400px] grid grid-cols-2 items-center mt-6">
         <Label>Cost</Label>
-        <TextBoxBorderless value={1.09} readOnly />
-        <Label className="text-sm">Platform fees</Label>
-        <TextBoxBorderless value={0.99} className="text-sm" readOnly />
-        <Label className="text-sm">Settlement fees</Label>
-        <TextBoxBorderless value={0.003} className="text-sm" readOnly />
-        <Label>Total cost</Label>
-        <TextBoxBorderless value={1.09} readOnly />
+        <TextBoxBorderless value={cost.cost} readOnly />
+        {cost.details.map((fee) => (
+          <>
+            <Label className="text-sm">{fee.name}</Label>
+            <TextBoxBorderless value={fee.value} className="text-sm" readOnly />
+          </>
+        ))}
       </div>
     </div>
   );
