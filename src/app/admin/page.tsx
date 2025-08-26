@@ -5,10 +5,9 @@ import Target, { TargetInputs } from "./components/Target";
 import {
   bearableLossCalculator as lossCalculator,
   calculatePrimaryValues,
-  PrimaryValues,
-  State,
   expectedProfitCalculator as profitCalculator,
 } from "./helpers/calculator";
+import { State, PrimaryValues } from "./types";
 
 export default function AdminPage() {
   const state = useRef<State>({

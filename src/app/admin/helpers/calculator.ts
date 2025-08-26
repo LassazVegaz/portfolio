@@ -1,22 +1,4 @@
-export type PrimaryValues = {
-  unitBuyingPrice: number;
-  quantity: number;
-  totalBuyingPrice: number;
-};
-
-type TargetValues = {
-  totalTarget: number;
-  targetPU: number;
-  targetPercentage: number;
-  unitSellingPrice: number;
-  totalSellingPrice: number;
-};
-
-export type State = {
-  primaryValues: PrimaryValues;
-  profitTargetValues: TargetValues;
-  lossTargetValues: TargetValues;
-};
+import { PrimaryValues, TargetValues } from "../types";
 
 class Calculator {
   private readonly n: number;
