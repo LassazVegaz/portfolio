@@ -14,6 +14,14 @@ const defaultCost: Cost = {
   details: [],
 };
 
+const defaultTraget = {
+  totalTarget: "0",
+  targetPU: "0",
+  targetPercentage: "0",
+  unitSellingPrice: "0",
+  totalSellingPrice: "0",
+};
+
 export default function AdminPage() {
   const state = useRef<State>({
     primaryValues: {
@@ -43,21 +51,8 @@ export default function AdminPage() {
     totalBuyingPrice: "0",
   });
 
-  const [profitTarget, setProfitTarget] = useState<TargetInputs>({
-    totalTarget: "0",
-    targetPU: "0",
-    targetPercentage: "0",
-    unitSellingPrice: "0",
-    totalSellingPrice: "0",
-  });
-
-  const [lossTarget, setLossTarget] = useState<TargetInputs>({
-    totalTarget: "0",
-    targetPU: "0",
-    targetPercentage: "0",
-    unitSellingPrice: "0",
-    totalSellingPrice: "0",
-  });
+  const [profitTarget, setProfitTarget] = useState<TargetInputs>(defaultTraget);
+  const [lossTarget, setLossTarget] = useState<TargetInputs>(defaultTraget);
 
   const [buyingCost, setBuyingCost] = useState(defaultCost);
   const [profitCost, setProfitCost] = useState(defaultCost);
