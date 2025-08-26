@@ -1,13 +1,8 @@
 import { ChangeEventHandler } from "react";
 import { Label, TextBox, TextBoxBorderless } from "./FormsRelated";
+import { TargetValues } from "../types";
 
-export type TargetInputs = {
-  totalTarget: string;
-  targetPU: string;
-  targetPercentage: string;
-  unitSellingPrice: string;
-  totalSellingPrice: string;
-};
+export type TargetInputs = { [k in keyof TargetValues]: string };
 
 type TargetProps = {
   type: "profit" | "loss";
