@@ -3,11 +3,11 @@ import { ChangeEventHandler, useRef, useState } from "react";
 import { Label, TextBox, TextBoxBorderless } from "./components/FormsRelated";
 import Target, { TargetInputs } from "./components/Target";
 import {
-  calculateExpectedProfitPU,
+  bearableLossCalculator as lossCalculator,
   calculatePrimaryValues,
-  calculateTargetProfitValues,
   PrimaryValues,
   State,
+  expectedProfitCalculator as profitCalculator,
 } from "./helpers/calculator";
 
 export default function AdminPage() {
@@ -57,11 +57,12 @@ export default function AdminPage() {
 
   const onProfitTargetChange = (name: keyof TargetInputs, value: string) => {
     state.current.profitTargetValues[name] = parseFloat(value);
-    const expectedProfitPU = calculateExpectedProfitPU[name](
+    const expectedProfitPU = profitCalculator.calculateTargetPU(
+      name,
       state.current.profitTargetValues[name],
       state.current.primaryValues
     );
-    state.current.profitTargetValues = calculateTargetProfitValues(
+    state.current.profitTargetValues = profitCalculator.calculateTargetValues(
       state.current.primaryValues,
       expectedProfitPU
     );
@@ -80,7 +81,28 @@ export default function AdminPage() {
   };
 
   const onLossTargetChange = (name: keyof TargetInputs, value: string) => {
-    setLossTarget((prev) => ({ ...prev, [name]: value }));
+    state.current.lossTargetValues[name] = parseFloat(value);
+    const bearableLossPU = lossCalculator.calculateTargetPU(
+      name,
+      state.current.lossTargetValues[name],
+      state.current.primaryValues
+    );
+    state.current.lossTargetValues = lossCalculator.calculateTargetValues(
+      state.current.primaryValues,
+      bearableLossPU
+    );
+
+    setLossTarget({
+      totalTarget: state.current.lossTargetValues.totalTarget.toFixed(2),
+      targetPU: state.current.lossTargetValues.targetPU.toFixed(2),
+      targetPercentage:
+        state.current.lossTargetValues.targetPercentage.toString(),
+      unitSellingPrice:
+        state.current.lossTargetValues.unitSellingPrice.toFixed(2),
+      totalSellingPrice:
+        state.current.lossTargetValues.totalSellingPrice.toFixed(2),
+      [name]: value,
+    });
   };
 
   const onPrimaryFieldChange: ChangeEventHandler<HTMLInputElement> = (e) => {
@@ -102,7 +124,7 @@ export default function AdminPage() {
       [fieldName]: value,
     }));
 
-    state.current.profitTargetValues = calculateTargetProfitValues(
+    state.current.profitTargetValues = profitCalculator.calculateTargetValues(
       state.current.primaryValues,
       state.current.profitTargetValues.targetPU
     );
@@ -115,6 +137,21 @@ export default function AdminPage() {
         state.current.profitTargetValues.unitSellingPrice.toFixed(2),
       totalSellingPrice:
         state.current.profitTargetValues.totalSellingPrice.toFixed(2),
+    });
+
+    state.current.lossTargetValues = lossCalculator.calculateTargetValues(
+      state.current.primaryValues,
+      state.current.lossTargetValues.targetPU
+    );
+    setLossTarget({
+      totalTarget: state.current.lossTargetValues.totalTarget.toFixed(2),
+      targetPU: state.current.lossTargetValues.targetPU.toFixed(2),
+      targetPercentage:
+        state.current.lossTargetValues.targetPercentage.toString(),
+      unitSellingPrice:
+        state.current.lossTargetValues.unitSellingPrice.toFixed(2),
+      totalSellingPrice:
+        state.current.lossTargetValues.totalSellingPrice.toFixed(2),
     });
   };
 
