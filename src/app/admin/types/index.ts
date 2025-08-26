@@ -17,3 +17,14 @@ export type State = {
   profitTargetValues: TargetValues;
   lossTargetValues: TargetValues;
 };
+
+export type CostCalculator = {
+  name: string;
+  /**
+   * Calculate the fee
+   * @param amount Total number of shares. Can be fractional
+   * @param totalPrice The total price of the transaction
+   * @returns The fee
+   */
+  calculate: (amount: number, totalPrice: number) => number;
+};
