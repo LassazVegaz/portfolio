@@ -18,6 +18,59 @@ export type State = {
   lossTargetValues: TargetValues;
 };
 
+class Calculator {
+  private readonly n: number;
+
+  private readonly targetPUCalculators: Record<
+    keyof TargetValues,
+    (changedValue: number, primaryValues: PrimaryValues) => number
+  > = {
+    targetPercentage: (changedValue, primaryValues) =>
+      (changedValue * primaryValues.unitBuyingPrice) / 100,
+    unitSellingPrice: (changedValue, primaryValues) =>
+      (changedValue - primaryValues.unitBuyingPrice) * this.n,
+    totalSellingPrice: (changedValue, primaryValues) =>
+      ((changedValue - primaryValues.totalBuyingPrice) * this.n) /
+      primaryValues.quantity,
+    targetPU: (changedValue) => changedValue,
+    totalTarget: (changedValue, primaryValues) =>
+      changedValue / primaryValues.quantity,
+  };
+
+  constructor(type: "profit" | "loss") {
+    this.n = type === "profit" ? 1 : -1;
+  }
+
+  calculateTargetPU(
+    changedFieldName: keyof TargetValues,
+    changedValue: number,
+    primaryValues: PrimaryValues
+  ): number {
+    const calculator = this.targetPUCalculators[changedFieldName];
+    return calculator(changedValue, primaryValues);
+  }
+
+  calculateTargetValues(
+    primaryValues: PrimaryValues,
+    targetPU: number
+  ): TargetValues {
+    const { unitBuyingPrice, quantity, totalBuyingPrice } = primaryValues;
+
+    const totalTarget = targetPU * quantity;
+
+    return {
+      targetPU,
+      totalTarget,
+      unitSellingPrice: unitBuyingPrice + targetPU * this.n,
+      totalSellingPrice: totalBuyingPrice + totalTarget * this.n,
+      targetPercentage: (targetPU / unitBuyingPrice) * 100,
+    };
+  }
+}
+
+export const bearableLossCalculator = new Calculator("loss");
+export const expectedProfitCalculator = new Calculator("profit");
+
 /**
  * Calculate primary values when one of them change.
  * Key is the changed field name.\
@@ -39,38 +92,4 @@ export const calculatePrimaryValues: Record<
   totalBuyingPrice: (primaryValues) =>
     (primaryValues.unitBuyingPrice =
       primaryValues.totalBuyingPrice / primaryValues.quantity),
-};
-
-// if a Target Value change, recalculate the expected profit per unit. Expected profit per unit
-// is calculated using the changed value
-export const calculateExpectedProfitPU: Record<
-  keyof TargetValues,
-  (changedValue: number, primaryValues: PrimaryValues) => number
-> = {
-  targetPercentage: (changedValue, primaryValues) =>
-    (changedValue * primaryValues.unitBuyingPrice) / 100,
-  unitSellingPrice: (changedValue, primaryValues) =>
-    changedValue - primaryValues.unitBuyingPrice,
-  totalSellingPrice: (changedValue, primaryValues) =>
-    (changedValue - primaryValues.totalBuyingPrice) / primaryValues.quantity,
-  targetPU: (changedValue) => changedValue,
-  totalTarget: (changedValue, primaryValues) =>
-    changedValue / primaryValues.quantity,
-};
-
-export const calculateTargetProfitValues = (
-  primaryValues: PrimaryValues,
-  expectedProfitPU: number
-): TargetValues => {
-  const { unitBuyingPrice, quantity, totalBuyingPrice } = primaryValues;
-
-  const expectedTotalProfit = expectedProfitPU * quantity;
-
-  return {
-    targetPU: expectedProfitPU,
-    totalTarget: expectedTotalProfit,
-    unitSellingPrice: unitBuyingPrice + expectedProfitPU,
-    totalSellingPrice: totalBuyingPrice + expectedTotalProfit,
-    targetPercentage: (expectedProfitPU / unitBuyingPrice) * 100,
-  };
 };
