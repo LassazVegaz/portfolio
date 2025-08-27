@@ -1,64 +1,73 @@
 "use client";
 import { ChangeEventHandler, useRef, useState } from "react";
 import { Label, TextBox, TextBoxBorderless } from "./components/FormsRelated";
-import Target, { TargetInputs } from "./components/Target";
+import Target, { OnChange } from "./components/Target";
 import {
   bearableLossCalculator as lossCalculator,
   calculatePrimaryValues,
   expectedProfitCalculator as profitCalculator,
 } from "./helpers/calculator";
-import { State, PrimaryValues, Cost } from "./types";
+import { PrimaryInputs, PrimaryOutputs, State, TargetOutputs } from "./types";
+import { primaryMapper, targetMapper } from "./helpers/mappers";
 
-const defaultCost: Cost = {
-  cost: "0",
-  details: [],
-};
-
-const defaultTraget = {
+const defaultTargetOutput: TargetOutputs = {
   totalTarget: "0",
   targetPU: "0",
   targetPercentage: "0",
   unitSellingPrice: "0",
   totalSellingPrice: "0",
+  sellingCost: "0",
+  totalCost: "0",
+  costDetails: [],
+};
+
+const defaultState: State = {
+  primaryValues: {
+    unitBuyingPrice: 0,
+    quantity: 0,
+    totalBuyingPrice: 0,
+    buyingCost: 0,
+    costDetails: [],
+  },
+  profitTargetValues: {
+    totalTarget: 0,
+    targetPU: 0,
+    targetPercentage: 0,
+    unitSellingPrice: 0,
+    totalSellingPrice: 0,
+    sellingCost: 0,
+    totalCost: 0,
+    costDetails: [],
+  },
+  lossTargetValues: {
+    totalTarget: 0,
+    targetPU: 0,
+    targetPercentage: 0,
+    unitSellingPrice: 0,
+    totalSellingPrice: 0,
+    sellingCost: 0,
+    totalCost: 0,
+    costDetails: [],
+  },
+};
+
+const defaultPrimaryOutputs: PrimaryOutputs = {
+  unitBuyingPrice: "0",
+  quantity: "0",
+  totalBuyingPrice: "0",
+  buyingCost: "0",
+  costDetails: [],
 };
 
 export default function AdminPage() {
-  const state = useRef<State>({
-    primaryValues: {
-      unitBuyingPrice: 0,
-      quantity: 0,
-      totalBuyingPrice: 0,
-    },
-    profitTargetValues: {
-      totalTarget: 0,
-      targetPU: 0,
-      targetPercentage: 0,
-      unitSellingPrice: 0,
-      totalSellingPrice: 0,
-    },
-    lossTargetValues: {
-      totalTarget: 0,
-      targetPU: 0,
-      targetPercentage: 0,
-      unitSellingPrice: 0,
-      totalSellingPrice: 0,
-    },
-  });
+  const state = useRef<State>(defaultState);
 
-  const [primaryValues, setPrimaryValues] = useState({
-    unitBuyingPrice: "0",
-    quantity: "0",
-    totalBuyingPrice: "0",
-  });
+  const [primaryOutputs, setPrimaryOutputs] = useState(defaultPrimaryOutputs);
 
-  const [profitTarget, setProfitTarget] = useState<TargetInputs>(defaultTraget);
-  const [lossTarget, setLossTarget] = useState<TargetInputs>(defaultTraget);
+  const [profitTarget, setProfitTarget] = useState(defaultTargetOutput);
+  const [lossTarget, setLossTarget] = useState(defaultTargetOutput);
 
-  const [buyingCost, setBuyingCost] = useState(defaultCost);
-  const [profitCost, setProfitCost] = useState(defaultCost);
-  const [lossCost, setLossCost] = useState(defaultCost);
-
-  const onProfitTargetChange = (name: keyof TargetInputs, value: string) => {
+  const onProfitTargetChange: OnChange = (name, value) => {
     state.current.profitTargetValues[name] = parseFloat(value);
     const expectedProfitPU = profitCalculator.calculateTargetPU(
       name,
@@ -70,20 +79,10 @@ export default function AdminPage() {
       expectedProfitPU
     );
 
-    setProfitTarget({
-      totalTarget: state.current.profitTargetValues.totalTarget.toFixed(2),
-      targetPU: state.current.profitTargetValues.targetPU.toFixed(2),
-      targetPercentage:
-        state.current.profitTargetValues.targetPercentage.toString(),
-      unitSellingPrice:
-        state.current.profitTargetValues.unitSellingPrice.toFixed(2),
-      totalSellingPrice:
-        state.current.profitTargetValues.totalSellingPrice.toFixed(2),
-      [name]: value,
-    });
+    setProfitTarget(targetMapper(state.current.profitTargetValues));
   };
 
-  const onLossTargetChange = (name: keyof TargetInputs, value: string) => {
+  const onLossTargetChange: OnChange = (name, value) => {
     state.current.lossTargetValues[name] = parseFloat(value);
     const bearableLossPU = lossCalculator.calculateTargetPU(
       name,
@@ -95,67 +94,34 @@ export default function AdminPage() {
       bearableLossPU
     );
 
-    setLossTarget({
-      totalTarget: state.current.lossTargetValues.totalTarget.toFixed(2),
-      targetPU: state.current.lossTargetValues.targetPU.toFixed(2),
-      targetPercentage:
-        state.current.lossTargetValues.targetPercentage.toString(),
-      unitSellingPrice:
-        state.current.lossTargetValues.unitSellingPrice.toFixed(2),
-      totalSellingPrice:
-        state.current.lossTargetValues.totalSellingPrice.toFixed(2),
-      [name]: value,
-    });
+    setLossTarget(targetMapper(state.current.lossTargetValues));
   };
 
   const onPrimaryFieldChange: ChangeEventHandler<HTMLInputElement> = (e) => {
     const { name, value } = e.target;
-    setPrimaryValues((prev) => ({ ...prev, [name]: value }));
+    setPrimaryOutputs((prev) => ({ ...prev, [name]: value }));
 
-    if (!(name in primaryValues)) return;
-    const fieldName = name as keyof PrimaryValues;
+    if (!(name in primaryOutputs)) return;
+    const fieldName = name as keyof PrimaryInputs;
 
     const fieldValue = parseFloat(value);
     if (isNaN(fieldValue)) return;
 
     state.current.primaryValues[fieldName] = fieldValue;
-    calculatePrimaryValues[fieldName](state.current.primaryValues);
-    setPrimaryValues(() => ({
-      unitBuyingPrice: state.current.primaryValues.unitBuyingPrice.toFixed(2),
-      quantity: state.current.primaryValues.quantity.toString(),
-      totalBuyingPrice: state.current.primaryValues.totalBuyingPrice.toFixed(2),
-      [fieldName]: value,
-    }));
+    calculatePrimaryValues(fieldName, state.current.primaryValues);
+    setPrimaryOutputs(primaryMapper(state.current.primaryValues));
 
     state.current.profitTargetValues = profitCalculator.calculateTargetValues(
       state.current.primaryValues,
       state.current.profitTargetValues.targetPU
     );
-    setProfitTarget({
-      totalTarget: state.current.profitTargetValues.totalTarget.toFixed(2),
-      targetPU: state.current.profitTargetValues.targetPU.toFixed(2),
-      targetPercentage:
-        state.current.profitTargetValues.targetPercentage.toString(),
-      unitSellingPrice:
-        state.current.profitTargetValues.unitSellingPrice.toFixed(2),
-      totalSellingPrice:
-        state.current.profitTargetValues.totalSellingPrice.toFixed(2),
-    });
+    setProfitTarget(targetMapper(state.current.profitTargetValues));
 
     state.current.lossTargetValues = lossCalculator.calculateTargetValues(
       state.current.primaryValues,
       state.current.lossTargetValues.targetPU
     );
-    setLossTarget({
-      totalTarget: state.current.lossTargetValues.totalTarget.toFixed(2),
-      targetPU: state.current.lossTargetValues.targetPU.toFixed(2),
-      targetPercentage:
-        state.current.lossTargetValues.targetPercentage.toString(),
-      unitSellingPrice:
-        state.current.lossTargetValues.unitSellingPrice.toFixed(2),
-      totalSellingPrice:
-        state.current.lossTargetValues.totalSellingPrice.toFixed(2),
-    });
+    setLossTarget(targetMapper(state.current.lossTargetValues));
   };
 
   return (
@@ -167,37 +133,35 @@ export default function AdminPage() {
           <Label>Unit buying price</Label>
           <TextBox
             name="unitBuyingPrice"
-            value={primaryValues.unitBuyingPrice}
+            value={primaryOutputs.unitBuyingPrice}
             onChange={onPrimaryFieldChange}
           />
           <Label>Quantity</Label>
           <TextBox
             name="quantity"
-            value={primaryValues.quantity}
+            value={primaryOutputs.quantity}
             onChange={onPrimaryFieldChange}
           />
           <Label>Total buying price</Label>
           <TextBox
             name="totalBuyingPrice"
-            value={primaryValues.totalBuyingPrice}
+            value={primaryOutputs.totalBuyingPrice}
             onChange={onPrimaryFieldChange}
           />
           <Label>Cost </Label>
-          <TextBoxBorderless value={buyingCost.cost} readOnly />
+          <TextBoxBorderless value={primaryOutputs.buyingCost} readOnly />
         </div>
       </div>
 
       <div className="mt-14 grid xl:grid-cols-2 justify-center xl:justify-normal gap-y-20">
         <Target
           type="profit"
-          inputs={profitTarget}
-          cost={profitCost}
+          targetDetails={profitTarget}
           onChange={onProfitTargetChange}
         />
         <Target
           type="loss"
-          inputs={lossTarget}
-          cost={lossCost}
+          targetDetails={lossTarget}
           onChange={onLossTargetChange}
         />
       </div>

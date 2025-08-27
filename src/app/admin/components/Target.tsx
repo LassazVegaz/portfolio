@@ -1,22 +1,12 @@
 import { ChangeEventHandler } from "react";
 import { Label, TextBox, TextBoxBorderless } from "./FormsRelated";
-import { TargetValues } from "../types";
+import { TargetOutputs, TargetInputs } from "../types";
 
-type CostDetailOutput = {
-  [k in keyof TargetValues["costDetails"][number]]: string;
-};
-
-export type TargetDetails = {
-  [k in keyof Omit<TargetValues, "costDetails">]: string;
-} & { [k in keyof Pick<TargetValues, "costDetails">]: CostDetailOutput[] };
-
-type Inputs = Omit<TargetValues, "sellingCost" | "totalCost" | "costDetails">;
-
-export type OnChange = (name: keyof Inputs, value: string) => void;
+export type OnChange = (name: keyof TargetInputs, value: string) => void;
 
 type TargetProps = {
   type: "profit" | "loss";
-  targetDetails: TargetDetails;
+  targetDetails: TargetOutputs;
   onChange: OnChange;
 };
 
@@ -26,7 +16,7 @@ export default function Target({ targetDetails, ...props }: TargetProps) {
   const onFieldChange: ChangeEventHandler<HTMLInputElement> = (e) => {
     const { name, value } = e.target;
     if (name in targetDetails) {
-      props.onChange(name as keyof Inputs, value);
+      props.onChange(name as keyof TargetInputs, value);
     }
   };
 

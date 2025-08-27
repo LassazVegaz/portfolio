@@ -3,6 +3,11 @@ export type CostDetail = {
   value: number;
 };
 
+/** How a cost detail are sent to the view */
+export type CostDetailOutput = {
+  [k in keyof PrimaryValues["costDetails"][number]]: string;
+};
+
 export type PrimaryValues = {
   unitBuyingPrice: number;
   quantity: number;
@@ -10,6 +15,14 @@ export type PrimaryValues = {
   buyingCost: number;
   costDetails: CostDetail[];
 };
+
+/** Primary values that can be changed by the user */
+export type PrimaryInputs = Omit<PrimaryValues, "buyingCost" | "costDetails">;
+
+/* How primary values are sent to the view */
+export type PrimaryOutputs = {
+  [k in keyof Omit<PrimaryValues, "costDetails">]: string;
+} & { [k in keyof Pick<PrimaryValues, "costDetails">]: CostDetailOutput[] };
 
 export type TargetValues = {
   totalTarget: number;
@@ -24,6 +37,17 @@ export type TargetValues = {
   /** Selling cost details */
   costDetails: CostDetail[];
 };
+
+/** Target values that can be changed by the user */
+export type TargetInputs = Omit<
+  TargetValues,
+  "sellingCost" | "totalCost" | "costDetails"
+>;
+
+/**How Target values are sent to the view */
+export type TargetOutputs = {
+  [k in keyof Omit<TargetValues, "costDetails">]: string;
+} & { [k in keyof Pick<TargetValues, "costDetails">]: CostDetailOutput[] };
 
 export type State = {
   primaryValues: PrimaryValues;
