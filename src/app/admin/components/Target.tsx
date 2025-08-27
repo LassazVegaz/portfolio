@@ -1,23 +1,32 @@
 import { ChangeEventHandler } from "react";
 import { Label, TextBox, TextBoxBorderless } from "./FormsRelated";
-import { Cost, TargetValues } from "../types";
+import { TargetValues } from "../types";
 
-export type TargetInputs = { [k in keyof TargetValues]: string };
+type CostDetailOutput = {
+  [k in keyof TargetValues["costDetails"][number]]: string;
+};
+
+export type TargetDetails = {
+  [k in keyof Omit<TargetValues, "costDetails">]: string;
+} & { [k in keyof Pick<TargetValues, "costDetails">]: CostDetailOutput[] };
+
+type Inputs = Omit<TargetValues, "sellingCost" | "totalCost" | "costDetails">;
+
+export type OnChange = (name: keyof Inputs, value: string) => void;
 
 type TargetProps = {
   type: "profit" | "loss";
-  inputs: TargetInputs;
-  cost: Cost;
-  onChange: (name: keyof TargetInputs, value: string) => void;
+  targetDetails: TargetDetails;
+  onChange: OnChange;
 };
 
-export default function Target({ inputs, cost, ...props }: TargetProps) {
+export default function Target({ targetDetails, ...props }: TargetProps) {
   const isProfit = props.type === "profit";
 
   const onFieldChange: ChangeEventHandler<HTMLInputElement> = (e) => {
     const { name, value } = e.target;
-    if (name in inputs) {
-      props.onChange(name as keyof TargetInputs, value);
+    if (name in targetDetails) {
+      props.onChange(name as keyof Inputs, value);
     }
   };
 
@@ -33,13 +42,13 @@ export default function Target({ inputs, cost, ...props }: TargetProps) {
           </Label>
           <TextBox
             name="totalTarget"
-            value={inputs.totalTarget}
+            value={targetDetails.totalTarget}
             onChange={onFieldChange}
           />
         </div>
         <TextBox
           name="targetPercentage"
-          value={inputs.targetPercentage}
+          value={targetDetails.targetPercentage}
           onChange={onFieldChange}
         />
         <Label>%</Label>
@@ -48,27 +57,29 @@ export default function Target({ inputs, cost, ...props }: TargetProps) {
         <Label>{isProfit ? "Expected profit PU" : "Bearable loss PU"}</Label>
         <TextBox
           name="targetPU"
-          value={inputs.targetPU}
+          value={targetDetails.targetPU}
           onChange={onFieldChange}
         />
         <Label>Unit selling price</Label>
         <TextBox
           name="unitSellingPrice"
-          value={inputs.unitSellingPrice}
+          value={targetDetails.unitSellingPrice}
           onChange={onFieldChange}
         />
         <Label>Total selling price</Label>
         <TextBox
           name="totalSellingPrice"
-          value={inputs.totalSellingPrice}
+          value={targetDetails.totalSellingPrice}
           onChange={onFieldChange}
         />
       </div>
 
       <div className="w-[400px] grid grid-cols-2 items-center mt-6">
-        <Label>Cost</Label>
-        <TextBoxBorderless value={cost.cost} readOnly />
-        {cost.details.map((fee) => (
+        <Label>Selling cost</Label>
+        <TextBoxBorderless value={targetDetails.sellingCost} readOnly />
+        <Label>Total cost</Label>
+        <TextBoxBorderless value={targetDetails.totalCost} readOnly />
+        {targetDetails.costDetails.map((fee) => (
           <>
             <Label className="text-sm">{fee.name}</Label>
             <TextBoxBorderless value={fee.value} className="text-sm" readOnly />
