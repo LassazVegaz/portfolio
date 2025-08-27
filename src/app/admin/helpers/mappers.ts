@@ -62,6 +62,7 @@ export function targetMapper(
     totalCost: data.totalCost.toFixed(2),
     costDetails: data.costDetails.map(mapCostDetail),
     totalSellingPriceAC: data.totalSellingPriceAC.toFixed(2),
+    unitSellingPriceAC: data.unitSellingPriceAC.toFixed(2),
   };
 
   if (changedField && changedValue) {

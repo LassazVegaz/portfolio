@@ -19,6 +19,7 @@ const defaultTargetOutput: TargetOutputs = {
   sellingCost: "0",
   totalCost: "0",
   totalSellingPriceAC: "0",
+  unitSellingPriceAC: "0",
   costDetails: [],
 };
 
@@ -39,6 +40,7 @@ const defaultState: State = {
     sellingCost: 0,
     totalCost: 0,
     totalSellingPriceAC: 0,
+    unitSellingPriceAC: 0,
     costDetails: [],
   },
   lossTargetValues: {
@@ -50,6 +52,7 @@ const defaultState: State = {
     sellingCost: 0,
     totalCost: 0,
     totalSellingPriceAC: 0,
+    unitSellingPriceAC: 0,
     costDetails: [],
   },
 };

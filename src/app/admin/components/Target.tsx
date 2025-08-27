@@ -78,6 +78,8 @@ export default function Target({ targetDetails, ...props }: TargetProps) {
         <TextBoxBorderless value={targetDetails.totalCost} readOnly />
         <Label>Total selling price {isProfit ? "AC" : "BC"}</Label>
         <TextBoxBorderless value={targetDetails.totalSellingPriceAC} readOnly />
+        <Label>Unit selling price {isProfit ? "AC" : "BC"}</Label>
+        <TextBoxBorderless value={targetDetails.unitSellingPriceAC} readOnly />
       </div>
     </div>
   );
