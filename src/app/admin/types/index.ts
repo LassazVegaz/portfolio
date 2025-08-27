@@ -36,12 +36,14 @@ export type TargetValues = {
   totalCost: number;
   /** Selling cost details */
   costDetails: CostDetail[];
+  /** Total selling price after all costs */
+  totalSellingPriceAC: number;
 };
 
 /** Target values that can be changed by the user */
 export type TargetInputs = Omit<
   TargetValues,
-  "sellingCost" | "totalCost" | "costDetails"
+  "sellingCost" | "totalCost" | "costDetails" | "totalSellingPriceAC"
 >;
 
 /**How Target values are sent to the view */

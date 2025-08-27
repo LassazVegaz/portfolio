@@ -48,6 +48,7 @@ class Calculator {
     const totalTarget = targetPU * quantity;
     const totalSellingPrice = totalBuyingPrice + totalTarget * this.n;
     const sellingCost = calculateCost(quantity, totalSellingPrice);
+    const totalCost = buyingCost + sellingCost.totalCost;
 
     return {
       targetPU,
@@ -57,7 +58,8 @@ class Calculator {
       targetPercentage: (targetPU / unitBuyingPrice) * 100,
       costDetails: sellingCost.details,
       sellingCost: sellingCost.totalCost,
-      totalCost: buyingCost + sellingCost.totalCost,
+      totalCost,
+      totalSellingPriceAC: totalSellingPrice + totalCost,
     };
   }
 }

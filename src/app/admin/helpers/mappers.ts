@@ -35,4 +35,5 @@ export const targetMapper = (data: TargetValues): TargetOutputs => ({
   sellingCost: data.sellingCost.toFixed(2),
   totalCost: data.totalCost.toFixed(2),
   costDetails: data.costDetails.map(mapCostDetail),
+  totalSellingPriceAC: data.totalSellingPriceAC.toFixed(2),
 });
