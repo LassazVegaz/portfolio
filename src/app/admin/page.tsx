@@ -1,5 +1,5 @@
 "use client";
-import { ChangeEventHandler, useRef, useState } from "react";
+import { ChangeEventHandler, useCallback, useRef, useState } from "react";
 import { Label, TextBox, TextBoxBorderless } from "./components/FormsRelated";
 import Target, { OnChange } from "./components/Target";
 import {
@@ -74,7 +74,7 @@ export default function AdminPage() {
   const [profitTarget, setProfitTarget] = useState(defaultTargetOutput);
   const [lossTarget, setLossTarget] = useState(defaultTargetOutput);
 
-  const onProfitTargetChange: OnChange = (name, value) => {
+  const onProfitTargetChange = useCallback<OnChange>((name, value) => {
     state.current.profitTargetValues[name] = parseFloat(value);
     const expectedProfitPU = profitCalculator.calculateTargetPU(
       name,
@@ -89,9 +89,9 @@ export default function AdminPage() {
     setProfitTarget(
       targetMapper(state.current.profitTargetValues, name, value)
     );
-  };
+  }, []);
 
-  const onLossTargetChange: OnChange = (name, value) => {
+  const onLossTargetChange = useCallback<OnChange>((name, value) => {
     state.current.lossTargetValues[name] = parseFloat(value);
     const bearableLossPU = lossCalculator.calculateTargetPU(
       name,
@@ -104,13 +104,15 @@ export default function AdminPage() {
     );
 
     setLossTarget(targetMapper(state.current.lossTargetValues, name, value));
-  };
+  }, []);
 
-  const onPrimaryFieldChange: ChangeEventHandler<HTMLInputElement> = (e) => {
+  const onPrimaryFieldChange = useCallback<
+    ChangeEventHandler<HTMLInputElement>
+  >((e) => {
     const { name, value } = e.target;
     setPrimaryOutputs((prev) => ({ ...prev, [name]: value }));
 
-    if (!(name in primaryOutputs)) return;
+    if (!(name in defaultPrimaryOutputs)) return;
     const fieldName = name as keyof PrimaryInputs;
 
     const fieldValue = parseFloat(value);
@@ -135,7 +137,7 @@ export default function AdminPage() {
       state.current.lossTargetValues.targetPU
     );
     setLossTarget(targetMapper(state.current.lossTargetValues));
-  };
+  }, []);
 
   return (
     <div className="px-20 py-2">
