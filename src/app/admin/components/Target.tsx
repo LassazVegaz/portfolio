@@ -1,4 +1,4 @@
-import { ChangeEventHandler } from "react";
+import { ChangeEventHandler, Fragment } from "react";
 import { Label, TextBox, TextBoxBorderless } from "./FormsRelated";
 import { TargetOutputs, TargetInputs } from "../types";
 
@@ -70,10 +70,10 @@ export default function Target({ targetDetails, ...props }: TargetProps) {
         <Label>Total cost</Label>
         <TextBoxBorderless value={targetDetails.totalCost} readOnly />
         {targetDetails.costDetails.map((fee) => (
-          <>
+          <Fragment key={fee.name}>
             <Label className="text-sm">{fee.name}</Label>
             <TextBoxBorderless value={fee.value} className="text-sm" readOnly />
-          </>
+          </Fragment>
         ))}
       </div>
     </div>
