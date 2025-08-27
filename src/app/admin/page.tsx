@@ -83,7 +83,9 @@ export default function AdminPage() {
       expectedProfitPU
     );
 
-    setProfitTarget(targetMapper(state.current.profitTargetValues));
+    setProfitTarget(
+      targetMapper(state.current.profitTargetValues, name, value)
+    );
   };
 
   const onLossTargetChange: OnChange = (name, value) => {
@@ -98,7 +100,7 @@ export default function AdminPage() {
       bearableLossPU
     );
 
-    setLossTarget(targetMapper(state.current.lossTargetValues));
+    setLossTarget(targetMapper(state.current.lossTargetValues, name, value));
   };
 
   const onPrimaryFieldChange: ChangeEventHandler<HTMLInputElement> = (e) => {
@@ -115,7 +117,9 @@ export default function AdminPage() {
 
     state.current.primaryValues[fieldName] = fieldValue;
     calculatePrimaryValues(fieldName, state.current.primaryValues);
-    setPrimaryOutputs(primaryMapper(state.current.primaryValues));
+    setPrimaryOutputs(
+      primaryMapper(state.current.primaryValues, fieldName, value)
+    );
 
     state.current.profitTargetValues = profitCalculator.calculateTargetValues(
       state.current.primaryValues,
