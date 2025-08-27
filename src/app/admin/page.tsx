@@ -63,6 +63,7 @@ export default function AdminPage() {
   const state = useRef<State>(defaultState);
 
   const [primaryOutputs, setPrimaryOutputs] = useState(defaultPrimaryOutputs);
+  const [notFractional, setNotFractional] = useState(true);
 
   const [profitTarget, setProfitTarget] = useState(defaultTargetOutput);
   const [lossTarget, setLossTarget] = useState(defaultTargetOutput);
@@ -106,6 +107,8 @@ export default function AdminPage() {
 
     const fieldValue = parseFloat(value);
     if (isNaN(fieldValue)) return;
+
+    if (fieldName === "quantity") setNotFractional(fieldValue >= 1);
 
     state.current.primaryValues[fieldName] = fieldValue;
     calculatePrimaryValues(fieldName, state.current.primaryValues);
@@ -157,11 +160,13 @@ export default function AdminPage() {
         <Target
           type="profit"
           targetDetails={profitTarget}
+          showTargetPU={notFractional}
           onChange={onProfitTargetChange}
         />
         <Target
           type="loss"
           targetDetails={lossTarget}
+          showTargetPU={notFractional}
           onChange={onLossTargetChange}
         />
       </div>

@@ -7,6 +7,7 @@ export type OnChange = (name: keyof TargetInputs, value: string) => void;
 type TargetProps = {
   type: "profit" | "loss";
   targetDetails: TargetOutputs;
+  showTargetPU: boolean;
   onChange: OnChange;
 };
 
@@ -44,12 +45,18 @@ export default function Target({ targetDetails, ...props }: TargetProps) {
         <Label>%</Label>
       </div>
       <div className="w-[400px] grid grid-cols-2 gap-y-2 items-center mt-2">
-        <Label>{isProfit ? "Expected profit PU" : "Bearable loss PU"}</Label>
-        <TextBox
-          name="targetPU"
-          value={targetDetails.targetPU}
-          onChange={onFieldChange}
-        />
+        {props.showTargetPU && (
+          <>
+            <Label>
+              {isProfit ? "Expected profit PU" : "Bearable loss PU"}
+            </Label>
+            <TextBox
+              name="targetPU"
+              value={targetDetails.targetPU}
+              onChange={onFieldChange}
+            />
+          </>
+        )}
         <Label>Unit selling price</Label>
         <TextBox
           name="unitSellingPrice"
