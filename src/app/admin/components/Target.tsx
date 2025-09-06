@@ -22,7 +22,7 @@ export default function Target({ targetDetails, ...props }: TargetProps) {
   };
 
   return (
-    <div className={`${!isProfit ? "xl:justify-self-end" : ""}`}>
+    <div className={`${!isProfit ? "lg:justify-self-end" : ""}`}>
       <div className="grid grid-cols-2 gap-y-2 items-center max-w-[400px] w-full">
         <Label>
           {isProfit ? "Total expected profit" : "Total bearable loss"}

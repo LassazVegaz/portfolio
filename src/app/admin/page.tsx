@@ -140,8 +140,8 @@ export default function AdminPage() {
   }, []);
 
   return (
-    <div className="md:px-20 py-4 md:py-2">
-      <h1 className="text-2xl md:text-3xl font-bold text-center">
+    <div className="lg:px-20 py-4">
+      <h1 className="text-2xl sm:text-3xl font-bold text-center">
         Stocks Calculator
       </h1>
 
@@ -170,7 +170,7 @@ export default function AdminPage() {
         </div>
       </div>
 
-      <div className="mt-14 grid xl:grid-cols-2 justify-center xl:justify-normal gap-y-20">
+      <div className="mt-14 grid lg:grid-cols-2 justify-center gap-y-20">
         <Target
           type="profit"
           targetDetails={profitTarget}
