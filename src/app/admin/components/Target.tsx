@@ -33,7 +33,7 @@ export default function Target({ targetDetails, ...props }: TargetProps) {
           onChange={onFieldChange}
         />
         <Label>
-          {isProfit ? "Profit as a percentage" : "Profit as a percentage"}
+          {isProfit ? "Profit as a percentage" : "Loss as a percentage"}
         </Label>
         <TextBox
           name="targetPercentage"
