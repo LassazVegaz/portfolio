@@ -22,29 +22,24 @@ export default function Target({ targetDetails, ...props }: TargetProps) {
   };
 
   return (
-    <div
-      className={`pl-[72px] xl:pl-0 ${!isProfit ? "xl:justify-self-end" : ""}`}
-    >
-      <div className="w-[480px] grid grid-cols-[400px_50px_auto] items-center gap-2">
-        {/* if gap or any width related props are changing, mind the padding left of the parent */}
-        <div className="grid grid-cols-2 items-center">
-          <Label>
-            {isProfit ? "Total expected profit" : "Total bearable loss"}
-          </Label>
-          <TextBox
-            name="totalTarget"
-            value={targetDetails.totalTarget}
-            onChange={onFieldChange}
-          />
-        </div>
+    <div className={`${!isProfit ? "lg:justify-self-end" : ""}`}>
+      <div className="grid grid-cols-2 gap-y-2 items-center max-w-[400px] w-full">
+        <Label>
+          {isProfit ? "Total expected profit" : "Total bearable loss"}
+        </Label>
+        <TextBox
+          name="totalTarget"
+          value={targetDetails.totalTarget}
+          onChange={onFieldChange}
+        />
+        <Label>
+          {isProfit ? "Profit as a percentage" : "Profit as a percentage"}
+        </Label>
         <TextBox
           name="targetPercentage"
           value={targetDetails.targetPercentage}
           onChange={onFieldChange}
         />
-        <Label>%</Label>
-      </div>
-      <div className="w-[400px] grid grid-cols-2 gap-y-2 items-center mt-2">
         {props.showTargetPU && (
           <>
             <Label>
@@ -71,7 +66,7 @@ export default function Target({ targetDetails, ...props }: TargetProps) {
         />
       </div>
 
-      <div className="w-[400px] grid grid-cols-2 items-center mt-6">
+      <div className="max-w-[400px] w-full grid grid-cols-2 items-center mt-6">
         <Label>Selling cost</Label>
         <TextBoxBorderless value={targetDetails.sellingCost} readOnly />
         <Label>Total cost</Label>
