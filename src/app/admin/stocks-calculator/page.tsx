@@ -9,6 +9,8 @@ import {
 } from "./helpers/calculator";
 import { PrimaryInputs, PrimaryOutputs, State, TargetOutputs } from "./types";
 import { primaryMapper, targetMapper } from "./helpers/mappers";
+import PageContainer from "@/components/PageContainer";
+import Header1 from "@/components/Header1";
 
 const defaultTargetOutput: TargetOutputs = {
   totalTarget: "0",
@@ -140,10 +142,8 @@ export default function AdminPage() {
   }, []);
 
   return (
-    <div className="lg:px-20 py-4">
-      <h1 className="text-2xl sm:text-3xl font-bold text-center">
-        Stocks Calculator
-      </h1>
+    <PageContainer className="lg:px-20">
+      <Header1>Stocks Calculator</Header1>
 
       <div className="mt-14 flex justify-center">
         <div className="grid grid-cols-2 gap-y-2 items-center max-w-[400px] w-full">
@@ -184,6 +184,6 @@ export default function AdminPage() {
           onChange={onLossTargetChange}
         />
       </div>
-    </div>
+    </PageContainer>
   );
 }
