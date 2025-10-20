@@ -5,7 +5,7 @@ import Link from "next/link";
 const AppCard = (props: { href: string; children: React.ReactNode }) => (
   <Link
     href={props.href}
-    className="dark:bg-black border-2 dark:border-white rounded p-1 w-32 h-32 flex items-center text-center md:text-lg font-semibold hover:dark:bg-white hover:dark:text-black transition-all duration-1000 odd:justify-self-end"
+    className="bg-black border-2 border-white rounded p-1 w-32 h-32 flex items-center text-center md:text-lg font-semibold hover:bg-white hover:text-black transition-all duration-1000 odd:justify-self-end"
   >
     {props.children}
   </Link>

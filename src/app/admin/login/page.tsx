@@ -14,7 +14,10 @@ export default function LoginPage() {
 
         <input type="email" className="p-2 border border-gray-300 rounded" />
         <input type="password" className="p-2 border border-gray-300 rounded" />
-        <button type="submit" className="bg-blue-500 text-white p-2 rounded">
+        <button
+          type="submit"
+          className="bg-blue-500 text-white p-2 rounded cursor-pointer"
+        >
           Login
         </button>
       </form>
