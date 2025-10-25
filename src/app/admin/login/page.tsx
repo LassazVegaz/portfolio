@@ -12,8 +12,16 @@ export default function LoginPage() {
           section.
         </p>
 
-        <input type="email" className="p-2 border border-gray-300 rounded" />
-        <input type="password" className="p-2 border border-gray-300 rounded" />
+        <input
+          type="text"
+          name="username"
+          className="p-2 border border-gray-300 rounded"
+        />
+        <input
+          type="password"
+          name="password"
+          className="p-2 border border-gray-300 rounded"
+        />
         <button
           type="submit"
           className="bg-blue-500 text-white p-2 rounded cursor-pointer"
