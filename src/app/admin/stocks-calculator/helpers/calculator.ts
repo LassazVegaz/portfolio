@@ -4,7 +4,7 @@ import {
   TargetInputs,
   TargetValues,
 } from "../types";
-import calculateCost from "./cost-calculators";
+import calculateCost from "./fee-calculators";
 
 class Calculator {
   private readonly n: number;
