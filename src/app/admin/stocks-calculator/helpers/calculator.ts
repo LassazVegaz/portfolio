@@ -4,7 +4,7 @@ import {
   TargetInputs,
   TargetValues,
 } from "../types";
-import calculateCost from "./fee-calculators";
+import calculateFees from "./fee-calculators";
 
 class Calculator {
   private readonly n: number;
@@ -42,13 +42,17 @@ class Calculator {
     primaryValues: PrimaryValues,
     targetPU: number
   ): TargetValues {
-    const { unitBuyingPrice, quantity, totalBuyingPrice, buyingCost } =
-      primaryValues;
+    const {
+      unitBuyingPrice,
+      quantity,
+      totalBuyingPrice,
+      buyingFees: buyingCost,
+    } = primaryValues;
 
     const totalTarget = targetPU * quantity;
     const totalSellingPrice = totalBuyingPrice + totalTarget * this.n;
-    const sellingCost = calculateCost(quantity, totalSellingPrice);
-    const totalCost = buyingCost + sellingCost.totalCost;
+    const sellingCost = calculateFees(quantity, totalSellingPrice);
+    const totalCost = buyingCost + sellingCost.totalFees;
     const totalSellingPriceAC = totalSellingPrice + totalCost;
 
     return {
@@ -57,11 +61,11 @@ class Calculator {
       unitSellingPrice: unitBuyingPrice + targetPU * this.n,
       totalSellingPrice: totalSellingPrice,
       targetPercentage: (targetPU / unitBuyingPrice) * 100,
-      costDetails: sellingCost.details,
-      sellingCost: sellingCost.totalCost,
-      totalCost,
-      totalSellingPriceAC,
-      unitSellingPriceAC: totalSellingPriceAC / quantity,
+      feeDetails: sellingCost.details,
+      sellingFees: sellingCost.totalFees,
+      totalFees: totalCost,
+      totalSellingPriceAF: totalSellingPriceAC,
+      unitSellingPriceAF: totalSellingPriceAC / quantity,
     };
   }
 }
@@ -97,10 +101,10 @@ export const calculatePrimaryValues = (
   primaryValues: PrimaryValues
 ) => {
   primaryValuesCalculator[changedField](primaryValues);
-  const cost = calculateCost(
+  const cost = calculateFees(
     primaryValues.quantity,
     primaryValues.totalBuyingPrice
   );
-  primaryValues.buyingCost = cost.totalCost;
-  primaryValues.costDetails = cost.details;
+  primaryValues.buyingFees = cost.totalFees;
+  primaryValues.feeDetails = cost.details;
 };

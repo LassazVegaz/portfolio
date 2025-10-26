@@ -68,13 +68,13 @@ export default function Target({ targetDetails, ...props }: TargetProps) {
 
       <div className="max-w-[400px] w-full grid grid-cols-2 items-center mt-6">
         <Label>Selling cost</Label>
-        <TextBoxBorderless value={targetDetails.sellingCost} readOnly />
+        <TextBoxBorderless value={targetDetails.sellingFees} readOnly />
         <Label>Total cost</Label>
-        <TextBoxBorderless value={targetDetails.totalCost} readOnly />
-        <Label>Total selling price {isProfit ? "AC" : "BC"}</Label>
-        <TextBoxBorderless value={targetDetails.totalSellingPriceAC} readOnly />
-        <Label>Unit selling price {isProfit ? "AC" : "BC"}</Label>
-        <TextBoxBorderless value={targetDetails.unitSellingPriceAC} readOnly />
+        <TextBoxBorderless value={targetDetails.totalFees} readOnly />
+        <Label>Total selling price {isProfit ? "AF" : "BF"}</Label>
+        <TextBoxBorderless value={targetDetails.totalSellingPriceAF} readOnly />
+        <Label>Unit selling price {isProfit ? "AF" : "BF"}</Label>
+        <TextBoxBorderless value={targetDetails.unitSellingPriceAF} readOnly />
       </div>
     </div>
   );

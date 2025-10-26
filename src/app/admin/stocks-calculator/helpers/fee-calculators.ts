@@ -1,6 +1,6 @@
-import { CostCalculator, CostDetail } from "../types";
+import { FeeCalculator, FeeDetail } from "../types";
 
-export const costCalculators: CostCalculator[] = [
+export const feeCalculators: FeeCalculator[] = [
   {
     name: "Platform fees",
     calculate: (amount: number, totalPrice: number) => {
@@ -41,20 +41,20 @@ export const costCalculators: CostCalculator[] = [
   },
 ];
 
-export default function calculateCost(amount: number, totalPrice: number) {
-  const details: CostDetail[] = [];
-  let totalCost = 0;
+export default function calculateFees(amount: number, totalPrice: number) {
+  const details: FeeDetail[] = [];
+  let totalFees = 0;
 
-  for (const calculator of costCalculators) {
+  for (const calculator of feeCalculators) {
     const fee = calculator.calculate(amount, totalPrice);
     if (fee > 0) {
       details.push({ name: calculator.name, value: fee });
-      totalCost += fee;
+      totalFees += fee;
     }
   }
 
   return {
-    totalCost,
+    totalFees,
     details,
   };
 }
