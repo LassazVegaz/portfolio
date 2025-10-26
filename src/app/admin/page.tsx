@@ -1,6 +1,7 @@
 import PageContainer from "@/components/PageContainer";
 import Header1 from "@/components/Header1";
 import Link from "next/link";
+import routingService from "@/services/routing-service";
 
 const AppCard = (props: { href: string; children: React.ReactNode }) => (
   <Link
@@ -11,7 +12,9 @@ const AppCard = (props: { href: string; children: React.ReactNode }) => (
   </Link>
 );
 
-export default function AdminPage() {
+export default async function AdminPage() {
+  await routingService.unauthorizedRedirection();
+
   return (
     <PageContainer className="grid grid-rows-[auto_1fr] items-center h-screen">
       <Header1>Apps</Header1>

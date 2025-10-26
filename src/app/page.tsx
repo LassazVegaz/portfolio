@@ -1,3 +1,4 @@
+import routingService from "@/services/routing-service";
 import Footer from "./components/Footer";
 import {
   SectionIntro,
@@ -5,7 +6,10 @@ import {
   SectionTimeline,
 } from "./components/Sections";
 
-export default function Home() {
+export default async function Home() {
+  // if admin is logged in, directly send the admin to relevant admin page
+  await routingService.authorizedRedirection();
+
   return (
     <>
       <SectionIntro />
