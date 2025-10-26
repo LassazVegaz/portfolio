@@ -35,10 +35,6 @@ export const feeCalculators: FeeCalculator[] = [
     name: "Consolidated Audit Trail Fee",
     calculate: (amount: number) => 0.000046 * amount,
   },
-  {
-    name: "ADR Custodian Fees",
-    calculate: (amount: number) => 0.03 * amount,
-  },
 ];
 
 const calculateTax = (totalFees: number) => {
