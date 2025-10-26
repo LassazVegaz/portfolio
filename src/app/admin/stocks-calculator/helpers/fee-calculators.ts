@@ -33,7 +33,7 @@ export const feeCalculators: FeeCalculator[] = [
   },
   {
     name: "Consolidated Audit Trail Fee",
-    calculate: (amount: number) => 0.000046 * amount,
+    calculate: (amount: number) => 0.0000265 * amount,
   },
 ];
 
