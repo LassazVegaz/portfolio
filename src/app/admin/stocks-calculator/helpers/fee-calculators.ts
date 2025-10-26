@@ -41,6 +41,11 @@ export const feeCalculators: FeeCalculator[] = [
   },
 ];
 
+const calculateTax = (totalFees: number) => {
+  const taxRate = 0.09;
+  return totalFees * taxRate;
+};
+
 export default function calculateFees(amount: number, totalPrice: number) {
   const details: FeeDetail[] = [];
   let totalFees = 0;
@@ -52,6 +57,10 @@ export default function calculateFees(amount: number, totalPrice: number) {
       totalFees += fee;
     }
   }
+
+  const tax = calculateTax(totalFees);
+  details.push({ name: "GST", value: tax });
+  totalFees += tax;
 
   return {
     totalFees,
