@@ -22,7 +22,7 @@ export const feeCalculators: FeeCalculator[] = [
   {
     name: "Trading Activity Fees",
     calculate: (p) => {
-      if (p.amount < 1) return 0;
+      if (p.amount < 1 || p.type !== "sell") return 0;
 
       const max = 8.3,
         min = 0.01;
