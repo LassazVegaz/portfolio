@@ -63,13 +63,19 @@ export type State = {
   lossTargetValues: TargetValues;
 };
 
+export type FeeCalculateParams = {
+  /** The total number of shares. Can be fractional */
+  amount: number;
+  /** The total price of the shares */
+  totalPrice: number;
+  /** The type of transaction */
+  type: "buy" | "sell";
+};
+
 export type FeeCalculator = {
   name: string;
   /**
    * Calculate the fee
-   * @param amount Total number of shares. Can be fractional
-   * @param totalPrice The total price of the transaction
-   * @returns The fee
    */
-  calculate: (amount: number, totalPrice: number) => number;
+  calculate: (params: FeeCalculateParams) => number;
 };

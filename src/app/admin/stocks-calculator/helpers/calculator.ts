@@ -51,7 +51,11 @@ class Calculator {
 
     const totalTarget = targetPU * quantity;
     const totalSellingPrice = totalBuyingPrice + totalTarget * this.n;
-    const sellingCost = calculateFees(quantity, totalSellingPrice);
+    const sellingCost = calculateFees({
+      amount: quantity,
+      totalPrice: totalSellingPrice,
+      type: "sell",
+    });
     const totalCost = buyingCost + sellingCost.totalFees;
     const totalSellingPriceAC = totalSellingPrice + totalCost;
 
@@ -101,10 +105,11 @@ export const calculatePrimaryValues = (
   primaryValues: PrimaryValues
 ) => {
   primaryValuesCalculator[changedField](primaryValues);
-  const cost = calculateFees(
-    primaryValues.quantity,
-    primaryValues.totalBuyingPrice
-  );
+  const cost = calculateFees({
+    amount: primaryValues.quantity,
+    totalPrice: primaryValues.totalBuyingPrice,
+    type: "buy",
+  });
   primaryValues.buyingFees = cost.totalFees;
   primaryValues.feeDetails = cost.details;
 };
