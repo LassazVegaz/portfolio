@@ -42,22 +42,18 @@ class Calculator {
     primaryValues: PrimaryValues,
     targetPU: number
   ): TargetValues {
-    const {
-      unitBuyingPrice,
-      quantity,
-      totalBuyingPrice,
-      buyingFees: buyingCost,
-    } = primaryValues;
+    const { unitBuyingPrice, quantity, totalBuyingPrice, buyingFees } =
+      primaryValues;
 
     const totalTarget = targetPU * quantity;
     const totalSellingPrice = totalBuyingPrice + totalTarget * this.n;
-    const sellingCost = calculateFees({
+    const sellingFees = calculateFees({
       amount: quantity,
       totalPrice: totalSellingPrice,
       type: "sell",
     });
-    const totalCost = buyingCost + sellingCost.totalFees;
-    const totalSellingPriceAC = totalSellingPrice + totalCost;
+    const totalFees = buyingFees + sellingFees.totalFees;
+    const totalSellingPriceAF = totalSellingPrice + totalFees;
 
     return {
       targetPU,
@@ -65,11 +61,11 @@ class Calculator {
       unitSellingPrice: unitBuyingPrice + targetPU * this.n,
       totalSellingPrice: totalSellingPrice,
       targetPercentage: (targetPU / unitBuyingPrice) * 100,
-      feeDetails: sellingCost.details,
-      sellingFees: sellingCost.totalFees,
-      totalFees: totalCost,
-      totalSellingPriceAF: totalSellingPriceAC,
-      unitSellingPriceAF: totalSellingPriceAC / quantity,
+      feeDetails: sellingFees.details,
+      sellingFees: sellingFees.totalFees,
+      totalFees: totalFees,
+      totalSellingPriceAF,
+      unitSellingPriceAF: totalSellingPriceAF / quantity,
     };
   }
 }
@@ -105,11 +101,11 @@ export const calculatePrimaryValues = (
   primaryValues: PrimaryValues
 ) => {
   primaryValuesCalculator[changedField](primaryValues);
-  const cost = calculateFees({
+  const fees = calculateFees({
     amount: primaryValues.quantity,
     totalPrice: primaryValues.totalBuyingPrice,
     type: "buy",
   });
-  primaryValues.buyingFees = cost.totalFees;
-  primaryValues.feeDetails = cost.details;
+  primaryValues.buyingFees = fees.totalFees;
+  primaryValues.feeDetails = fees.details;
 };
