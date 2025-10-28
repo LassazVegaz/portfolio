@@ -18,11 +18,11 @@ const defaultTargetOutput: TargetOutputs = {
   targetPercentage: "0",
   unitSellingPrice: "0",
   totalSellingPrice: "0",
-  sellingCost: "0",
-  totalCost: "0",
-  totalSellingPriceAC: "0",
-  unitSellingPriceAC: "0",
-  costDetails: [],
+  sellingFees: "0",
+  totalFees: "0",
+  totalSellingPriceAF: "0",
+  unitSellingPriceAF: "0",
+  feeDetails: [],
 };
 
 const defaultState: State = {
@@ -30,8 +30,8 @@ const defaultState: State = {
     unitBuyingPrice: 0,
     quantity: 0,
     totalBuyingPrice: 0,
-    buyingCost: 0,
-    costDetails: [],
+    buyingFees: 0,
+    feeDetails: [],
   },
   profitTargetValues: {
     totalTarget: 0,
@@ -39,11 +39,11 @@ const defaultState: State = {
     targetPercentage: 0,
     unitSellingPrice: 0,
     totalSellingPrice: 0,
-    sellingCost: 0,
-    totalCost: 0,
-    totalSellingPriceAC: 0,
-    unitSellingPriceAC: 0,
-    costDetails: [],
+    sellingFees: 0,
+    totalFees: 0,
+    totalSellingPriceAF: 0,
+    unitSellingPriceAF: 0,
+    feeDetails: [],
   },
   lossTargetValues: {
     totalTarget: 0,
@@ -51,11 +51,11 @@ const defaultState: State = {
     targetPercentage: 0,
     unitSellingPrice: 0,
     totalSellingPrice: 0,
-    sellingCost: 0,
-    totalCost: 0,
-    totalSellingPriceAC: 0,
-    unitSellingPriceAC: 0,
-    costDetails: [],
+    sellingFees: 0,
+    totalFees: 0,
+    totalSellingPriceAF: 0,
+    unitSellingPriceAF: 0,
+    feeDetails: [],
   },
 };
 
@@ -63,8 +63,8 @@ const defaultPrimaryOutputs: PrimaryOutputs = {
   unitBuyingPrice: "0",
   quantity: "0",
   totalBuyingPrice: "0",
-  buyingCost: "0",
-  costDetails: [],
+  buyingFees: "0",
+  feeDetails: [],
 };
 
 export default function ClientSidePage() {
@@ -166,7 +166,7 @@ export default function ClientSidePage() {
             onChange={onPrimaryFieldChange}
           />
           <Label>Cost </Label>
-          <TextBoxBorderless value={primaryOutputs.buyingCost} readOnly />
+          <TextBoxBorderless value={primaryOutputs.buyingFees} readOnly />
         </div>
       </div>
 

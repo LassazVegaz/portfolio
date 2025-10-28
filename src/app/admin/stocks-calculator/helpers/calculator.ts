@@ -4,7 +4,7 @@ import {
   TargetInputs,
   TargetValues,
 } from "../types";
-import calculateCost from "./cost-calculators";
+import calculateFees from "./fee-calculators";
 
 class Calculator {
   private readonly n: number;
@@ -42,14 +42,18 @@ class Calculator {
     primaryValues: PrimaryValues,
     targetPU: number
   ): TargetValues {
-    const { unitBuyingPrice, quantity, totalBuyingPrice, buyingCost } =
+    const { unitBuyingPrice, quantity, totalBuyingPrice, buyingFees } =
       primaryValues;
 
     const totalTarget = targetPU * quantity;
     const totalSellingPrice = totalBuyingPrice + totalTarget * this.n;
-    const sellingCost = calculateCost(quantity, totalSellingPrice);
-    const totalCost = buyingCost + sellingCost.totalCost;
-    const totalSellingPriceAC = totalSellingPrice + totalCost;
+    const sellingFees = calculateFees({
+      amount: quantity,
+      totalPrice: totalSellingPrice,
+      type: "sell",
+    });
+    const totalFees = buyingFees + sellingFees.totalFees;
+    const totalSellingPriceAF = totalSellingPrice + totalFees;
 
     return {
       targetPU,
@@ -57,11 +61,11 @@ class Calculator {
       unitSellingPrice: unitBuyingPrice + targetPU * this.n,
       totalSellingPrice: totalSellingPrice,
       targetPercentage: (targetPU / unitBuyingPrice) * 100,
-      costDetails: sellingCost.details,
-      sellingCost: sellingCost.totalCost,
-      totalCost,
-      totalSellingPriceAC,
-      unitSellingPriceAC: totalSellingPriceAC / quantity,
+      feeDetails: sellingFees.details,
+      sellingFees: sellingFees.totalFees,
+      totalFees: totalFees,
+      totalSellingPriceAF,
+      unitSellingPriceAF: totalSellingPriceAF / quantity,
     };
   }
 }
@@ -97,10 +101,11 @@ export const calculatePrimaryValues = (
   primaryValues: PrimaryValues
 ) => {
   primaryValuesCalculator[changedField](primaryValues);
-  const cost = calculateCost(
-    primaryValues.quantity,
-    primaryValues.totalBuyingPrice
-  );
-  primaryValues.buyingCost = cost.totalCost;
-  primaryValues.costDetails = cost.details;
+  const fees = calculateFees({
+    amount: primaryValues.quantity,
+    totalPrice: primaryValues.totalBuyingPrice,
+    type: "buy",
+  });
+  primaryValues.buyingFees = fees.totalFees;
+  primaryValues.feeDetails = fees.details;
 };

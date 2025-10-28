@@ -1,5 +1,5 @@
 import {
-  CostDetail,
+  FeeDetail,
   CostDetailOutput,
   PrimaryInputs,
   PrimaryOutputs,
@@ -9,7 +9,7 @@ import {
   TargetValues,
 } from "../types";
 
-const mapCostDetail = (c: CostDetail): CostDetailOutput => ({
+const mapCostDetail = (c: FeeDetail): CostDetailOutput => ({
   name: c.name,
   value: c.value.toFixed(2),
 });
@@ -25,8 +25,8 @@ export const primaryMapper = (
   unitBuyingPrice: data.unitBuyingPrice.toFixed(2),
   quantity: data.quantity.toString(),
   totalBuyingPrice: data.totalBuyingPrice.toFixed(2),
-  buyingCost: data.buyingCost.toFixed(2),
-  costDetails: data.costDetails.map(mapCostDetail),
+  buyingFees: data.buyingFees.toFixed(2),
+  feeDetails: data.feeDetails.map(mapCostDetail),
   [changedField]: changedValue,
 });
 
@@ -58,11 +58,11 @@ export function targetMapper(
     targetPercentage: data.targetPercentage.toString(),
     unitSellingPrice: data.unitSellingPrice.toFixed(2),
     totalSellingPrice: data.totalSellingPrice.toFixed(2),
-    sellingCost: data.sellingCost.toFixed(2),
-    totalCost: data.totalCost.toFixed(2),
-    costDetails: data.costDetails.map(mapCostDetail),
-    totalSellingPriceAC: data.totalSellingPriceAC.toFixed(2),
-    unitSellingPriceAC: data.unitSellingPriceAC.toFixed(2),
+    sellingFees: data.sellingFees.toFixed(2),
+    totalFees: data.totalFees.toFixed(2),
+    feeDetails: data.feeDetails.map(mapCostDetail),
+    totalSellingPriceAF: data.totalSellingPriceAF.toFixed(2),
+    unitSellingPriceAF: data.unitSellingPriceAF.toFixed(2),
   };
 
   if (changedField && changedValue) {
