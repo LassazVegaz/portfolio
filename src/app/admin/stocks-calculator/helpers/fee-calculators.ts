@@ -1,12 +1,15 @@
 import { FeeCalculateParams, FeeCalculator, FeeDetail } from "../types";
 
+const roundToTwoDecimals = (num: number) =>
+  Math.round((num + Number.EPSILON) * 100) / 100;
+
 export const feeCalculators: FeeCalculator[] = [
   {
     name: "Platform fees",
     calculate: (p) => {
       const max = 0.99;
       const cost = p.amount < 1 ? p.totalPrice * (0.99 / 100) : 0.99;
-      return cost > max ? max : cost;
+      return roundToTwoDecimals(cost > max ? max : cost);
     },
   },
   {
@@ -16,7 +19,7 @@ export const feeCalculators: FeeCalculator[] = [
 
       const max = 0.01 * p.totalPrice;
       const cost = 0.003 * p.amount;
-      return cost > max ? max : cost;
+      return roundToTwoDecimals(cost > max ? max : cost);
     },
   },
   {
@@ -28,18 +31,18 @@ export const feeCalculators: FeeCalculator[] = [
         min = 0.01;
 
       const cost = 0.000166 * p.amount;
-      return cost < min ? min : cost > max ? max : cost;
+      return roundToTwoDecimals(cost < min ? min : cost > max ? max : cost);
     },
   },
   {
     name: "Consolidated Audit Trail Fee",
-    calculate: (p) => 0.0000265 * p.amount,
+    calculate: (p) => roundToTwoDecimals(0.0000265 * p.amount),
   },
 ];
 
 const calculateTax = (totalFees: number) => {
   const taxRate = 0.09;
-  return totalFees * taxRate;
+  return roundToTwoDecimals(totalFees * taxRate);
 };
 
 export default function calculateFees(params: FeeCalculateParams) {
