@@ -9,7 +9,7 @@ export const feeCalculators: FeeCalculator[] = [
     calculate: (p) => {
       const max = 0.99;
       const cost = p.amount < 1 ? p.totalPrice * (0.99 / 100) : 0.99;
-      return roundToTwoDecimals(cost > max ? max : cost);
+      return roundToTwoDecimals(Math.min(cost, max));
     },
   },
   {
@@ -19,7 +19,7 @@ export const feeCalculators: FeeCalculator[] = [
 
       const max = 0.01 * p.totalPrice;
       const cost = 0.003 * p.amount;
-      return roundToTwoDecimals(cost > max ? max : cost);
+      return roundToTwoDecimals(Math.min(cost, max));
     },
   },
   {
@@ -31,7 +31,7 @@ export const feeCalculators: FeeCalculator[] = [
         min = 0.01;
 
       const cost = 0.000166 * p.amount;
-      return roundToTwoDecimals(cost < min ? min : cost > max ? max : cost);
+      return roundToTwoDecimals(cost < min ? min : Math.min(cost, max));
     },
   },
   {
