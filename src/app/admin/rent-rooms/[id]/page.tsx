@@ -18,10 +18,7 @@ export default function NewRoomPage() {
           />
         </div>
 
-        <div className="flex justify-end space-x-4">
-          <button className="px-4 py-2 rounded border border-gray-300 min-w-24">
-            Cancel
-          </button>
+        <div className="flex justify-center">
           <button
             type="submit"
             className="bg-blue-500 text-white px-4 py-2 rounded min-w-24"
