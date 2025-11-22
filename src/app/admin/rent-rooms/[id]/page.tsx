@@ -1,12 +1,16 @@
 import Header1 from "@/components/Header1";
 import PageContainer from "@/components/PageContainer";
+import { fetchData } from "./actions";
 
 export default function NewRoomPage() {
   return (
     <PageContainer className="grid grid-rows-[auto_1fr] h-screen">
       <Header1>Add New Room</Header1>
 
-      <form className="space-y-4 mt-6 mx-5 grid grid-rows-[1fr_auto]">
+      <form
+        action={fetchData}
+        className="space-y-4 mt-6 mx-5 grid grid-rows-[1fr_auto]"
+      >
         <div>
           <label htmlFor="roomLink">Room link</label>
           <div className="flex items-center space-x-2">
@@ -17,7 +21,9 @@ export default function NewRoomPage() {
               placeholder="Enter room link"
               className="border border-gray-300 p-2 w-full rounded"
             />
-            <button className="text-2xl">⬇️</button>
+            <button name="fetchButton" type="submit" className="text-2xl">
+              ⬇️
+            </button>
           </div>
         </div>
 
@@ -29,6 +35,7 @@ export default function NewRoomPage() {
             Reset
           </button>
           <button
+            name="saveButton"
             type="submit"
             className="bg-blue-500 text-white px-4 py-2 rounded min-w-24"
           >
