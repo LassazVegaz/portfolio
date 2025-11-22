@@ -9,13 +9,16 @@ export default function NewRoomPage() {
       <form className="space-y-4 mt-6 mx-5 grid grid-rows-[1fr_auto]">
         <div>
           <label htmlFor="roomLink">Room link</label>
-          <input
-            type="text"
-            id="roomLink"
-            name="roomLink"
-            placeholder="Enter room link"
-            className="border border-gray-300 p-2 w-full rounded"
-          />
+          <div className="flex items-center space-x-2">
+            <input
+              type="text"
+              id="roomLink"
+              name="roomLink"
+              placeholder="Enter room link"
+              className="border border-gray-300 p-2 w-full rounded"
+            />
+            <button className="text-2xl">⬇️</button>
+          </div>
         </div>
 
         <div className="flex justify-between space-x-4">
