@@ -6,7 +6,7 @@ import routingService from "@/services/routing-service";
 const AppCard = (props: { href: string; children: React.ReactNode }) => (
   <Link
     href={props.href}
-    className="bg-black border-2 border-white rounded p-1 w-32 h-32 flex items-center text-center md:text-lg font-semibold hover:bg-white hover:text-black transition-all duration-1000 odd:justify-self-end"
+    className="bg-black border-2 border-white rounded p-1 w-32 h-32 flex items-center justify-center text-center md:text-lg font-semibold hover:bg-white hover:text-black transition-all duration-1000 odd:justify-self-end"
   >
     {props.children}
   </Link>
@@ -21,7 +21,7 @@ export default async function AdminPage() {
 
       <div className="grid grid-cols-2 gap-4 items-center">
         <AppCard href="/admin/stocks-calculator">Stocks Calculator</AppCard>
-        <AppCard href="/admin">Comming Soon</AppCard>
+        <AppCard href="/admin/rent-rooms">Rent Rooms</AppCard>
         <AppCard href="/admin">Comming Soon</AppCard>
         <AppCard href="/admin">Comming Soon</AppCard>
       </div>
