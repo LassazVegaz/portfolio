@@ -10,10 +10,16 @@ const rooms = [
 
 export default function RentRoomsPage() {
   return (
-    <PageContainer>
+    <PageContainer className="px-5">
       <Header1>Rent Rooms</Header1>
 
-      <div className="space-y-4 px-5 mt-4">
+      <input
+        type="search"
+        placeholder="Search rooms..."
+        className="border border-gray-300 p-2 w-full rounded mt-4"
+      />
+
+      <div className="space-y-4 mt-6">
         {rooms.map((r) => (
           <div key={r} className="p-4 border border-gray-300 rounded">
             {r}
