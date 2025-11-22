@@ -18,12 +18,24 @@ export default function NewRoomPage() {
           />
         </div>
 
-        <div className="flex justify-center">
+        <div className="flex justify-between space-x-4">
+          <button
+            type="reset"
+            className="px-4 py-2 rounded border border-gray-300 min-w-24"
+          >
+            Reset
+          </button>
           <button
             type="submit"
             className="bg-blue-500 text-white px-4 py-2 rounded min-w-24"
           >
             Save
+          </button>
+          <button
+            type="button"
+            className="border border-red-500 text-white px-4 py-2 rounded min-w-24"
+          >
+            Delete
           </button>
         </div>
       </form>
