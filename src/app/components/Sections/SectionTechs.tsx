@@ -23,7 +23,7 @@ const SectionTechs = () => {
   return (
     <>
       <div
-        className="min-h-[100vh] p-2 flex flex-wrap justify-around items-center gap-8 relative"
+        className="min-h-screen p-2 flex flex-wrap justify-around items-center gap-8 relative"
         id="techs-images-container"
       >
         {Array(imagesCount)
