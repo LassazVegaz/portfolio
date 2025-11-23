@@ -61,6 +61,7 @@ export class CarousellService {
 
     data["Name"] = this.getName($);
     data["Price"] = this.getPrice($);
+    data["Description"] = this.getDescription($);
 
     return data;
   }
@@ -82,6 +83,17 @@ export class CarousellService {
     return Number.parseFloat(
       $("h1").next().children("p").text().trim().slice(2).replaceAll(",", "")
     );
+  }
+
+  private getDescription($: CheerioAPI) {
+    return $("p:contains('Description')")
+      .next()
+      .find("p")
+      .text()
+      .trim()
+      .split("\n")
+      .map((s) => s.trim())
+      .join(" ");
   }
 }
 
