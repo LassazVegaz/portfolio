@@ -62,6 +62,7 @@ export class CarousellService {
     data["Name"] = this.getName($);
     data["Price"] = this.getPrice($);
     data["Description"] = this.getDescription($);
+    data["Images"] = this.getImageUrls($);
 
     return data;
   }
@@ -94,6 +95,13 @@ export class CarousellService {
       .split("\n")
       .map((s) => s.trim())
       .join(" ");
+  }
+
+  private getImageUrls($: CheerioAPI) {
+    return $("[aria-label=Carousel]")
+      .find("img")
+      .map((_, e) => e.attribs["src"])
+      .toArray();
   }
 }
 
