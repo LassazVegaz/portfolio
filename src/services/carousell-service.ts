@@ -56,6 +56,8 @@ export class CarousellService {
 
     this.labels.forEach((l) => (data[l] = this.getLabelValue(l, $)));
 
+    data["Name"] = this.getName($);
+
     return data;
   }
 
@@ -66,6 +68,10 @@ export class CarousellService {
       .first()
       .text()
       .trim();
+  }
+
+  getName($: CheerioAPI) {
+    return $("h1").text().trim();
   }
 }
 
