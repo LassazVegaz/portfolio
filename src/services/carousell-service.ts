@@ -21,6 +21,9 @@ export class CarousellService {
     "Type",
     "Room",
     "Gender",
+    "MRT",
+    "Postal Code",
+    "Street Name",
   ];
 
   //#region
@@ -57,6 +60,7 @@ export class CarousellService {
     this.labels.forEach((l) => (data[l] = this.getLabelValue(l, $)));
 
     data["Name"] = this.getName($);
+    data["Price"] = this.getPrice($);
 
     return data;
   }
@@ -72,6 +76,12 @@ export class CarousellService {
 
   getName($: CheerioAPI) {
     return $("h1").text().trim();
+  }
+
+  private getPrice($: CheerioAPI) {
+    return Number.parseFloat(
+      $("h1").next().children("p").text().trim().slice(2).replaceAll(",", "")
+    );
   }
 }
 
