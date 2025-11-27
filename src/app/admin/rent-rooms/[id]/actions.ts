@@ -1,5 +1,5 @@
 "use server";
-import { carousellService as cs } from "@/services/carousell-service";
+import cs from "@/services/cs-scrapping-service";
 
 export const fetchData = async (formData: FormData) => {
   const url = formData.get("roomLink");

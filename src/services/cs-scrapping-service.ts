@@ -31,7 +31,7 @@ type Label =
   | "Postal Code"
   | "Street Name";
 
-export class CarousellService {
+export class CarousellScrappingService {
   private initialData: InitialData | null = null;
 
   //#region
@@ -144,4 +144,6 @@ export class CarousellService {
   }
 }
 
-export const carousellService = new CarousellService();
+const carousellScrappingService = new CarousellScrappingService();
+
+export default carousellScrappingService;
