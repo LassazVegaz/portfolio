@@ -12,3 +12,25 @@ generator client {
 datasource db {
   provider = "mongodb"
 }
+
+model RentingRoom {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  name            String?
+  price           Float?
+  description     String?
+  ac              Boolean?
+  cookingAllowed  Boolean?
+  hasInternet     Boolean?
+  noOwnerStaying  Boolean?
+  pubIncluded     Boolean?
+  visitorsAllowed Boolean?
+  furnishing      String?
+  lease           String?
+  level           String?
+  type            String?
+  room            String?
+  gender          String?
+  mrt             String?
+  postalCode      String?
+  streetName      String?
+}
