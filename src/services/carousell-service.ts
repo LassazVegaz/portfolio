@@ -1,3 +1,4 @@
+import CarousellScrappedData from "@/app/models/carousell-scrapped-data.model";
 import { CheerioAPI, load } from "cheerio";
 import fs from "node:fs/promises";
 
@@ -5,26 +6,33 @@ const USER_AGENT =
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36";
 const cacheFile = "D:/My Apps/NextJs/my/portfolio/data/cache.html";
 
-export class CarousellService {
-  private $: CheerioAPI | null = null;
+/**
+ * Initial data those should be loaded before scrapping data
+ */
+type InitialData = {
+  $: CheerioAPI;
+  id: string;
+};
 
-  private readonly labels = [
-    "Air-Conditioning",
-    "Cooking",
-    "Internet",
-    "No Owner Staying",
-    "PUB Included",
-    "Visitors allowed",
-    "Furnishing",
-    "Lease",
-    "Level",
-    "Type",
-    "Room",
-    "Gender",
-    "MRT",
-    "Postal Code",
-    "Street Name",
-  ];
+type Label =
+  | "Air-Conditioning"
+  | "Cooking"
+  | "Internet"
+  | "No Owner Staying"
+  | "PUB Included"
+  | "Visitors allowed"
+  | "Furnishing"
+  | "Lease"
+  | "Level"
+  | "Type"
+  | "Room"
+  | "Gender"
+  | "MRT"
+  | "Postal Code"
+  | "Street Name";
+
+export class CarousellService {
+  private initialData: InitialData | null = null;
 
   //#region
   async loadCache(url: string) {
@@ -36,7 +44,11 @@ export class CarousellService {
     }
 
     const html = await fs.readFile(cacheFile, "utf-8");
-    this.$ = load(html);
+
+    this.initialData = {
+      $: load(html),
+      id: this.getIdFromUrl(url),
+    };
   }
 
   private async createFile(url: string) {
@@ -51,23 +63,42 @@ export class CarousellService {
   }
   //#endregion
 
-  getData() {
-    if (this.$ === null) throw new Error("cache is not loaded");
-    const $ = this.$;
+  getData(): CarousellScrappedData {
+    if (this.initialData === null)
+      throw new Error(
+        "Initial data is not loaded. Please call loadCache before getData"
+      );
+    const { $, id } = this.initialData;
 
-    const data: Record<string, unknown> = {};
-
-    this.labels.forEach((l) => (data[l] = this.getLabelValue(l, $)));
-
-    data["Name"] = this.getName($);
-    data["Price"] = this.getPrice($);
-    data["Description"] = this.getDescription($);
-    data["Images"] = this.getImageUrls($);
-
-    return data;
+    return {
+      id,
+      name: this.getName($),
+      price: this.getPrice($),
+      description: this.getDescription($),
+      images: this.getImageUrls($),
+      ac: this.isItYes("Air-Conditioning", $),
+      cookingAllowed: this.isItYes("Cooking", $),
+      hasInternet: this.isItYes("Internet", $),
+      noOwnerStaying: this.isItYes("No Owner Staying", $),
+      pubIncluded: this.isItYes("PUB Included", $),
+      visitorsAllowed: this.isItYes("Visitors allowed", $),
+      furnishing: this.getLabelValue("Furnishing", $),
+      lease: this.getLabelValue("Lease", $),
+      level: this.getLabelValue("Level", $),
+      type: this.getLabelValue("Type", $),
+      room: this.getLabelValue("Room", $),
+      gender: this.getLabelValue("Gender", $),
+      mrt: this.getLabelValue("MRT", $),
+      postalCode: this.getLabelValue("Postal Code", $),
+      streetName: this.getLabelValue("Street Name", $),
+    };
   }
 
-  private getLabelValue(label: string, $: CheerioAPI) {
+  private isItYes(label: Label, $: CheerioAPI) {
+    return this.getLabelValue(label, $).toLowerCase() === "yes";
+  }
+
+  private getLabelValue(label: Label, $: CheerioAPI) {
     return $(`p:contains('${label}')`)
       .parent()
       .find("div span")
@@ -76,7 +107,7 @@ export class CarousellService {
       .trim();
   }
 
-  getName($: CheerioAPI) {
+  private getName($: CheerioAPI) {
     return $("h1").text().trim();
   }
 
@@ -102,6 +133,14 @@ export class CarousellService {
       .find("img")
       .map((_, e) => e.attribs["src"])
       .toArray();
+  }
+
+  private getIdFromUrl(url: string) {
+    const partBeforeParams = url.split("?")[0];
+    const parts = partBeforeParams.split("-");
+    let id = parts[parts.length - 1];
+    if (id[id.length - 1] === "/") id = id.substring(0, id.length - 1);
+    return id;
   }
 }
 
