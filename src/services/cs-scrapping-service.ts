@@ -35,7 +35,7 @@ export class CarousellScrappingService {
   private initialData: InitialData | null = null;
 
   //#region
-  async loadCache(url: string) {
+  async loadData(url: string) {
     try {
       await fs.access(cacheFile, fs.constants.F_OK);
       console.log("cache found");
