@@ -3,7 +3,7 @@
 import path from "node:path";
 import fs from "node:fs";
 import { config } from "dotenv";
-import { defineConfig, env } from "prisma/config";
+import { defineConfig } from "prisma/config";
 
 const envs = [".env.production.local", ".env.development.local"]; // production first
 if (process.env.NODE_ENV === "development") envs.reverse();
@@ -18,8 +18,5 @@ export default defineConfig({
   schema: "prisma/schema.prisma",
   migrations: {
     path: "prisma/migrations",
-  },
-  datasource: {
-    url: env("DATABASE_URL"),
   },
 });
