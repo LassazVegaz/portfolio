@@ -1,4 +1,4 @@
-import CarousellScrappedData from "@/app/models/carousell-scrapped-data.model";
+import { RentingRoom } from "@/generated/prisma/client";
 import { CheerioAPI, load } from "cheerio";
 import fs from "node:fs/promises";
 
@@ -63,7 +63,7 @@ export class CarousellScrappingService {
   }
   //#endregion
 
-  getData(): CarousellScrappedData {
+  getData(): RentingRoom {
     if (this.initialData === null)
       throw new Error(
         "Initial data is not loaded. Please call loadCache before getData"
