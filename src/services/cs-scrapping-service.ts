@@ -138,8 +138,8 @@ export class CarousellScrappingService {
   private getIdFromUrl(url: string) {
     const partBeforeParams = url.split("?")[0];
     const parts = partBeforeParams.split("-");
-    let id = parts[parts.length - 1];
-    if (id[id.length - 1] === "/") id = id.substring(0, id.length - 1);
+    let id = parts.at(-1)!; // since array is non-empty, this will never be undefined
+    if (id.endsWith("/")) id = id.substring(0, id.length - 1);
     return id;
   }
 }
