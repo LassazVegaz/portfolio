@@ -15,7 +15,7 @@ datasource db {
 }
 
 model RentingRoom {
-  id              String             @id @default(auto()) @map("_id") @db.ObjectId
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
   name            String?
   price           Float?
   description     String?
@@ -34,11 +34,5 @@ model RentingRoom {
   mrt             String?
   postalCode      String?
   streetName      String?
-  images          RentingRoomImage[]
-}
-
-model RentingRoomImage {
-  id            String      @id @default(auto()) @map("_id") @db.ObjectId
-  room          RentingRoom @relation(fields: [rentingRoomId], references: [id])
-  rentingRoomId String      @db.ObjectId
+  images          String[]
 }
