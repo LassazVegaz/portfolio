@@ -1,10 +1,32 @@
 {
+  "version": "0.2.0",
   "configurations": [
     {
-      "command": "pnpm dev",
-      "name": "Debug NextJS",
+      "name": "full stack",
+      "type": "node",
       "request": "launch",
-      "type": "node-terminal"
+      "program": "${workspaceFolder}/node_modules/next/dist/bin/next",
+      "runtimeArgs": ["--inspect"],
+      "skipFiles": ["<node_internals>/**"],
+      "serverReadyAction": {
+        "action": "debugWithChrome",
+        "killOnServerStop": true,
+        "pattern": "- Local:.+(https?://.+)",
+        "uriFormat": "%s",
+        "webRoot": "${workspaceFolder}"
+      }
+    },
+    {
+      "name": "SS",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "pnpm dev -- --inspect"
+    },
+    {
+      "name": "CS",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:3000"
     }
   ]
 }

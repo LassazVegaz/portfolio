@@ -11,6 +11,6 @@ export const loginAction = async (data: FormData) => {
     typeof password === "string" &&
     (await authService.login(username, password))
   ) {
-    redirect("/admin/stocks-calculator");
+    redirect("/admin");
   }
 };

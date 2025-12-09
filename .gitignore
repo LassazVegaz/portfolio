@@ -39,3 +39,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# tempory storage
+data
+
+#prisma
+/src/generated/prisma
