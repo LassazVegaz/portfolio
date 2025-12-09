@@ -1,3 +1,4 @@
+import PageBlock from "@/app/components/PageBlock";
 import Header1 from "@/components/Header1";
 import PageContainer from "@/components/PageContainer";
 import Link from "next/link";
@@ -33,6 +34,8 @@ export default function RentRoomsPage() {
       >
         +
       </Link>
+
+      <PageBlock />
     </PageContainer>
   );
 }

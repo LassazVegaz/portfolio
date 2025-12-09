@@ -1,6 +1,7 @@
 import Header1 from "@/components/Header1";
 import PageContainer from "@/components/PageContainer";
 import { fetchData } from "./actions";
+import PageBlock from "@/app/components/PageBlock";
 
 export default function NewRoomPage() {
   return (
@@ -49,6 +50,9 @@ export default function NewRoomPage() {
           </button>
         </div>
       </form>
+
+      {/* temporary block page */}
+      <PageBlock />
     </PageContainer>
   );
 }
