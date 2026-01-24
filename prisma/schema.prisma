@@ -36,3 +36,11 @@ model RentingRoom {
   streetName      String?
   images          String[]
 }
+
+model Category {
+  id         String     @id @default(auto()) @map("_id") @db.ObjectId
+  name       String
+  parentId   String?    @db.ObjectId
+  parent     Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  categories Category[] @relation("CategoryHierarchy")
+}
