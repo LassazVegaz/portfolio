@@ -33,7 +33,7 @@ export const FormButton = ({
 }: React.ComponentProps<"button">) => (
   <button
     className={twMerge(
-      "border border-gray-300 rounded px-3 py-2 hover:bg-gray-100 min-w-20",
+      "border border-gray-300 rounded px-3 py-2 hover:bg-gray-100 min-w-20 disabled:opacity-50",
       className,
     )}
     {...props}
