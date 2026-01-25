@@ -15,8 +15,7 @@ export class CategoriesService {
   }
 
   async updateCategory(id: string, dto: UpdateCategoryDto) {
-    if (dto.parentId !== undefined && dto.parentId === id)
-      throw new Error("A category cannot be its own parent.");
+    if (dto.parentId) await this.validateParentCategory(id, dto.parentId);
 
     const c = await prisma.category.update({
       where: { id },
@@ -41,6 +40,21 @@ export class CategoriesService {
   async getAllCategories() {
     const categories = await prisma.category.findMany();
     return categories;
+  }
+
+  /**
+   * Validates that the parent category does not create a circular reference.
+   */
+  private async validateParentCategory(categoryId: string, parentId: string) {
+    let currentParentId = parentId;
+    while (currentParentId) {
+      if (currentParentId === categoryId) {
+        throw new Error("A category cannot be its own parent.");
+      }
+      const parentCategory = await this.getCategoryById(currentParentId);
+      if (!parentCategory) break;
+      currentParentId = parentCategory.parentId!;
+    }
   }
 }
 
