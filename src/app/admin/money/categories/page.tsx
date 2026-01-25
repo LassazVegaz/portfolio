@@ -7,9 +7,7 @@ export default function CategoriesPage() {
     <PageContainer>
       <Header1>Categories</Header1>
 
-      <FloatingAction href={{ pathname: "/admin/money/categories/new" }}>
-        +
-      </FloatingAction>
+      <FloatingAction href="/admin/money/categories/new">+</FloatingAction>
     </PageContainer>
   );
 }

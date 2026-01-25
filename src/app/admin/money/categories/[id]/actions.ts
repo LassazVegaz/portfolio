@@ -20,7 +20,7 @@ export async function formAction(prevState: null, form: FormData) {
       name: data.name,
       parentId: data.parentId,
     });
-    redirect(`/admin/money/${"categories/" + created.id}`);
+    redirect(`/admin/money/categories/${created.id}`);
   } else if (data.save) {
     await categoriesService.updateCategory(data.id, {
       name: data.name,
