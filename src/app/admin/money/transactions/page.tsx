@@ -7,7 +7,7 @@ export default function MoneyPage() {
     <PageContainer>
       <Header1>Transactions</Header1>
 
-      <FloatingAction href="/admin/money/new">+</FloatingAction>
+      <FloatingAction href="/admin/money/categories/new">+</FloatingAction>
     </PageContainer>
   );
 }
