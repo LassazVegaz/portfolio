@@ -1,4 +1,5 @@
 "use client";
+import { useActionState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import {
   FieldContainer,
@@ -7,28 +8,45 @@ import {
   SelectField,
   SelectOption,
 } from "@/components/FormFields";
-import Form from "@/components/Form";
 import { formAction } from "../actions";
-import { useActionState } from "react";
+import Form from "@/components/Form";
+import { Category } from "@/generated/prisma/browser";
 
 type ClientFormProps = {
-  id: string;
+  isNew: boolean;
+  category?: Category;
 };
 
 export default function ClientForm(props: Readonly<ClientFormProps>) {
+  const submitter = useRef<HTMLButtonElement | null>(null);
   const router = useRouter();
-  const [, action, isPending] = useActionState(formAction, null);
+  const [error, action, pending] = useActionState(formAction, null);
+
+  if (error) alert(error);
 
   return (
-    <Form action={action}>
-      <input type="hidden" name="id" value={props.id} />
+    <Form
+      action={(f) => {
+        f.append(submitter.current!.name, submitter.current!.value);
+        return action(f);
+      }}
+    >
+      <input type="hidden" name="id" value={props.category?.id} />
 
       <FieldContainer label="Name">
-        <InputField type="text" name="name" />
+        <InputField
+          type="text"
+          name="name"
+          defaultValue={props.category?.name ?? ""}
+          required
+        />
       </FieldContainer>
 
       <FieldContainer label="Parent category">
-        <SelectField name="parentId">
+        <SelectField
+          name="parentId"
+          defaultValue={props.category?.parentId ?? ""}
+        >
           <SelectOption value="">-- None --</SelectOption>
           <SelectOption value="1">Category 1</SelectOption>
           <SelectOption value="2">Category 2</SelectOption>
@@ -36,25 +54,35 @@ export default function ClientForm(props: Readonly<ClientFormProps>) {
       </FieldContainer>
 
       <div className="flex justify-between mt-10">
-        <FormButton disabled={isPending} onClick={router.back}>
+        <FormButton
+          type="button"
+          disabled={pending}
+          onClick={() => router.back()}
+        >
           Cancel
         </FormButton>
         <FormButton
-          name="save"
+          name="actionType"
+          value="save"
           type="submit"
-          disabled={isPending}
+          disabled={pending}
           className="text-btn-blue border-btn-blue"
+          onClick={(e) => (submitter.current = e.currentTarget)}
         >
           Save
         </FormButton>
-        <FormButton
-          name="delete"
-          type="submit"
-          disabled={isPending}
-          className="text-btn-red border-btn-red"
-        >
-          Delete
-        </FormButton>
+        {props.isNew === false && (
+          <FormButton
+            name="actionType"
+            value="delete"
+            type="submit"
+            disabled={pending}
+            className="text-btn-red border-btn-red"
+            onClick={(e) => (submitter.current = e.currentTarget)}
+          >
+            Delete
+          </FormButton>
+        )}
       </div>
     </Form>
   );

@@ -1,35 +1,46 @@
 "use server";
-import categoriesService from "@/services/categories.service";
+import { Route } from "next";
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import categoriesService from "@/services/categories.service";
 
 type FormDataDto = {
-  id: string;
+  id?: string;
   name: string;
   parentId: string | null;
-  save?: string;
-  delete?: string;
+  actionType: "save" | "delete";
 };
 
-export async function formAction(prevState: null, form: FormData) {
+export const formAction = async (_: null | string, form: FormData) => {
   const data = Object.fromEntries(form.entries()) as FormDataDto;
+  let routeTo: Route | null = null;
 
   data.parentId = data.parentId || null;
 
-  if (data.save && data.id === "new") {
-    const created = await categoriesService.createCategory({
-      name: data.name,
-      parentId: data.parentId,
-    });
-    redirect(`/admin/money/categories/${created.id}`);
-  } else if (data.save) {
-    await categoriesService.updateCategory(data.id, {
-      name: data.name,
-      parentId: data.parentId,
-    });
-  } else if (data.delete) {
-    await categoriesService.deleteCategory(data.id);
-    redirect("/admin/money/categories");
+  try {
+    if (data.actionType === "save" && data.id) {
+      await categoriesService.updateCategory(data.id, {
+        name: data.name,
+        parentId: data.parentId,
+      });
+      revalidatePath(`/admin/money/categories/${data.id}`);
+    } else if (data.actionType === "save") {
+      const created = await categoriesService.createCategory({
+        name: data.name,
+        parentId: data.parentId,
+      });
+      routeTo = `/admin/money/categories/${created.id}` as Route;
+    } else if (data.actionType === "delete" && data.id) {
+      await categoriesService.deleteCategory(data.id);
+      routeTo = "/admin/money/categories";
+    }
+  } catch (error) {
+    if (error instanceof Error) {
+      return error.message;
+    } else throw error;
   }
 
+  if (routeTo) redirect(routeTo);
+
   return null;
-}
+};
