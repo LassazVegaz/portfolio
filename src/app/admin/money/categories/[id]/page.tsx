@@ -4,21 +4,37 @@ import PageContainer from "@/components/PageContainer";
 import ClientForm from "./components/ClientForm";
 import categoriesService from "@/services/categories.service";
 
+/**
+ * Get all cetegories excluding the current category.
+ * If currentId is provided, also exclude its child categories.
+ */
+const getCategories = async (currentId?: string) => {
+  const categories = currentId
+    ? await categoriesService.getNonChildCategories(currentId)
+    : await categoriesService.getAllCategories();
+
+  return categories.filter((cat) => cat.id !== currentId);
+};
+
 export default async function CategoryPage(
   props: Readonly<PageProps<"/admin/money/categories/[id]">>,
 ) {
   const { id } = await props.params;
+  const isNew = id === "new";
 
-  const category =
-    id === "new" ? undefined : await categoriesService.getCategoryById(id);
+  const category = isNew
+    ? undefined
+    : await categoriesService.getCategoryById(id);
 
   if (category === null) notFound();
+
+  const categories = await getCategories(isNew ? undefined : id);
 
   return (
     <PageContainer>
       <Header1>A Category</Header1>
 
-      <ClientForm category={category} isNew={id === "new"} />
+      <ClientForm category={category} isNew={isNew} categories={categories} />
     </PageContainer>
   );
 }

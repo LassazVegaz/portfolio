@@ -1,5 +1,5 @@
 "use client";
-import { useActionState, useRef } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   FieldContainer,
@@ -15,12 +15,20 @@ import { Category } from "@/generated/prisma/browser";
 type ClientFormProps = {
   isNew: boolean;
   category?: Category;
+  categories: Pick<Category, "id" | "name">[];
 };
 
 export default function ClientForm(props: Readonly<ClientFormProps>) {
   const submitter = useRef<HTMLButtonElement | null>(null);
+  const [parentId, setParentId] = useState(props.category?.parentId ?? "");
   const router = useRouter();
   const [error, action, pending] = useActionState(formAction, null);
+
+  useEffect(() => {
+    console.log("parent id:", props.category?.parentId);
+
+    setParentId(props.category?.parentId ?? "");
+  }, [props.category?.parentId]);
 
   if (error) alert(error);
 
@@ -45,11 +53,15 @@ export default function ClientForm(props: Readonly<ClientFormProps>) {
       <FieldContainer label="Parent category">
         <SelectField
           name="parentId"
-          defaultValue={props.category?.parentId ?? ""}
+          value={parentId}
+          onChange={(e) => setParentId(e.target.value)}
         >
           <SelectOption value="">-- None --</SelectOption>
-          <SelectOption value="1">Category 1</SelectOption>
-          <SelectOption value="2">Category 2</SelectOption>
+          {props.categories.map((cat) => (
+            <SelectOption key={cat.id} value={cat.id}>
+              {cat.name}
+            </SelectOption>
+          ))}
         </SelectField>
       </FieldContainer>
 
