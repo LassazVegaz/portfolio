@@ -42,6 +42,22 @@ export class CategoriesService {
     return categories;
   }
 
+  async getNonChildCategories(id: string) {
+    const categories = await this.getAllCategories();
+    const childCategoryIds = new Set<string>();
+    const queue: string[] = [id];
+    while (queue.length > 0) {
+      const currentId = queue.shift()!;
+      for (const category of categories) {
+        if (category.parentId === currentId) {
+          childCategoryIds.add(category.id);
+          queue.push(category.id);
+        }
+      }
+    }
+    return categories.filter((category) => !childCategoryIds.has(category.id));
+  }
+
   /**
    * Validates that the parent category does not create a circular reference.
    */
