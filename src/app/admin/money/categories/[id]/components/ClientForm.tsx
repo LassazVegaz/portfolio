@@ -16,7 +16,6 @@ import {
   updateAction,
   deleteAction,
 } from "../actions";
-import ValidationException from "@/exceptions/validation.exception";
 
 type ClientFormProps = {
   isNew: boolean;
@@ -68,8 +67,16 @@ export default function ClientForm(props: Readonly<ClientFormProps>) {
   }, [props.category, props.isNew, router]);
 
   const onDeleteClick = useCallback(async () => {
-    await deleteAction(props.category!.id);
-    router.push("/admin/money/categories");
+    setPending(true);
+    try {
+      await deleteAction(props.category!.id);
+      router.push("/admin/money/categories");
+    } catch (error) {
+      console.error(error);
+      alert("An error occurred. Please try again.");
+    } finally {
+      setPending(false);
+    }
   }, [props.category, router]);
 
   return (
