@@ -34,5 +34,7 @@ export const updateAction = async (id: string, params: UpdateCategoryDto) => {
 export const getCategoriesForDropdown = async (currentCatId: string) => {
   const categories =
     await categoriesService.getNonChildCategories(currentCatId);
-  return categories.map((cat) => ({ id: cat.id, name: cat.name }));
+  return categories
+    .filter((cat) => cat.id !== currentCatId)
+    .map((cat) => ({ id: cat.id, name: cat.name }));
 };
