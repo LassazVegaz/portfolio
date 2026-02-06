@@ -16,6 +16,7 @@ import {
   updateAction,
   deleteAction,
 } from "../actions";
+import ValidationException from "@/exceptions/validation.exception";
 
 type ClientFormProps = {
   isNew: boolean;
@@ -59,7 +60,8 @@ export default function ClientForm(props: Readonly<ClientFormProps>) {
       }
     } catch (error) {
       console.error(error);
-      alert("An error occurred. Please try again.");
+      if (error instanceof Error) alert(error.message);
+      else alert("An error occurred. Please try again.");
     } finally {
       setPending(false);
     }

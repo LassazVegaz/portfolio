@@ -65,6 +65,13 @@ export class CategoriesService {
     return count > 0;
   }
 
+  async nameExists(name: string) {
+    const count = await prisma.category.count({
+      where: { name },
+    });
+    return count > 0;
+  }
+
   /**
    * Validates that the parent category does not create a circular reference.
    */
