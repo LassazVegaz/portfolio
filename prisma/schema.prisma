@@ -38,9 +38,20 @@ model RentingRoom {
 }
 
 model Category {
-  id         String     @id @default(auto()) @map("_id") @db.ObjectId
-  name       String
-  parentId   String?    @db.ObjectId
-  parent     Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  categories Category[] @relation("CategoryHierarchy")
+  id           String        @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  parentId     String?       @db.ObjectId
+  parent       Category?     @relation("CategoryHierarchy", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  categories   Category[]    @relation("CategoryHierarchy")
+  transactions Transaction[]
+}
+
+model Transaction {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  amount        Float
+  title         String
+  transactionAt DateTime  @default(now())
+  comments      String?
+  category      Category? @relation(fields: [categoryId], references: [id])
+  categoryId    String?   @db.ObjectId
 }
