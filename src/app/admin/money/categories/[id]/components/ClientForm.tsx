@@ -1,5 +1,5 @@
 "use client";
-import { useActionState, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   FieldContainer,
@@ -8,39 +8,69 @@ import {
   SelectField,
   SelectOption,
 } from "@/components/FormFields";
-import { formAction } from "../actions";
 import Form from "@/components/Form";
 import { Category } from "@/generated/prisma/browser";
+import {
+  createAction,
+  getCategoriesForDropdown,
+  updateAction,
+  deleteAction,
+} from "../actions";
 
 type ClientFormProps = {
   isNew: boolean;
-  category?: Category;
+  category?: Category | null;
   categories: Pick<Category, "id" | "name">[];
 };
 
+type FormEntries = { [k in keyof Pick<Category, "name" | "parentId">]: string };
+
+const _onSaveClick = async (form: HTMLFormElement, id?: string) => {
+  const formData = new FormData(form);
+  const entries = Object.fromEntries(formData.entries()) as FormEntries;
+  const data = {
+    name: entries.name,
+    parentId: entries.parentId === "" ? null : entries.parentId,
+  };
+
+  if (id) await updateAction(id, data);
+  else id = await createAction(data);
+
+  return id;
+};
+
 export default function ClientForm(props: Readonly<ClientFormProps>) {
-  const submitter = useRef<HTMLButtonElement | null>(null);
-  const [parentId, setParentId] = useState(props.category?.parentId ?? "");
   const router = useRouter();
-  const [error, action, pending] = useActionState(formAction, null);
+  const form = useRef<HTMLFormElement>(null);
+  const [parentId, setParentId] = useState(props.category?.parentId ?? "");
+  const [categories, setCategories] = useState(props.categories);
+  const [pending, setPending] = useState(false);
 
-  useEffect(() => {
-    console.log("parent id:", props.category?.parentId);
+  const onSaveClick = useCallback(async () => {
+    setPending(true);
+    try {
+      const newId = await _onSaveClick(form.current!, props.category?.id);
+      if (props.isNew) {
+        router.push(`/admin/money/categories/${newId}`);
+      } else {
+        const cats = await getCategoriesForDropdown(newId);
+        setCategories(cats);
+      }
+    } catch (error) {
+      console.error(error);
+      alert("An error occurred. Please try again.");
+    } finally {
+      setPending(false);
+    }
+  }, [props.category, props.isNew, router]);
 
-    setParentId(props.category?.parentId ?? "");
-  }, [props.category?.parentId]);
-
-  if (error) alert(error);
+  const onDeleteClick = useCallback(async () => {
+    await deleteAction(props.category!.id);
+    router.push("/admin/money/categories");
+  }, [props.category, router]);
 
   return (
-    <Form
-      action={(f) => {
-        f.append(submitter.current!.name, submitter.current!.value);
-        return action(f);
-      }}
-    >
-      <input type="hidden" name="id" value={props.category?.id} />
-
+    <Form ref={form}>
       <FieldContainer label="Name">
         <InputField
           type="text"
@@ -57,7 +87,7 @@ export default function ClientForm(props: Readonly<ClientFormProps>) {
           onChange={(e) => setParentId(e.target.value)}
         >
           <SelectOption value="">-- None --</SelectOption>
-          {props.categories.map((cat) => (
+          {categories.map((cat) => (
             <SelectOption key={cat.id} value={cat.id}>
               {cat.name}
             </SelectOption>
@@ -66,31 +96,23 @@ export default function ClientForm(props: Readonly<ClientFormProps>) {
       </FieldContainer>
 
       <div className="flex justify-between mt-10">
-        <FormButton
-          type="button"
-          disabled={pending}
-          onClick={() => router.back()}
-        >
+        <FormButton type="button" disabled={pending} onClick={router.back}>
           Cancel
         </FormButton>
         <FormButton
-          name="actionType"
-          value="save"
           type="submit"
           disabled={pending}
           className="text-btn-blue border-btn-blue"
-          onClick={(e) => (submitter.current = e.currentTarget)}
+          onClick={onSaveClick}
         >
           Save
         </FormButton>
         {props.isNew === false && (
           <FormButton
-            name="actionType"
-            value="delete"
-            type="submit"
+            type="button"
             disabled={pending}
             className="text-btn-red border-btn-red"
-            onClick={(e) => (submitter.current = e.currentTarget)}
+            onClick={onDeleteClick}
           >
             Delete
           </FormButton>

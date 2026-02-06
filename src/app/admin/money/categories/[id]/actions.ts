@@ -1,46 +1,31 @@
 "use server";
-import { Route } from "next";
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
-import categoriesService from "@/services/categories.service";
+import categoriesService, {
+  CreateCategoryDto,
+  UpdateCategoryDto,
+} from "@/services/categories.service";
 
-type FormDataDto = {
-  id?: string;
-  name: string;
-  parentId: string | null;
-  actionType: "save" | "delete";
+export const deleteAction = async (id: string) => {
+  await categoriesService.deleteCategory(id);
+  revalidatePath(`/admin/money/categories/${id}`);
+  revalidatePath("/admin/money/categories");
 };
 
-export const formAction = async (_: null | string, form: FormData) => {
-  const data = Object.fromEntries(form.entries()) as FormDataDto;
-  let routeTo: Route | null = null;
+export const createAction = async (params: CreateCategoryDto) => {
+  const created = await categoriesService.createCategory(params);
+  revalidatePath(`/admin/money/categories/${created.id}`);
+  revalidatePath("/admin/money/categories");
+  return created.id;
+};
 
-  data.parentId = data.parentId || null;
+export const updateAction = async (id: string, params: UpdateCategoryDto) => {
+  await categoriesService.updateCategory(id, params);
+  revalidatePath(`/admin/money/categories/${id}`);
+  revalidatePath("/admin/money/categories");
+};
 
-  try {
-    if (data.actionType === "save" && data.id) {
-      await categoriesService.updateCategory(data.id, {
-        name: data.name,
-        parentId: data.parentId,
-      });
-      revalidatePath(`/admin/money/categories/${data.id}`);
-    } else if (data.actionType === "save") {
-      const created = await categoriesService.createCategory({
-        name: data.name,
-        parentId: data.parentId,
-      });
-      routeTo = `/admin/money/categories/${created.id}` as Route;
-    } else if (data.actionType === "delete" && data.id) {
-      await categoriesService.deleteCategory(data.id);
-      routeTo = "/admin/money/categories";
-    }
-  } catch (error) {
-    if (error instanceof Error) {
-      return error.message;
-    } else throw error;
-  }
-
-  if (routeTo) redirect(routeTo);
-
-  return null;
+export const getCategoriesForDropdown = async (currentCatId: string) => {
+  const categories =
+    await categoriesService.getNonChildCategories(currentCatId);
+  return categories.map((cat) => ({ id: cat.id, name: cat.name }));
 };

@@ -13,7 +13,12 @@ const getCategories = async (currentId?: string) => {
     ? await categoriesService.getNonChildCategories(currentId)
     : await categoriesService.getAllCategories();
 
-  return categories.filter((cat) => cat.id !== currentId);
+  return categories
+    .filter((cat) => cat.id !== currentId)
+    .map((cat) => ({
+      id: cat.id,
+      name: cat.name,
+    }));
 };
 
 export default async function CategoryPage(
@@ -22,11 +27,9 @@ export default async function CategoryPage(
   const { id } = await props.params;
   const isNew = id === "new";
 
-  const category = isNew
-    ? undefined
-    : await categoriesService.getCategoryById(id);
+  const category = isNew ? null : await categoriesService.getCategoryById(id);
 
-  if (category === null) notFound();
+  if (!isNew && !category) notFound();
 
   const categories = await getCategories(isNew ? undefined : id);
 
