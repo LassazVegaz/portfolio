@@ -31,13 +31,22 @@ export default async function CategoryPage(
 
   if (!isNew && !category) notFound();
 
+  const hasChildCategories = isNew
+    ? undefined
+    : await categoriesService.hasChildCategories(id);
+
   const categories = await getCategories(isNew ? undefined : id);
 
   return (
     <PageContainer>
       <Header1>A Category</Header1>
 
-      <ClientForm category={category} isNew={isNew} categories={categories} />
+      <ClientForm
+        category={category}
+        isNew={isNew}
+        categories={categories}
+        hasChildCategories={hasChildCategories}
+      />
     </PageContainer>
   );
 }

@@ -20,6 +20,7 @@ import {
 type ClientFormProps = {
   isNew: boolean;
   category?: Category | null;
+  hasChildCategories?: boolean;
   categories: Pick<Category, "id" | "name">[];
 };
 
@@ -110,7 +111,7 @@ export default function ClientForm(props: Readonly<ClientFormProps>) {
         {props.isNew === false && (
           <FormButton
             type="button"
-            disabled={pending}
+            disabled={pending || props.hasChildCategories}
             className="text-btn-red border-btn-red"
             onClick={onDeleteClick}
           >

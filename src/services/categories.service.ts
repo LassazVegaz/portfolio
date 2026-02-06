@@ -58,6 +58,13 @@ export class CategoriesService {
     return categories.filter((category) => !childCategoryIds.has(category.id));
   }
 
+  async hasChildCategories(id: string) {
+    const count = await prisma.category.count({
+      where: { parentId: id },
+    });
+    return count > 0;
+  }
+
   /**
    * Validates that the parent category does not create a circular reference.
    */
