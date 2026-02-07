@@ -47,11 +47,11 @@ model Category {
 }
 
 model Transaction {
-  id            String    @id @default(auto()) @map("_id") @db.ObjectId
-  amount        Float
-  title         String
-  transactionAt DateTime  @default(now())
-  comments      String?
-  category      Category? @relation(fields: [categoryId], references: [id])
-  categoryId    String?   @db.ObjectId
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  amount     Float
+  title      String
+  time       DateTime  @default(now())
+  comments   String?
+  category   Category? @relation(fields: [categoryId], references: [id])
+  categoryId String?   @db.ObjectId
 }
