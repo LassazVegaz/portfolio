@@ -3,6 +3,7 @@ import Header1 from "@/components/Header1";
 import PageContainer from "@/components/PageContainer";
 import ClientForm from "./components/ClientForm";
 import categoriesService from "@/services/categories.service";
+import HomeButton from "@/components/HomeButton";
 
 /**
  * Get all cetegories excluding the current category.
@@ -39,6 +40,8 @@ export default async function CategoryPage(
 
   return (
     <PageContainer>
+      <HomeButton />
+
       <Header1>A Category</Header1>
 
       <ClientForm
