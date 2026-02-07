@@ -32,6 +32,13 @@ export class TransactionsService {
     });
     return t;
   }
+
+  async getAll() {
+    const transactions = await prisma.transaction.findMany({
+      orderBy: { time: "desc" },
+    });
+    return transactions;
+  }
 }
 
 const transactionsService = new TransactionsService();
