@@ -98,16 +98,39 @@ export default function ClientForm(props: Readonly<ClientFormProps>) {
   return (
     <Form ref={form} className="mt-10 grid grid-cols-1 gap-4">
       <FieldContainer label="Amount">
-        <InputField type="text" name="amount" required />
+        <InputField
+          type="text"
+          name="amount"
+          required
+          defaultValue={props.transaction?.amount.toFixed(2)}
+        />
       </FieldContainer>
       <FieldContainer label="Title">
-        <InputField type="text" name="title" required />
+        <InputField
+          type="text"
+          name="title"
+          required
+          defaultValue={props.transaction?.title}
+        />
       </FieldContainer>
       <FieldContainer label="Comments">
-        <InputField type="text" name="comments" />
+        <InputField
+          type="text"
+          name="comments"
+          defaultValue={props.transaction?.comments || ""}
+        />
       </FieldContainer>
       <FieldContainer label="Time">
-        <InputField type="datetime-local" name="time" required />
+        <InputField
+          type="datetime-local"
+          name="time"
+          required
+          defaultValue={
+            props.transaction?.time
+              ? new Date(props.transaction.time).toISOString().slice(0, 16)
+              : ""
+          }
+        />
       </FieldContainer>
 
       <div className="flex justify-between mt-10">
