@@ -9,6 +9,7 @@ import {
 } from "@/components/FormFields";
 import { createAction, updateAction, deleteAction } from "../actions";
 import { Transaction } from "@/generated/prisma/browser";
+import ValidationException from "@/exceptions/validation.exception";
 
 type FormEntries = {
   [k in keyof Pick<
@@ -22,9 +23,27 @@ type ClientFormProps = {
   transaction?: Transaction | null;
 };
 
+const handleKnownExceptions = (error: unknown) => {
+  let handled = false;
+
+  if (error instanceof ValidationException) {
+    alert(error.message);
+    handled = true;
+  }
+
+  return handled;
+};
+
+const validateFormEntries = (entries: FormEntries) => {
+  if (Number.isNaN(Number.parseFloat(entries.amount)))
+    throw new ValidationException("Amount must be a valid number");
+};
+
 const _onSaveClick = async (form: HTMLFormElement, id?: string) => {
   const formData = new FormData(form);
   const entries = Object.fromEntries(formData.entries()) as FormEntries;
+  validateFormEntries(entries);
+
   if (id) {
     await updateAction(id, entries);
   } else {
@@ -41,14 +60,17 @@ export default function ClientForm(props: Readonly<ClientFormProps>) {
 
   const onSaveClick: MouseEventHandler<HTMLButtonElement> = useCallback(
     async (e) => {
+      if (!form.current!.checkValidity()) return;
       e.preventDefault();
       setPending(true);
       try {
         const id = await _onSaveClick(form.current!, props.transaction?.id);
         if (props.isNew) router.push(`/admin/money/transactions/${id}`);
       } catch (error) {
-        console.error("Failed to save transaction:", error);
-        alert("An error occurred while saving the transaction.");
+        if (!handleKnownExceptions(error)) {
+          console.error("Failed to save transaction:", error);
+          alert("An error occurred while saving the transaction.");
+        }
       } finally {
         setPending(false);
       }
