@@ -1,11 +1,8 @@
 import PageContainer from "@/components/PageContainer";
 import Header1 from "@/components/Header1";
-import routingService from "@/services/routing-service";
 import AppCard from "@/components/AppCard";
 
 export default async function AdminPage() {
-  await routingService.unauthorizedRedirection();
-
   return (
     <PageContainer className="grid grid-rows-[auto_1fr] items-center h-screen">
       <Header1>Apps</Header1>
