@@ -1,5 +1,6 @@
 import FloatingAction from "@/components/FloatingAction";
 import Header1 from "@/components/Header1";
+import TopNavigator from "@/components/HomeButton";
 import PageContainer from "@/components/PageContainer";
 import categoriesService from "@/services/categories.service";
 import Link from "next/link";
@@ -9,6 +10,8 @@ export default async function CategoriesPage() {
 
   return (
     <PageContainer className="grid grid-rows-[auto_1fr] gap-6 max-h-screen">
+      <TopNavigator links={["home", "money"]} />
+
       <Header1>Categories</Header1>
 
       <div className="flex flex-col space-y-4 overflow-y-auto mb-4">

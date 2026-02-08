@@ -1,5 +1,11 @@
+import TopNavigator from "@/components/HomeButton";
 import ClientSidePage from "./components/ClientSidePage";
 
 export default async function AdminPage() {
-  return <ClientSidePage />;
+  return (
+    <>
+      <TopNavigator links={["home"]} />
+      <ClientSidePage />
+    </>
+  );
 }
