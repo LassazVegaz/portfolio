@@ -19,7 +19,7 @@ export default async function proxy(req: NextRequest) {
 
     if (isPublicPath && isLoggedIn) {
       return NextResponse.redirect(new URL("/admin", req.url));
-    } else if (!isLoggedIn) {
+    } else if (isAdminPath && !isLoggedIn) {
       const c = await cookies();
       c.set(COOKIE_NAME_REDIRECTED_FROM, pathname, {
         httpOnly: true,
