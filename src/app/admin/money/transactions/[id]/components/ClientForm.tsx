@@ -39,9 +39,7 @@ export default function ClientForm(props: Readonly<ClientFormProps>) {
   const form = useRef<HTMLFormElement>(null);
   const [pending, setPending] = useState(false);
 
-  const defaultTime = props.transaction?.time
-    ? toLocalISOString(props.transaction.time)
-    : "";
+  const defaultTime = toLocalISOString(props.transaction?.time ?? new Date());
 
   const onSaveClick: MouseEventHandler<HTMLButtonElement> = async (e) => {
     if (!form.current!.checkValidity()) return;
