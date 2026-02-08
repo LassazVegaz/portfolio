@@ -1,6 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { MouseEventHandler, useCallback, useRef, useState } from "react";
+import { MouseEventHandler, useRef, useState } from "react";
 import Form from "@/components/Form";
 import {
   FieldContainer,
@@ -9,39 +9,20 @@ import {
 } from "@/components/FormFields";
 import { createAction, updateAction, deleteAction } from "../actions";
 import { Transaction } from "@/generated/prisma/browser";
-import ValidationException from "@/exceptions/validation.exception";
-
-type FormEntries = {
-  [k in keyof Pick<
-    Transaction,
-    "amount" | "title" | "comments" | "time"
-  >]: string;
-};
+import {
+  buildFormEntries,
+  handleKnownExceptions,
+  toLocalISOString,
+  validateFormEntries,
+} from "../utils";
 
 type ClientFormProps = {
   isNew: boolean;
   transaction?: Transaction | null;
 };
 
-const handleKnownExceptions = (error: unknown) => {
-  let handled = false;
-
-  if (error instanceof ValidationException) {
-    alert(error.message);
-    handled = true;
-  }
-
-  return handled;
-};
-
-const validateFormEntries = (entries: FormEntries) => {
-  if (Number.isNaN(Number.parseFloat(entries.amount)))
-    throw new ValidationException("Amount must be a valid number");
-};
-
 const _onSaveClick = async (form: HTMLFormElement, id?: string) => {
-  const formData = new FormData(form);
-  const entries = Object.fromEntries(formData.entries()) as FormEntries;
+  const entries = buildFormEntries(form);
   validateFormEntries(entries);
 
   if (id) {
@@ -58,42 +39,40 @@ export default function ClientForm(props: Readonly<ClientFormProps>) {
   const form = useRef<HTMLFormElement>(null);
   const [pending, setPending] = useState(false);
 
-  const onSaveClick: MouseEventHandler<HTMLButtonElement> = useCallback(
-    async (e) => {
-      if (!form.current!.checkValidity()) return;
-      e.preventDefault();
-      setPending(true);
-      try {
-        const id = await _onSaveClick(form.current!, props.transaction?.id);
-        if (props.isNew) router.push(`/admin/money/transactions/${id}`);
-      } catch (error) {
-        if (!handleKnownExceptions(error)) {
-          console.error("Failed to save transaction:", error);
-          alert("An error occurred while saving the transaction.");
-        }
-      } finally {
-        setPending(false);
-      }
-    },
-    [props.isNew, props.transaction?.id, router],
-  );
+  const defaultTime = props.transaction?.time
+    ? toLocalISOString(props.transaction.time)
+    : "";
 
-  const onDeleteClick: MouseEventHandler<HTMLButtonElement> = useCallback(
-    async (e) => {
-      e.preventDefault();
-      setPending(true);
-      try {
-        await deleteAction(props.transaction!.id);
-        router.push("/admin/money/transactions");
-      } catch (error) {
-        console.error("Failed to delete transaction:", error);
-        alert("An error occurred while deleting the transaction.");
-      } finally {
-        setPending(false);
+  const onSaveClick: MouseEventHandler<HTMLButtonElement> = async (e) => {
+    if (!form.current!.checkValidity()) return;
+    e.preventDefault();
+    setPending(true);
+    try {
+      const id = await _onSaveClick(form.current!, props.transaction?.id);
+      if (props.isNew) router.push(`/admin/money/transactions/${id}`);
+    } catch (error) {
+      if (!handleKnownExceptions(error)) {
+        console.error("Failed to save transaction:", error);
+        alert("An error occurred while saving the transaction.");
       }
-    },
-    [router, props.transaction],
-  );
+    } finally {
+      setPending(false);
+    }
+  };
+
+  const onDeleteClick: MouseEventHandler<HTMLButtonElement> = async (e) => {
+    e.preventDefault();
+    setPending(true);
+    try {
+      await deleteAction(props.transaction!.id);
+      router.push("/admin/money/transactions");
+    } catch (error) {
+      console.error("Failed to delete transaction:", error);
+      alert("An error occurred while deleting the transaction.");
+    } finally {
+      setPending(false);
+    }
+  };
 
   return (
     <Form ref={form} className="mt-10 grid grid-cols-1 gap-4">
@@ -125,11 +104,7 @@ export default function ClientForm(props: Readonly<ClientFormProps>) {
           type="datetime-local"
           name="time"
           required
-          defaultValue={
-            props.transaction?.time
-              ? new Date(props.transaction.time).toISOString().slice(0, 16)
-              : ""
-          }
+          defaultValue={defaultTime}
         />
       </FieldContainer>
 

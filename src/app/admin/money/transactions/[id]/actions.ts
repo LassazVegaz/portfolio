@@ -10,10 +10,11 @@ type FormEntries = {
 };
 
 export const createAction = async (entries: FormEntries) => {
+  console.log("time:", entries.time);
   const created = await ts.create({
     amount: Number.parseFloat(entries.amount),
     title: entries.title,
-    comments: entries.comments,
+    comments: entries.comments || null,
     time: new Date(entries.time),
     categoryId: null,
   });
