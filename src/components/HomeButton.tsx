@@ -1,13 +1,14 @@
 import { Route } from "next";
-import Image from "next/image";
+import Image, { StaticImageData } from "next/image";
 import Link from "next/link";
+import homeImg from "../../public/home.png";
 
 type NavigationLink = "home" | "money";
 
 type LinkProps = (
   | {
       type: "image";
-      src: string;
+      src: StaticImageData;
       alt: string;
     }
   | {
@@ -21,7 +22,7 @@ type LinkProps = (
 const links: Record<NavigationLink, LinkProps> = {
   home: {
     type: "image",
-    src: "/home.png",
+    src: homeImg,
     alt: "home",
     href: "/admin",
   },
@@ -41,11 +42,11 @@ const NavigationButton = (props: LinkButtonProps) => {
   return (
     <Link href={link.href} className="p-1.5">
       {link.type === "text" ? (
-        <span className="font-bold h-6 w-6 flex items-center justify-center">
+        <span className="font-bold h-5 w-5 flex items-center justify-center">
           {link.content}
         </span>
       ) : (
-        <Image src={link.src} width={24} height={24} alt={link.alt} />
+        <Image src={link.src} alt={link.alt} className="max-w-5 max-h-5" />
       )}
     </Link>
   );
