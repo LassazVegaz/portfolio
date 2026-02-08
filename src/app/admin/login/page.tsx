@@ -2,11 +2,8 @@ import PageContainer from "@/components/PageContainer";
 import Header1 from "@/components/Header1";
 import { loginAction } from "./actions";
 import LoginButton from "./components/LoginButton";
-import routingService from "@/services/routing-service";
 
 export default async function LoginPage() {
-  await routingService.authorizedRedirection();
-
   return (
     <PageContainer className="grid grid-rows-[auto_1fr] items-center h-screen">
       <Header1>Access Admin Part</Header1>

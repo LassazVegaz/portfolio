@@ -1,9 +1,5 @@
-onlyBuiltDependencies:
-  - '@parcel/watcher'
-  - '@prisma/client'
-  - '@prisma/engines'
-  - '@tailwindcss/oxide'
-  - esbuild
-  - prisma
+packages:
+  - .
+ignoredBuiltDependencies:
   - sharp
   - unrs-resolver
