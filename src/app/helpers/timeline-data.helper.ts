@@ -8,6 +8,32 @@ export type TimelinePiece = {
 const timelineData: TimelinePiece[] = [
   {
     title: "Senior Software Engineer",
+    range: "06/2024 to 04/2026",
+    company: "Singapore Economic Development Board (EDB)",
+    points: [
+      "Developed and maintained .NET APIs, libraries, batch jobs, and a large‑scale CRM system in a private AWS cloud.",
+      "Reduced runtime errors & improved long‑term maintainability by converting a sizeable JS codebase to TS.",
+      "Automated SonarQube scanning, unit testing & deployments by creating GitLab CI/CD pipelines using YAML & PS.",
+      "Increased system security using AWS strict VPCs, ALB/NLB firewalls & strict IAM Permission Policies.",
+      "Reduced downtime by monitoring EC2s using AWS alerts & logs monitoring using Elasticsearch.",
+      "Technologies: .NET, TypeScript, AWS (S3, Secrets Manager, EC2, IAM), Azure AD, GitLab CI/CD, MS SQL Server",
+    ],
+  },
+  {
+    title: "Senior Software Engineer",
+    range: "09/2023 to 05/2024",
+    company: "Lukfo AI",
+    points: [
+      "Built AI‑powered e‑commerce system, including conversational chat and image analysis.",
+      "Reduced development time by building AI features using Django, a general-purpose API using .NET & a NextJS frontend.",
+      "Increased user experience by semantically searching images using Pinecone Vector DB & OpenAI API embeddings.",
+      "Reduced maintenance time by designing the microservices architecture & AI flows using classical diagrams.",
+      "Increased maintainability by introducing Azure Service Bus for microservices to communicate using events.",
+      "Technologies: .NET, Django, NextJS, TypeScript, PostgreSQL, Pinecone, OpenAI API, Azure Service Bus, Microservices",
+    ],
+  },
+  {
+    title: "Senior Software Engineer",
     range: "07/2022 to 08/2023",
     company: "HCL Technologies",
     points: [
