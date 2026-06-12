@@ -1,4 +1,5 @@
 {
   "sonarlint.analysisExcludesStandalone": ".env.development.local,.env.production.local",
-  "prisma.pinToPrisma6": true
+  "prisma.pinToPrisma6": true,
+  "js/ts.tsdk.path": "node_modules\\typescript\\lib"
 }
