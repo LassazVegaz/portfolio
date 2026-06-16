@@ -5,3 +5,19 @@
   --color-btn-green: #00ff00;
   --color-btn-blue: #00ff39;
 }
+
+body::-webkit-scrollbar {
+  width: 0.5rem;
+}
+
+body::-webkit-scrollbar-track {
+  background: #1e1e24;
+}
+
+body::-webkit-scrollbar-thumb {
+  background: #ffffffa0;
+}
+
+body::-webkit-scrollbar-thumb:hover {
+  background: #ffffff80;
+}
