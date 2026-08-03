@@ -2,11 +2,11 @@ import FloatingAction from "@/components/FloatingAction";
 import Header1 from "@/components/Header1";
 import TopNavigator from "@/components/HomeButton";
 import PageContainer from "@/components/PageContainer";
-import ts from "@/services/transactions.service";
+import { Transaction } from "@/generated/prisma/client";
 import Link from "next/link";
 
 export default async function MoneyPage() {
-  const transactions = await ts.getAll();
+  const transactions = [] as Transaction[]; // await ts.getAll();
 
   return (
     <PageContainer className="grid grid-rows-[auto_1fr] gap-6 max-h-screen">

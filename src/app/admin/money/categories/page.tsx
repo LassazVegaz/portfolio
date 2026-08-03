@@ -2,11 +2,12 @@ import FloatingAction from "@/components/FloatingAction";
 import Header1 from "@/components/Header1";
 import TopNavigator from "@/components/HomeButton";
 import PageContainer from "@/components/PageContainer";
-import categoriesService from "@/services/categories.service";
+import { Category } from "@/generated/prisma/client";
 import Link from "next/link";
 
 export default async function CategoriesPage() {
-  const categories = await categoriesService.getAllCategories();
+  // const categories = await categoriesService.getAllCategories();
+  const categories = [] as Category[];
 
   return (
     <PageContainer className="grid grid-rows-[auto_1fr] gap-6 max-h-screen">

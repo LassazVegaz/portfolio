@@ -1,27 +1,30 @@
-import fs from "fs";
-import path from "path";
-import { MDXRemote } from "next-mdx-remote/rsc";
-import { Icons } from "../Icons";
-
-const aboutMeTextDir = path.join(process.cwd(), "src/assets/about-me.md");
-const aboutMeText = fs.readFileSync(aboutMeTextDir, "utf8");
-
 export default function SectionMySelf() {
   return (
-    <section
-      id="about-me"
-      className="min-h-screen flex items-center justify-center"
-    >
-      <div className="border-2 border-gray-300 rounded-lg shadow-lg max-w-[800px] transition duration-300 hover:shadow-xl dark:shadow-slate-600 dark:hover:shadow-slate-600">
-        <div className="p-10">
-          <h4 className="text-4xl text-center mb-4">About Me</h4>
-
-          <div className="text-justify [&_a]:transition-all [&_a]:duration-300 [&>p]:my-2 [&_a]:text-blue-500 [&_a]:hover:text-blue-700 dark:text-slate-400">
-            <MDXRemote source={aboutMeText} />
+    <section id="about-me" className="about section-container section-spacing">
+      <div className="section-label"><span>01</span> About</div>
+      <div className="about-grid">
+        <div>
+          <p className="eyebrow">More than a stack of technologies</p>
+          <h2>I care about the whole system—and the people relying on it.</h2>
+        </div>
+        <div className="about-copy">
+          <p>
+            I&apos;m a Senior Software Engineer who started coding at thirteen,
+            chasing the dream of building a game on a 256 MB PC. That curiosity
+            grew into a career spanning public-sector platforms, AI-powered
+            products, cloud infrastructure, and full-stack applications.
+          </p>
+          <p>
+            Most recently, I built and maintained secure systems for Singapore&apos;s
+            Economic Development Board. I&apos;m at my best where product thinking,
+            architecture, and hands-on engineering meet—simplifying complexity
+            without losing sight of reliability.
+          </p>
+          <div className="about-links">
+            <a href="https://medium.com/@lasindunuwangaweerasinghe" target="_blank" rel="noopener noreferrer">Read my writing ↗</a>
+            <a href="https://www.fiverr.com/lassaz_vegaz" target="_blank" rel="noopener noreferrer">Fiverr profile ↗</a>
           </div>
         </div>
-
-        <Icons className="flex justify-center items-center gap-10 mb-2" />
       </div>
     </section>
   );
