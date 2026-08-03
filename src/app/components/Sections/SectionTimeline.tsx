@@ -1,42 +1,33 @@
 import timelineData, {
   TimelinePiece,
 } from "@/app/helpers/timeline-data.helper";
-import styles from "./SectionTimeline.module.scss";
-
 const TimelineItem = ({ data }: { data: TimelinePiece }) => (
-  <div
-    className={`${styles["timeline-item"]} grid grid-cols-[60px_auto_1fr] sm:grid-cols-[3fr_auto_5fr] md:grid-cols-[1fr_auto_1fr] gap-4 2xl w-[95%]`}
-  >
-    <div
-      className={`${styles["onhover-date-range"]} text-sm lg:text-base text-center sm:text-right opacity-40 pt-1`}
-    >
-      {data.range}
+  <article className="timeline-item">
+    <div className="timeline-meta">
+      <span>{data.range}</span>
+      <i />
     </div>
-    <div className="grid grid-rows-[auto_1fr] gap-2 justify-items-center pt-3">
-      <span
-        color="primary"
-        className={`${styles["onhover-glow"]} w-4 h-4 inline-block bg-blue-600 rounded-full`}
-      />
-      <span className="w-0.5 inline-block bg-white opacity-70 rounded" />
-    </div>
-    <div className={`${styles["onhover-enlarge"]} pb-5`}>
-      <h5 className="text-2xl dark:text-slate-50">{data.title}</h5>
-      <h6 className="text-xl mb-5 dark:text-slate-100">{data.company}</h6>
-      <ul className="dark:text-slate-300">
-        {data.points.map((point, index) => (
-          <li key={index}>
-            <p className="max-w-[500px] text-base">{point}</p>
-          </li>
-        ))}
+    <div className="timeline-card">
+      <p className="timeline-company">{data.company}</p>
+      <h3>{data.title}</h3>
+      <ul>
+        {data.points.slice(0, 5).map((point, index) => <li key={index}>{point}</li>)}
       </ul>
     </div>
-  </div>
+  </article>
 );
 
 const SectionTimeline = () => (
-  <section className="py-5 mt-28" id="career-timeline">
-    <h4 className="text-4xl text-center mb-8">Career Timeline</h4>
-    <div className="flex flex-col items-center gap-1">
+  <section className="experience section-container section-spacing" id="career-timeline">
+    <div className="section-label"><span>03</span> Experience</div>
+    <div className="section-heading-row">
+      <div>
+        <p className="eyebrow">The path so far</p>
+        <h2>Built through ownership, curiosity, and change.</h2>
+      </div>
+      <p>From an early startup CTO role to engineering public-sector systems in Singapore.</p>
+    </div>
+    <div className="timeline">
       {timelineData.map((data, index) => (
         <TimelineItem key={index} data={data} />
       ))}

@@ -17,7 +17,7 @@ export default function SocialIcon(props: SocialIconProps) {
         alt={props.alt}
         width={iconSize}
         height={iconSize}
-        className="transition-all duration-300 hover:scale-125 w-[25px] h-[25px] rounded-md p-0.5 dark:bg-slate-500 dark:hover:bg-slate-400"
+        className="social-icon-image"
       />
     </a>
   );
