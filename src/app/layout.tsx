@@ -3,7 +3,7 @@ import type { Metadata, Viewport } from "next";
 import { Analytics } from "@vercel/analytics/next";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.SITE_URL ?? "https://lasindu.dev"),
+  metadataBase: new URL(process.env.SITE_URL ?? "https://lassi.vercel.app"),
   title: "Lasindu Weerasinghe — Senior Software Engineer",
   description:
     "Senior Software Engineer building reliable cloud platforms, AI products, and full-stack applications with .NET and TypeScript.",
