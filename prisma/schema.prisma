@@ -57,7 +57,7 @@ model Transaction {
   title       String
   time        DateTime             @default(now())
   comments    String?
-  category    Category             @relation(fields: [categoryId], references: [id])
+  category    Category             @relation(fields: [categoryId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   categoryId  String               @db.ObjectId
   createdAt   DateTime             @default(now())
   updatedAt   DateTime             @updatedAt
