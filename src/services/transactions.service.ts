@@ -61,22 +61,18 @@ export class TransactionsService {
   }
 
   async getById(id: string) {
-    const transaction = await prisma.transaction.findUnique({
+    return prisma.transaction.findUnique({
       where: { id },
       include: { category: true },
     });
-    return transaction ? this.normalizeLegacyTransaction(transaction) : null;
   }
 
   async getAll(filters: TransactionFilters = {}) {
-    const transactions = await prisma.transaction.findMany({
+    return prisma.transaction.findMany({
       where: this.buildWhere(filters),
       include: { category: true },
       orderBy: [{ time: "desc" }, { createdAt: "desc" }],
     });
-    return Promise.all(
-      transactions.map((transaction) => this.normalizeLegacyTransaction(transaction)),
-    );
   }
 
   async getOpeningBalanceCents() {
@@ -100,7 +96,6 @@ export class TransactionsService {
   }
 
   async getBalanceCents(excludingTransactionId?: string) {
-    await this.migrateLegacyTransactions();
     const [openingBalanceCents, incoming, outgoing] = await Promise.all([
       this.getOpeningBalanceCents(),
       prisma.transaction.aggregate({
@@ -140,59 +135,6 @@ export class TransactionsService {
     }
     if (!dto.title.trim()) throw new Error("Title is required.");
     if (Number.isNaN(dto.time.getTime())) throw new Error("Date is invalid.");
-  }
-
-  private async migrateLegacyTransactions() {
-    const transactions = await prisma.transaction.findMany({
-      include: { category: true },
-    });
-    await Promise.all(
-      transactions
-        .filter(
-          (transaction) =>
-            transaction.amountCents === null ||
-            transaction.direction === null ||
-            transaction.category === null,
-        )
-        .map((transaction) => this.normalizeLegacyTransaction(transaction)),
-    );
-  }
-
-  private async normalizeLegacyTransaction(
-    transaction: Awaited<
-      ReturnType<typeof prisma.transaction.findMany<{ include: { category: true } }>>
-    >[number],
-  ) {
-    if (
-      transaction.amountCents !== null &&
-      transaction.direction !== null &&
-      transaction.category !== null
-    ) {
-      return {
-        ...transaction,
-        amountCents: transaction.amountCents,
-        direction: transaction.direction,
-        category: transaction.category,
-      };
-    }
-
-    const category = transaction.category ?? (await categoriesService.ensureUnclassified());
-    const legacyAmount = transaction.amount ?? 0;
-    return prisma.transaction.update({
-      where: { id: transaction.id },
-      data: {
-        amountCents: transaction.amountCents ?? Math.abs(Math.round(legacyAmount * 100)),
-        direction: transaction.direction ?? "OUT",
-        categoryId: category.id,
-      },
-      include: { category: true },
-    }) as Promise<
-      typeof transaction & {
-        amountCents: number;
-        direction: TransactionDirection;
-        category: NonNullable<typeof transaction.category>;
-      }
-    >;
   }
 
   private buildWhere(filters: TransactionFilters) {
