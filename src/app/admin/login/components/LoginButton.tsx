@@ -10,7 +10,7 @@ export default function LoginButton() {
       className="bg-blue-500 text-white p-2 rounded enabled:cursor-pointer disabled:opacity-50"
       disabled={pending}
     >
-      Login
+      {pending ? "Signing in…" : "Sign in"}
     </button>
   );
 }

@@ -1,35 +1,146 @@
+import "server-only";
+
+import { compare, hash } from "bcryptjs";
 import { cookies } from "next/headers";
+import prisma from "./prisma-service";
+import {
+  COOKIE_NAME_ADMIN_SESSION,
+  sessionCookieOptions,
+} from "@/constants/cookies.constants";
+import {
+  AdminSession,
+  createSessionToken,
+  verifySessionToken,
+} from "./session-service";
+
+const PASSWORD_ROUNDS = 12;
+const DUMMY_PASSWORD_HASH =
+  "$2b$12$YqzmPVhiQ68WJzefkwb2qutV6C4xU2ttHgzY45iZPmnICybZwl9zS";
+
+export class AuthenticationError extends Error {
+  constructor(message = "Your session has expired. Please sign in again.") {
+    super(message);
+    this.name = "AuthenticationError";
+  }
+}
 
 class AuthService {
-  private readonly COOKIE_NAME = "admin-auth";
-  private readonly LOGGED_IN_VALUE = "true";
+  async login(usernameInput: string, password: string): Promise<boolean> {
+    const username = usernameInput.trim();
+    let user = await prisma.adminUser.findUnique({ where: { username } });
 
-  async login(username: string, password: string): Promise<boolean> {
-    if (username === "admin" && password === "admin") {
-      const c = await cookies();
-      const sevenDaysInSeconds = 60 * 60 * 24 * 7;
-      c.set(this.COOKIE_NAME, this.LOGGED_IN_VALUE, {
-        httpOnly: true,
-        secure: true,
-        maxAge: sevenDaysInSeconds,
-      });
-      return true;
+    if (!user && (await prisma.adminUser.count()) === 0) {
+      user = await this.bootstrapFirstAdmin(username, password);
     }
 
-    return false;
+    const passwordMatches = await compare(
+      password,
+      user?.passwordHash ?? DUMMY_PASSWORD_HASH,
+    );
+    if (!user || !passwordMatches) return false;
+
+    await this.writeSession({
+      userId: user.id,
+      username: user.username,
+      version: user.sessionVersion,
+    });
+    return true;
   }
 
   async logout(): Promise<void> {
-    const c = await cookies();
-    c.delete(this.COOKIE_NAME);
+    const cookieStore = await cookies();
+    cookieStore.delete(COOKIE_NAME_ADMIN_SESSION);
+  }
+
+  async getSession(): Promise<AdminSession | null> {
+    const cookieStore = await cookies();
+    return verifySessionToken(
+      cookieStore.get(COOKIE_NAME_ADMIN_SESSION)?.value,
+    );
+  }
+
+  async getAuthenticatedUser() {
+    const session = await this.getSession();
+    if (!session) return null;
+
+    const user = await prisma.adminUser.findUnique({
+      where: { id: session.userId },
+    });
+    if (!user || user.sessionVersion !== session.version) return null;
+    return user;
+  }
+
+  async requireAuthenticatedUser() {
+    const user = await this.getAuthenticatedUser();
+    if (!user) throw new AuthenticationError();
+    return user;
   }
 
   async isLoggedIn(): Promise<boolean> {
-    const c = await cookies();
-    return c.get(this.COOKIE_NAME)?.value === this.LOGGED_IN_VALUE;
+    return (await this.getAuthenticatedUser()) !== null;
+  }
+
+  async updateProfile(input: {
+    username: string;
+    currentPassword: string;
+    newPassword?: string;
+  }) {
+    const user = await this.requireAuthenticatedUser();
+    if (!(await compare(input.currentPassword, user.passwordHash))) {
+      throw new AuthenticationError("The current password is incorrect.");
+    }
+
+    const username = input.username.trim();
+    const passwordHash = input.newPassword
+      ? await hash(input.newPassword, PASSWORD_ROUNDS)
+      : user.passwordHash;
+
+    const updated = await prisma.adminUser.update({
+      where: { id: user.id },
+      data: {
+        username,
+        passwordHash,
+        sessionVersion: { increment: 1 },
+      },
+    });
+
+    await this.writeSession({
+      userId: updated.id,
+      username: updated.username,
+      version: updated.sessionVersion,
+    });
+    return updated;
+  }
+
+  private async writeSession(session: AdminSession) {
+    const cookieStore = await cookies();
+    cookieStore.set(
+      COOKIE_NAME_ADMIN_SESSION,
+      await createSessionToken(session),
+      sessionCookieOptions,
+    );
+  }
+
+  private async bootstrapFirstAdmin(username: string, password: string) {
+    const bootstrapUsername = process.env.ADMIN_BOOTSTRAP_USERNAME;
+    const bootstrapPassword = process.env.ADMIN_BOOTSTRAP_PASSWORD;
+    if (
+      !bootstrapUsername ||
+      !bootstrapPassword ||
+      username !== bootstrapUsername ||
+      password !== bootstrapPassword
+    ) {
+      return null;
+    }
+
+    return prisma.adminUser.create({
+      data: {
+        username,
+        passwordHash: await hash(password, PASSWORD_ROUNDS),
+      },
+    });
   }
 }
 
 const authService = new AuthService();
-
 export default authService;

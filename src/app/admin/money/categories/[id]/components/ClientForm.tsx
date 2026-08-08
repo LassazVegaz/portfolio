@@ -9,18 +9,22 @@ import {
   SelectOption,
 } from "@/components/FormFields";
 import Form from "@/components/Form";
-import { Category } from "@/generated/prisma/browser";
 import {
   createAction,
-  getCategoriesForDropdown,
   updateAction,
   deleteAction,
 } from "../actions";
 
+type Category = {
+  id: string;
+  name: string;
+  parentId: string | null;
+  isSystem: boolean;
+};
+
 type ClientFormProps = {
   isNew: boolean;
   category?: Category | null;
-  hasChildCategories?: boolean;
   categories: Pick<Category, "id" | "name">[];
 };
 
@@ -44,7 +48,6 @@ export default function ClientForm(props: Readonly<ClientFormProps>) {
   const router = useRouter();
   const form = useRef<HTMLFormElement>(null);
   const [parentId, setParentId] = useState(props.category?.parentId ?? "");
-  const [categories, setCategories] = useState(props.categories);
   const [pending, setPending] = useState(false);
 
   const onSaveClick = useCallback(async () => {
@@ -53,10 +56,7 @@ export default function ClientForm(props: Readonly<ClientFormProps>) {
       const newId = await _onSaveClick(form.current!, props.category?.id);
       if (props.isNew) {
         router.push(`/admin/money/categories/${newId}`);
-      } else {
-        const cats = await getCategoriesForDropdown(newId);
-        setCategories(cats);
-      }
+      } else router.refresh();
     } catch (error) {
       console.error(error);
       if (error instanceof Error) alert(error.message);
@@ -80,13 +80,15 @@ export default function ClientForm(props: Readonly<ClientFormProps>) {
   }, [props.category, router]);
 
   return (
-    <Form ref={form}>
+    <Form ref={form} className="admin-panel mt-8 grid gap-5 rounded-2xl p-6">
       <FieldContainer label="Name">
         <InputField
           type="text"
           name="name"
           defaultValue={props.category?.name ?? ""}
           required
+          disabled={props.category?.isSystem}
+          className="admin-input"
         />
       </FieldContainer>
 
@@ -95,9 +97,11 @@ export default function ClientForm(props: Readonly<ClientFormProps>) {
           name="parentId"
           value={parentId}
           onChange={(e) => setParentId(e.target.value)}
+          disabled={props.category?.isSystem}
+          className="admin-input"
         >
           <SelectOption value="">-- None --</SelectOption>
-          {categories.map((cat) => (
+          {props.categories.map((cat) => (
             <SelectOption key={cat.id} value={cat.id}>
               {cat.name}
             </SelectOption>
@@ -117,10 +121,10 @@ export default function ClientForm(props: Readonly<ClientFormProps>) {
         >
           Save
         </FormButton>
-        {props.isNew === false && (
+        {props.isNew === false && !props.category?.isSystem && (
           <FormButton
             type="button"
-            disabled={pending || props.hasChildCategories}
+            disabled={pending}
             className="text-btn-red border-btn-red"
             onClick={onDeleteClick}
           >

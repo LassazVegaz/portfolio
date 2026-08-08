@@ -1,12 +1,12 @@
 import Link from "next/link";
 
-const FloatingAction: typeof Link = (props) => {
+export default function FloatingAction(
+  props: React.ComponentProps<typeof Link>,
+) {
   return (
     <Link
-      className="inline-block text-center p-2 border border-gray-300 w-12 h-12 rounded-full text-2xl absolute bottom-8 right-8"
       {...props}
+      className="fixed bottom-6 right-6 z-20 inline-grid h-14 w-14 place-items-center rounded-full bg-emerald-300 text-2xl font-medium text-slate-950 shadow-xl shadow-emerald-950/40 transition hover:scale-105"
     />
   );
-};
-
-export default FloatingAction;
+}

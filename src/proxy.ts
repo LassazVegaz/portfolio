@@ -1,31 +1,39 @@
 import { NextRequest, NextResponse } from "next/server";
-import authService from "./services/auth-service";
-import { Route } from "next";
-import { cookies } from "next/headers";
-import { COOKIE_NAME_REDIRECTED_FROM } from "./constants/cookies.constants";
+import {
+  COOKIE_NAME_ADMIN_SESSION,
+  COOKIE_NAME_REDIRECTED_FROM,
+} from "./constants/cookies.constants";
+import { verifySessionToken } from "./services/session-service";
 
-const publicPaths = new Set<Route>(["/", "/my-story", "/admin/login"]);
+const LOGIN_PATH = "/admin/login";
 
-const adminPathsStartWith: Route = "/admin";
+export default async function proxy(request: NextRequest) {
+  const { pathname, search } = request.nextUrl;
+  if (!pathname.startsWith("/admin")) return NextResponse.next();
 
-export default async function proxy(req: NextRequest) {
-  const { pathname } = req.nextUrl;
+  const session = await verifySessionToken(
+    request.cookies.get(COOKIE_NAME_ADMIN_SESSION)?.value,
+  );
 
-  const isPublicPath = publicPaths.has(pathname as Route);
-  const isAdminPath = pathname.startsWith(adminPathsStartWith);
-
-  if (isPublicPath || isAdminPath) {
-    const isLoggedIn = await authService.isLoggedIn();
-
-    if (isPublicPath && isLoggedIn) {
-      return NextResponse.redirect(new URL("/admin", req.url));
-    } else if (isAdminPath && !isLoggedIn) {
-      const c = await cookies();
-      c.set(COOKIE_NAME_REDIRECTED_FROM, pathname, {
-        httpOnly: true,
-        secure: true,
-      });
-      return NextResponse.rewrite(new URL("/admin/login", req.url));
-    }
+  if (pathname === LOGIN_PATH) {
+    return session
+      ? NextResponse.redirect(new URL("/admin", request.url))
+      : NextResponse.next();
   }
+
+  if (session) return NextResponse.next();
+
+  const response = NextResponse.redirect(new URL(LOGIN_PATH, request.url));
+  response.cookies.set(COOKIE_NAME_REDIRECTED_FROM, `${pathname}${search}`, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+    path: "/admin",
+    maxAge: 60 * 10,
+  });
+  return response;
 }
+
+export const config = {
+  matcher: ["/admin/:path*"],
+};

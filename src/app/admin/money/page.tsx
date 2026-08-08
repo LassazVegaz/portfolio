@@ -5,7 +5,8 @@ import PageContainer from "@/components/PageContainer";
 
 export default function MoneyPage() {
   return (
-    <PageContainer className="grid grid-rows-[auto_1fr] items-center h-screen">
+    <main className="admin-shell min-h-screen">
+    <PageContainer className="mx-auto grid max-w-4xl grid-rows-[auto_auto_1fr] gap-8">
       <TopNavigator links={["home"]} />
 
       <Header1>Money</Header1>
@@ -13,7 +14,9 @@ export default function MoneyPage() {
       <div className="grid grid-cols-2 gap-4 items-center">
         <AppCard href="/admin/money/transactions">Transactions</AppCard>
         <AppCard href="/admin/money/categories">Categories</AppCard>
+        <AppCard href="/admin/money/settings">Opening Balance</AppCard>
       </div>
     </PageContainer>
+    </main>
   );
 }

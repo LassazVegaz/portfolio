@@ -4,7 +4,7 @@ export default function AppCard(props: React.ComponentProps<typeof Link>) {
   return (
     <Link
       {...props}
-      className="bg-black border-2 border-white rounded p-1 w-32 h-32 flex items-center justify-center text-center md:text-lg font-semibold hover:bg-white hover:text-black transition-all duration-1000 odd:justify-self-end"
+      className="admin-panel flex min-h-32 items-center justify-center rounded-2xl border border-white/10 p-5 text-center font-semibold transition hover:-translate-y-1 hover:border-emerald-300/40 hover:text-emerald-300"
     />
   );
 }

@@ -1,90 +1,154 @@
-import { Category } from "@/generated/prisma/client";
+import "server-only";
+
 import prisma from "./prisma-service";
 
-export type CreateCategoryDto = Pick<Category, "name" | "parentId">;
+export const UNCLASSIFIED_CATEGORY_NAME = "Unclassified";
 
+export type CreateCategoryDto = {
+  name: string;
+  parentId: string | null;
+};
 export type UpdateCategoryDto = Partial<CreateCategoryDto>;
 
-export class CategoriesService {
-  async createCategory(dto: CreateCategoryDto) {
-    const c = await prisma.category.create({
-      data: dto,
-    });
+const normalizeName = (name: string) =>
+  name.trim().replace(/\s+/g, " ").toLocaleLowerCase("en-US");
 
-    return c;
+const cleanName = (name: string) => name.trim().replace(/\s+/g, " ");
+
+export class CategoriesService {
+  async ensureUnclassified() {
+    const normalizedName = normalizeName(UNCLASSIFIED_CATEGORY_NAME);
+    const existing = await prisma.category.findFirst({
+      where: {
+        OR: [
+          { normalizedName },
+          { name: { equals: UNCLASSIFIED_CATEGORY_NAME, mode: "insensitive" } },
+        ],
+      },
+    });
+    if (existing) {
+      return prisma.category.update({
+        where: { id: existing.id },
+        data: { normalizedName, isSystem: true, parentId: null },
+      });
+    }
+    return prisma.category.create({
+      data: { name: UNCLASSIFIED_CATEGORY_NAME, normalizedName, isSystem: true },
+    });
+  }
+
+  async createCategory(dto: CreateCategoryDto) {
+    const name = cleanName(dto.name);
+    if (!name) throw new Error("Category name is required.");
+    if (dto.parentId) await this.validateParent(dto.parentId);
+
+    return prisma.category.create({
+      data: {
+        name,
+        normalizedName: normalizeName(name),
+        parentId: dto.parentId,
+      },
+    });
+  }
+
+  async findOrCreateByName(nameInput?: string | null) {
+    const name = cleanName(nameInput ?? "");
+    if (!name) return this.ensureUnclassified();
+
+    const normalizedName = normalizeName(name);
+    const existing = await prisma.category.findFirst({
+      where: {
+        OR: [
+          { normalizedName },
+          { name: { equals: name, mode: "insensitive" } },
+        ],
+      },
+    });
+    return existing ?? prisma.category.create({ data: { name, normalizedName } });
   }
 
   async updateCategory(id: string, dto: UpdateCategoryDto) {
-    if (dto.parentId) await this.validateParentCategory(id, dto.parentId);
+    const existing = await this.getCategoryById(id);
+    if (!existing) throw new Error("Category not found.");
+    if (existing.isSystem) throw new Error("The Unclassified category cannot be edited.");
+    if (dto.parentId === id) throw new Error("A category cannot be its own parent.");
+    if (dto.parentId) await this.validateParent(dto.parentId);
 
-    const c = await prisma.category.update({
+    const name = dto.name === undefined ? undefined : cleanName(dto.name);
+    if (name !== undefined && !name) throw new Error("Category name is required.");
+
+    return prisma.category.update({
       where: { id },
-      data: dto,
+      data: {
+        name,
+        normalizedName: name ? normalizeName(name) : undefined,
+        parentId: dto.parentId,
+      },
     });
-    return c;
   }
 
   async deleteCategory(id: string) {
-    await prisma.category.delete({
-      where: { id },
+    const category = await this.getCategoryById(id);
+    if (!category) return;
+    if (category.isSystem) throw new Error("The Unclassified category cannot be deleted.");
+
+    const unclassified = await this.ensureUnclassified();
+    await prisma.transaction.updateMany({
+      where: { categoryId: id },
+      data: { categoryId: unclassified.id },
     });
+    await prisma.category.updateMany({
+      where: { parentId: id },
+      data: { parentId: null },
+    });
+    await prisma.category.delete({ where: { id } });
   }
 
   async getCategoryById(id: string) {
-    const c = await prisma.category.findUnique({
-      where: { id },
-    });
-    return c;
+    return prisma.category.findUnique({ where: { id } });
   }
 
   async getAllCategories() {
-    const categories = await prisma.category.findMany();
-    return categories;
+    await this.ensureUnclassified();
+    return prisma.category.findMany({
+      orderBy: [{ isSystem: "desc" }, { name: "asc" }],
+    });
   }
 
-  async getNonChildCategories(id: string) {
-    const categories = await this.getAllCategories();
-    const childCategoryIds = new Set<string>();
-    const queue: string[] = [id];
-    while (queue.length > 0) {
-      const currentId = queue.shift()!;
-      for (const category of categories) {
-        if (category.parentId === currentId) {
-          childCategoryIds.add(category.id);
-          queue.push(category.id);
-        }
-      }
-    }
-    return categories.filter((category) => !childCategoryIds.has(category.id));
+  async getAvailableParents(currentId?: string) {
+    return prisma.category.findMany({
+      where: {
+        id: currentId ? { not: currentId } : undefined,
+        parentId: null,
+        isSystem: false,
+      },
+      orderBy: { name: "asc" },
+    });
   }
 
   async hasChildCategories(id: string) {
-    const count = await prisma.category.count({
-      where: { parentId: id },
-    });
-    return count > 0;
+    return (await prisma.category.count({ where: { parentId: id } })) > 0;
   }
 
-  async nameExists(name: string) {
-    const count = await prisma.category.count({
-      where: { name },
-    });
-    return count > 0;
+  async nameExists(name: string, exceptId?: string) {
+    return (
+      (await prisma.category.count({
+        where: {
+          OR: [
+            { normalizedName: normalizeName(name) },
+            { name: { equals: cleanName(name), mode: "insensitive" } },
+          ],
+          id: exceptId ? { not: exceptId } : undefined,
+        },
+      })) > 0
+    );
   }
 
-  /**
-   * Validates that the parent category does not create a circular reference.
-   */
-  private async validateParentCategory(categoryId: string, parentId: string) {
-    let currentParentId = parentId;
-    while (currentParentId) {
-      if (currentParentId === categoryId) {
-        throw new Error("A category cannot be its own parent.");
-      }
-      const parentCategory = await this.getCategoryById(currentParentId);
-      if (!parentCategory) break;
-      currentParentId = parentCategory.parentId!;
-    }
+  private async validateParent(parentId: string) {
+    const parent = await this.getCategoryById(parentId);
+    if (!parent) throw new Error("Parent category not found.");
+    if (parent.isSystem) throw new Error("Unclassified cannot have subcategories.");
+    if (parent.parentId) throw new Error("Subcategories cannot have subcategories.");
   }
 }
 

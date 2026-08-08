@@ -2,7 +2,35 @@
 
 My awesome portfolio with hidden tools 😂😂
 
-## Plan
+## Money workspace
+
+The private `/admin` area now includes a maintainable SGD ledger with:
+
+- database-backed admin credentials and bcrypt password hashing;
+- signed, expiring, HTTP-only sessions verified by the edge proxy;
+- profile and password management with session invalidation;
+- exact integer-cent money calculations, opening balance, and IN/OUT entries;
+- top-level categories, one level of subcategories, and a protected Unclassified category;
+- category suggestions and automatic creation while entering a transaction;
+- filtered statistics, cash-flow and spending charts, and paginated transactions;
+- a compact oldest-first mobile ledger and an adaptive desktop dashboard.
+
+### First deployment
+
+1. Copy the variables from `.env.example` into the local/deployment environment. Keep `AUTH_SECRET` stable and private.
+2. Run `pnpm prisma db push` against the intended MongoDB database, then deploy.
+3. Sign in once with `ADMIN_BOOTSTRAP_USERNAME` and `ADMIN_BOOTSTRAP_PASSWORD`. This creates the first `AdminUser` with a bcrypt hash.
+4. Remove the two `ADMIN_BOOTSTRAP_*` variables and manage credentials from `/admin/profile` thereafter.
+
+Older transaction documents are upgraded when first read: their original `amount` is converted to cents, their direction defaults to money out, and missing categories become Unclassified. Review any old income entries after deployment because the previous model did not record a direction.
+
+### Security notes
+
+- Every admin route is protected by `proxy.ts`; every mutating server action also performs its own authentication check.
+- Admin responses are private and non-cacheable. Baseline framing, MIME-sniffing, referrer, and permissions headers are configured in `next.config.ts`.
+- For internet exposure, enable rate limiting for `/admin/login` at the hosting/WAF layer. In-memory counters are not reliable in a serverless deployment.
+
+## Original plan
 
 - Improve proxy.ts
   - check if there any anti-patterns in it and fix them.

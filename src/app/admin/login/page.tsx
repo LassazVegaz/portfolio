@@ -1,36 +1,56 @@
+"use client";
+
 import PageContainer from "@/components/PageContainer";
-import Header1 from "@/components/Header1";
+import { useActionState } from "react";
 import { loginAction } from "./actions";
 import LoginButton from "./components/LoginButton";
 
-export default async function LoginPage() {
-  return (
-    <PageContainer className="grid grid-rows-[auto_1fr] items-center h-screen">
-      <Header1>Access Admin Part</Header1>
+export default function LoginPage() {
+  const [state, action] = useActionState(loginAction, {});
 
-      <form
-        className="flex flex-col gap-4 max-w-sm mx-auto w-full"
-        action={loginAction}
-      >
-        <p className="text-gray-600 text-center">
-          This is a protected admin page. Only authorized users can access this
-          section.
+  return (
+    <main className="admin-shell min-h-screen grid place-items-center px-5 py-10">
+      <PageContainer className="admin-panel w-full max-w-md rounded-3xl p-7 sm:p-10">
+        <p className="admin-eyebrow">Private workspace</p>
+        <h1 className="mt-2 text-3xl font-semibold tracking-tight">
+          Welcome back
+        </h1>
+        <p className="mt-3 text-sm text-slate-400">
+          Sign in to access your financial dashboard and admin tools.
         </p>
 
-        <input
-          type="text"
-          name="username"
-          required
-          className="p-2 border border-gray-300 rounded"
-        />
-        <input
-          type="password"
-          name="password"
-          required
-          className="p-2 border border-gray-300 rounded"
-        />
-        <LoginButton />
-      </form>
-    </PageContainer>
+        <form className="mt-8 grid gap-5" action={action}>
+          <label className="grid gap-2 text-sm font-medium">
+            Username
+            <input
+              type="text"
+              name="username"
+              autoComplete="username"
+              required
+              maxLength={80}
+              className="admin-input"
+            />
+          </label>
+          <label className="grid gap-2 text-sm font-medium">
+            Password
+            <input
+              type="password"
+              name="password"
+              autoComplete="current-password"
+              required
+              maxLength={200}
+              className="admin-input"
+            />
+          </label>
+
+          {state.error && (
+            <p role="alert" className="text-sm text-rose-300">
+              {state.error}
+            </p>
+          )}
+          <LoginButton />
+        </form>
+      </PageContainer>
+    </main>
   );
 }
