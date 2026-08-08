@@ -40,7 +40,7 @@ model RentingRoom {
 model Category {
   id             String        @id @default(auto()) @map("_id") @db.ObjectId
   name           String
-  normalizedName String?
+  normalizedName String        @unique
   isSystem       Boolean       @default(false)
   parentId       String?       @db.ObjectId
   parent         Category?     @relation("CategoryHierarchy", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
@@ -51,17 +51,16 @@ model Category {
 }
 
 model Transaction {
-  id          String                @id @default(auto()) @map("_id") @db.ObjectId
-  amount      Float?
-  amountCents Int?
-  direction   TransactionDirection?
+  id          String               @id @default(auto()) @map("_id") @db.ObjectId
+  amountCents Int
+  direction   TransactionDirection
   title       String
-  time        DateTime              @default(now())
+  time        DateTime             @default(now())
   comments    String?
-  category    Category?             @relation(fields: [categoryId], references: [id])
-  categoryId  String?               @db.ObjectId
-  createdAt   DateTime              @default(now())
-  updatedAt   DateTime              @updatedAt
+  category    Category             @relation(fields: [categoryId], references: [id])
+  categoryId  String               @db.ObjectId
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
 
   @@index([time])
   @@index([categoryId])
