@@ -22,7 +22,7 @@ The private `/admin` area now includes a maintainable SGD ledger with:
 3. Sign in once with `ADMIN_BOOTSTRAP_USERNAME` and `ADMIN_BOOTSTRAP_PASSWORD`. This creates the first `AdminUser` with a bcrypt hash.
 4. Remove the two `ADMIN_BOOTSTRAP_*` variables and manage credentials from `/admin/profile` thereafter.
 
-Older transaction documents are upgraded when first read: their original `amount` is converted to cents, their direction defaults to money out, and missing categories become Unclassified. Review any old income entries after deployment because the previous model did not record a direction.
+The money schema intentionally starts fresh: transaction amounts, directions, and categories are required, and amounts are stored as integer cents.
 
 ### Security notes
 
@@ -43,7 +43,7 @@ Older transaction documents are upgraded when first read: their original `amount
   - check if auth-service.ts is used in a secured way in the proxy.ts, pages and actions. If there are security issues, fix them.
   - All pages afer 'admin' and including 'admin' can be accessed only by authenticated users.
 - Improve UI/UX of navigation bar
-- Improve "money" feature. This feature includes storing transactions. All transactions are in SGD. There are categories of transactions. A transaction can belong to only one category. Transactions that do not have a category fall into a category named "unclassified". unclassified category does not have sub categories. This feature start from path 'src\app\admin\money'.
+- Improve "money" feature. This feature includes storing transactions. All transactions are in SGD. There are categories of transactions. A transaction can belong to only one category. Transactions that do not have a category fall into a category named "unclassified". unclassified category does not have sub categories. This feature start from path 'src\\app\\admin\\money'.
   - User should be able add, edit, view and delete categories.
   - Categories should be able to have any number of sub categories except for unlcassified category. A subcategory does not have subcategories.
   - When adding a transaction, use can mention the category. If the mentioned category does not exist, it should be created when adding the transaction. When use types a category, a suggestion list should be displayed. If the typed category does not exist, a text should be displayed saying that a category will be created.
