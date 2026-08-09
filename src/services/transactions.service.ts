@@ -1,8 +1,7 @@
 import "server-only";
-
-import { TransactionDirection } from "@/generated/prisma/client";
 import prisma from "./prisma-service";
 import categoriesService from "./categories.service";
+import { TransactionDirection } from "@prisma/client";
 
 const PRIMARY_ACCOUNT_ID = "primary";
 

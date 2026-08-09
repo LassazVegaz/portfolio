@@ -1,4 +1,4 @@
-import { RentingRoom } from "@/generated/prisma/client";
+import { RentingRoom } from "@prisma/client";
 import { CheerioAPI, load } from "cheerio";
 import fs from "node:fs/promises";
 
@@ -66,7 +66,7 @@ export class CarousellScrappingService {
   getData(): RentingRoom {
     if (this.initialData === null)
       throw new Error(
-        "Initial data is not loaded. Please call loadCache before getData"
+        "Initial data is not loaded. Please call loadCache before getData",
       );
     const { $, id } = this.initialData;
 
@@ -113,7 +113,7 @@ export class CarousellScrappingService {
 
   private getPrice($: CheerioAPI) {
     return Number.parseFloat(
-      $("h1").next().children("p").text().trim().slice(2).replaceAll(",", "")
+      $("h1").next().children("p").text().trim().slice(2).replaceAll(",", ""),
     );
   }
 

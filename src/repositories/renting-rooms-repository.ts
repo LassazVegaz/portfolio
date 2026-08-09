@@ -1,5 +1,5 @@
-import { RentingRoom } from "@/generated/prisma/client";
 import prisma from "@/services/prisma-service";
+import { RentingRoom } from "@prisma/client";
 
 export class RentingRoomsRepository {
   async create(data: RentingRoom): Promise<RentingRoom> {
