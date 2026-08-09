@@ -20,6 +20,9 @@ importers:
       cheerio:
         specifier: ^1.2.0
         version: 1.2.0
+      classnames:
+        specifier: ^2.5.1
+        version: 2.5.1
       dotenv:
         specifier: ^17.4.2
         version: 17.4.2
@@ -1160,6 +1163,9 @@ packages:
 
   citty@0.2.2:
     resolution: {integrity: sha512-+6vJA3L98yv+IdfKGZHBNiGW5KHn22e/JwID0Strsz8h4S/csAu/OuICwxrg44k5MRiZHWIo8XXuJgQTriRP4w==}
+
+  classnames@2.5.1:
+    resolution: {integrity: sha512-saHYOzhIQs6wy2sVxTM6bUDsQO4F50V9RQ22qBpEdCW+I+/Wmke2HOl6lS6dTpdxVhb88/I6+Hs+438c3lfUow==}
 
   client-only@0.0.1:
     resolution: {integrity: sha512-IV3Ou0jSMzZrd3pZ48nLkT9DA7Ag1pnPzaiQhpW7c3RbcqqzvzzVu+L8gfqMp/8IM2MQtSiqaCxrrcfu8I8rMA==}
@@ -3925,6 +3931,8 @@ snapshots:
       consola: 3.4.2
 
   citty@0.2.2: {}
+
+  classnames@2.5.1: {}
 
   client-only@0.0.1: {}
 
