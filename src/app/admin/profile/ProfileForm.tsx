@@ -3,11 +3,16 @@
 import { useActionState } from "react";
 import { updateProfileAction } from "./actions";
 
-export default function ProfileForm({ username }: { username: string }) {
+export default function ProfileForm({
+  username,
+}: Readonly<{ username: string }>) {
   const [state, action, pending] = useActionState(updateProfileAction, {});
 
   return (
-    <form action={action} className="admin-panel mt-8 grid gap-5 rounded-2xl p-6">
+    <form
+      action={action}
+      className="admin-panel mt-8 grid gap-5 rounded-2xl p-6"
+    >
       <label className="grid gap-2 text-sm font-medium">
         Username
         <input
@@ -53,8 +58,14 @@ export default function ProfileForm({ username }: { username: string }) {
         </label>
       </div>
       {state.error && <p className="text-sm text-rose-300">{state.error}</p>}
-      {state.success && <p className="text-sm text-emerald-300">{state.success}</p>}
-      <button className="admin-primary-button justify-self-start" disabled={pending}>
+      {state.success && (
+        <p className="text-sm text-emerald-300">{state.success}</p>
+      )}
+      <button
+        type="submit"
+        className="admin-primary-button justify-self-start"
+        disabled={pending}
+      >
         {pending ? "Saving…" : "Save profile"}
       </button>
     </form>

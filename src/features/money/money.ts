@@ -8,7 +8,7 @@ export const formatMoney = (cents: number) =>
   }).format(cents / 100);
 
 export const parseMoneyToCents = (value: string, allowNegative = false) => {
-  const cleaned = value.trim().replace(/,/g, "");
+  const cleaned = value.trim().replaceAll(",", "");
   const pattern = allowNegative ? /^-?\d+(\.\d{1,2})?$/ : /^\d+(\.\d{1,2})?$/;
   if (!pattern.test(cleaned)) {
     throw new Error("Use a valid SGD amount with no more than two decimals.");

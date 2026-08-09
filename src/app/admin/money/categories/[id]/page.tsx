@@ -11,11 +11,10 @@ import categoriesService from "@/services/categories.service";
 const getCategories = async (currentId?: string) => {
   const categories = await categoriesService.getAvailableParents(currentId);
 
-  return categories
-    .map((cat) => ({
-      id: cat.id,
-      name: cat.name,
-    }));
+  return categories.map((cat) => ({
+    id: cat.id,
+    name: cat.name,
+  }));
 };
 
 export default async function CategoryPage(
@@ -32,19 +31,15 @@ export default async function CategoryPage(
 
   return (
     <main className="admin-shell min-h-screen">
-    <PageContainer className="mx-auto max-w-2xl">
-      <TopNavigator links={["home", "money"]} />
-      <p className="admin-eyebrow mt-10">Money settings</p>
-      <h1 className="mt-2 text-3xl font-semibold">
-        {isNew ? "New category" : category?.name}
-      </h1>
+      <PageContainer className="mx-auto max-w-2xl">
+        <TopNavigator links={["home", "money"]} />
+        <p className="admin-eyebrow mt-10">Money settings</p>
+        <h1 className="mt-2 text-3xl font-semibold">
+          {isNew ? "New category" : category?.name}
+        </h1>
 
-      <ClientForm
-        category={category}
-        isNew={isNew}
-        categories={categories}
-      />
-    </PageContainer>
+        <ClientForm category={category} isNew={isNew} categories={categories} />
+      </PageContainer>
     </main>
   );
 }

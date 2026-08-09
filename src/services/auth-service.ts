@@ -59,7 +59,7 @@ class AuthService {
     const user = await prisma.adminUser.findUnique({
       where: { id: session.userId },
     });
-    if (!user || user.sessionVersion !== session.version) return null;
+    if (user?.sessionVersion !== session.version) return null;
     return user;
   }
 

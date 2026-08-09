@@ -20,16 +20,15 @@ export const loginAction = async (
   const parsed = loginSchema.safeParse(Object.fromEntries(data));
   if (!parsed.success) return { error: "Enter your username and password." };
 
-  if (await authService.login(parsed.data.username, parsed.data.password)) {
-    const c = await cookies();
-    const requestedPath = c.get(COOKIE_NAME_REDIRECTED_FROM)?.value;
-    c.delete(COOKIE_NAME_REDIRECTED_FROM);
-    const redirectedFrom =
-      requestedPath?.startsWith("/admin") && !requestedPath.startsWith("//")
-        ? (requestedPath as Route)
-        : "/admin";
-    redirect(redirectedFrom);
-  }
+  if (!(await authService.login(parsed.data.username, parsed.data.password)))
+    return { error: "Invalid username or password." };
 
-  return { error: "Invalid username or password." };
+  const c = await cookies();
+  const requestedPath = c.get(COOKIE_NAME_REDIRECTED_FROM)?.value;
+  c.delete(COOKIE_NAME_REDIRECTED_FROM);
+  const redirectedFrom =
+    requestedPath?.startsWith("/admin") && !requestedPath.startsWith("//")
+      ? (requestedPath as Route)
+      : "/admin";
+  redirect(redirectedFrom);
 };

@@ -33,7 +33,11 @@ export class CategoriesService {
       });
     }
     return prisma.category.create({
-      data: { name: UNCLASSIFIED_CATEGORY_NAME, normalizedName, isSystem: true },
+      data: {
+        name: UNCLASSIFIED_CATEGORY_NAME,
+        normalizedName,
+        isSystem: true,
+      },
     });
   }
 
@@ -64,18 +68,23 @@ export class CategoriesService {
         ],
       },
     });
-    return existing ?? prisma.category.create({ data: { name, normalizedName } });
+    return (
+      existing ?? prisma.category.create({ data: { name, normalizedName } })
+    );
   }
 
   async updateCategory(id: string, dto: UpdateCategoryDto) {
     const existing = await this.getCategoryById(id);
     if (!existing) throw new Error("Category not found.");
-    if (existing.isSystem) throw new Error("The Unclassified category cannot be edited.");
-    if (dto.parentId === id) throw new Error("A category cannot be its own parent.");
+    if (existing.isSystem)
+      throw new Error("The Unclassified category cannot be edited.");
+    if (dto.parentId === id)
+      throw new Error("A category cannot be its own parent.");
     if (dto.parentId) await this.validateParent(dto.parentId);
 
     const name = dto.name === undefined ? undefined : cleanName(dto.name);
-    if (name !== undefined && !name) throw new Error("Category name is required.");
+    if (name !== undefined && !name)
+      throw new Error("Category name is required.");
 
     return prisma.category.update({
       where: { id },
@@ -90,7 +99,8 @@ export class CategoriesService {
   async deleteCategory(id: string) {
     const category = await this.getCategoryById(id);
     if (!category) return;
-    if (category.isSystem) throw new Error("The Unclassified category cannot be deleted.");
+    if (category.isSystem)
+      throw new Error("The Unclassified category cannot be deleted.");
 
     const unclassified = await this.ensureUnclassified();
     await prisma.transaction.updateMany({
@@ -147,8 +157,10 @@ export class CategoriesService {
   private async validateParent(parentId: string) {
     const parent = await this.getCategoryById(parentId);
     if (!parent) throw new Error("Parent category not found.");
-    if (parent.isSystem) throw new Error("Unclassified cannot have subcategories.");
-    if (parent.parentId) throw new Error("Subcategories cannot have subcategories.");
+    if (parent.isSystem)
+      throw new Error("Unclassified cannot have subcategories.");
+    if (parent.parentId)
+      throw new Error("Subcategories cannot have subcategories.");
   }
 }
 

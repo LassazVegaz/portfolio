@@ -86,7 +86,7 @@ export class TransactionsService {
 
   async setOpeningBalanceCents(openingBalanceCents: number) {
     if (!Number.isSafeInteger(openingBalanceCents)) {
-      throw new Error("Opening balance is invalid.");
+      throw new TypeError("Opening balance is invalid.");
     }
     return prisma.moneyAccount.upsert({
       where: { id: PRIMARY_ACCOUNT_ID },
@@ -101,14 +101,18 @@ export class TransactionsService {
       prisma.transaction.aggregate({
         where: {
           direction: "IN",
-          id: excludingTransactionId ? { not: excludingTransactionId } : undefined,
+          id: excludingTransactionId
+            ? { not: excludingTransactionId }
+            : undefined,
         },
         _sum: { amountCents: true },
       }),
       prisma.transaction.aggregate({
         where: {
           direction: "OUT",
-          id: excludingTransactionId ? { not: excludingTransactionId } : undefined,
+          id: excludingTransactionId
+            ? { not: excludingTransactionId }
+            : undefined,
         },
         _sum: { amountCents: true },
       }),
@@ -131,7 +135,9 @@ export class TransactionsService {
 
   private validate(dto: SaveTransactionDto) {
     if (!Number.isSafeInteger(dto.amountCents) || dto.amountCents <= 0) {
-      throw new Error("Amount must be greater than zero and have at most two decimals.");
+      throw new Error(
+        "Amount must be greater than zero and have at most two decimals.",
+      );
     }
     if (!dto.title.trim()) throw new Error("Title is required.");
     if (Number.isNaN(dto.time.getTime())) throw new Error("Date is invalid.");
