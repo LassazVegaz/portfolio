@@ -14,8 +14,6 @@ import {
 } from "./session-service";
 
 const PASSWORD_ROUNDS = 12;
-const DUMMY_PASSWORD_HASH =
-  "$2b$12$YqzmPVhiQ68WJzefkwb2qutV6C4xU2ttHgzY45iZPmnICybZwl9zS";
 
 export class AuthenticationError extends Error {
   constructor(message = "Your session has expired. Please sign in again.") {
@@ -27,17 +25,12 @@ export class AuthenticationError extends Error {
 class AuthService {
   async login(usernameInput: string, password: string): Promise<boolean> {
     const username = usernameInput.trim();
-    let user = await prisma.adminUser.findUnique({ where: { username } });
+    const user = await prisma.adminUser.findUnique({ where: { username } });
 
-    if (!user && (await prisma.adminUser.count()) === 0) {
-      user = await this.bootstrapFirstAdmin(username, password);
-    }
+    if (!user) return false;
 
-    const passwordMatches = await compare(
-      password,
-      user?.passwordHash ?? DUMMY_PASSWORD_HASH,
-    );
-    if (!user || !passwordMatches) return false;
+    const passwordMatches = await compare(password, user.passwordHash);
+    if (!passwordMatches) return false;
 
     await this.writeSession({
       userId: user.id,
