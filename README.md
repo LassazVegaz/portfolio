@@ -2,7 +2,35 @@
 
 My awesome portfolio with hidden tools 😂😂
 
-## Plan
+## Money workspace
+
+The private `/admin` area now includes a maintainable SGD ledger with:
+
+- database-backed admin credentials and bcrypt password hashing;
+- signed, expiring, HTTP-only sessions verified by the edge proxy;
+- profile and password management with session invalidation;
+- exact integer-cent money calculations, opening balance, and IN/OUT entries;
+- top-level categories, one level of subcategories, and a protected Unclassified category;
+- category suggestions and automatic creation while entering a transaction;
+- filtered statistics, cash-flow and spending charts, and paginated transactions;
+- a compact oldest-first mobile ledger and an adaptive desktop dashboard.
+
+### First deployment
+
+1. Copy the variables from `.env.example` into the local/deployment environment. Keep `AUTH_SECRET` stable and private.
+2. Run `pnpm prisma db push` against the intended MongoDB database, then deploy.
+3. Sign in once with `ADMIN_BOOTSTRAP_USERNAME` and `ADMIN_BOOTSTRAP_PASSWORD`. This creates the first `AdminUser` with a bcrypt hash.
+4. Remove the two `ADMIN_BOOTSTRAP_*` variables and manage credentials from `/admin/profile` thereafter.
+
+The money schema intentionally starts fresh: transaction amounts, directions, and categories are required, and amounts are stored as integer cents.
+
+### Security notes
+
+- Every admin route is protected by `proxy.ts`; every mutating server action also performs its own authentication check.
+- Admin responses are private and non-cacheable. Baseline framing, MIME-sniffing, referrer, and permissions headers are configured in `next.config.ts`.
+- For internet exposure, enable rate limiting for `/admin/login` at the hosting/WAF layer. In-memory counters are not reliable in a serverless deployment.
+
+## Original plan
 
 - Improve proxy.ts
   - check if there any anti-patterns in it and fix them.
@@ -15,7 +43,7 @@ My awesome portfolio with hidden tools 😂😂
   - check if auth-service.ts is used in a secured way in the proxy.ts, pages and actions. If there are security issues, fix them.
   - All pages afer 'admin' and including 'admin' can be accessed only by authenticated users.
 - Improve UI/UX of navigation bar
-- Improve "money" feature. This feature includes storing transactions. All transactions are in SGD. There are categories of transactions. A transaction can belong to only one category. Transactions that do not have a category fall into a category named "unclassified". unclassified category does not have sub categories. This feature start from path 'src\app\admin\money'.
+- Improve "money" feature. This feature includes storing transactions. All transactions are in SGD. There are categories of transactions. A transaction can belong to only one category. Transactions that do not have a category fall into a category named "unclassified". unclassified category does not have sub categories. This feature start from path 'src\\app\\admin\\money'.
   - User should be able add, edit, view and delete categories.
   - Categories should be able to have any number of sub categories except for unlcassified category. A subcategory does not have subcategories.
   - When adding a transaction, use can mention the category. If the mentioned category does not exist, it should be created when adding the transaction. When use types a category, a suggestion list should be displayed. If the typed category does not exist, a text should be displayed saying that a category will be created.

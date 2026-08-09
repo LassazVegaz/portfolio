@@ -1,33 +1,61 @@
 import FloatingAction from "@/components/FloatingAction";
-import Header1 from "@/components/Header1";
 import TopNavigator from "@/components/HomeButton";
 import PageContainer from "@/components/PageContainer";
-import { Category } from "@/generated/prisma/client";
+import categoriesService from "@/services/categories.service";
 import Link from "next/link";
+import { Route } from "next";
 
 export default async function CategoriesPage() {
-  // const categories = await categoriesService.getAllCategories();
-  const categories = [] as Category[];
+  const categories = await categoriesService.getAllCategories();
+  const roots = categories.filter((category) => !category.parentId);
 
   return (
-    <PageContainer className="grid grid-rows-[auto_1fr] gap-6 max-h-screen">
-      <TopNavigator links={["home", "money"]} />
+    <main className="admin-shell min-h-screen">
+      <PageContainer className="mx-auto max-w-4xl">
+        <TopNavigator links={["home", "money"]} />
+        <div className="mt-10 flex items-end justify-between gap-4">
+          <div>
+            <p className="admin-eyebrow">Organise transactions</p>
+            <h1 className="mt-2 text-3xl font-semibold">Categories</h1>
+          </div>
+          <span className="text-sm text-slate-400">{categories.length} total</span>
+        </div>
 
-      <Header1>Categories</Header1>
-
-      <div className="flex flex-col space-y-4 overflow-y-auto mb-4">
-        {categories.map((cat) => (
-          <Link
-            key={cat.id}
-            href={`/admin/money/categories/${cat.id}`}
-            className="p-4 border border-gray-200 rounded-md"
-          >
-            {cat.name}
-          </Link>
-        ))}
-      </div>
-
-      <FloatingAction href="/admin/money/categories/new">+</FloatingAction>
-    </PageContainer>
+        <div className="mt-8 grid gap-4 md:grid-cols-2">
+          {roots.map((category) => {
+            const children = categories.filter(
+              (candidate) => candidate.parentId === category.id,
+            );
+            return (
+              <section key={category.id} className="admin-panel rounded-2xl p-5">
+                <Link
+                  href={`/admin/money/categories/${category.id}`}
+                  className="flex items-center justify-between font-semibold hover:text-emerald-300"
+                >
+                  {category.name}
+                  {category.isSystem && (
+                    <span className="admin-badge">Default</span>
+                  )}
+                </Link>
+                {children.length > 0 && (
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {children.map((child) => (
+                      <Link
+                        key={child.id}
+                        href={`/admin/money/categories/${child.id}`}
+                        className="admin-chip"
+                      >
+                        {child.name}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </section>
+            );
+          })}
+        </div>
+        <FloatingAction href={"/admin/money/categories/new" as Route}>+</FloatingAction>
+      </PageContainer>
+    </main>
   );
 }

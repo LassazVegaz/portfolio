@@ -1,43 +1,160 @@
-import { Transaction } from "@/generated/prisma/client";
-import prisma from "./prisma-service";
+import "server-only";
 
-export type CreateTransactionDto = Omit<Transaction, "id">;
-export type UpdateTransactionDto = Partial<CreateTransactionDto>;
+import { TransactionDirection } from "@/generated/prisma/client";
+import prisma from "./prisma-service";
+import categoriesService from "./categories.service";
+
+const PRIMARY_ACCOUNT_ID = "primary";
+
+export type SaveTransactionDto = {
+  amountCents: number;
+  direction: TransactionDirection;
+  title: string;
+  comments: string | null;
+  time: Date;
+  categoryId?: string | null;
+  categoryName?: string | null;
+};
+
+export type TransactionFilters = {
+  categoryId?: string;
+  direction?: TransactionDirection;
+  from?: Date;
+  to?: Date;
+  search?: string;
+};
 
 export class TransactionsService {
-  async create(dto: CreateTransactionDto) {
-    const t = await prisma.transaction.create({
-      data: dto,
+  async create(dto: SaveTransactionDto) {
+    this.validate(dto);
+    const categoryId = await this.resolveCategory(dto);
+    return prisma.transaction.create({
+      data: {
+        amountCents: dto.amountCents,
+        direction: dto.direction,
+        title: dto.title.trim(),
+        comments: dto.comments?.trim() || null,
+        time: dto.time,
+        categoryId,
+      },
     });
-    return t;
   }
 
-  async update(id: string, dto: UpdateTransactionDto) {
-    const t = await prisma.transaction.update({
+  async update(id: string, dto: SaveTransactionDto) {
+    this.validate(dto);
+    const categoryId = await this.resolveCategory(dto);
+    return prisma.transaction.update({
       where: { id },
-      data: dto,
+      data: {
+        amountCents: dto.amountCents,
+        direction: dto.direction,
+        title: dto.title.trim(),
+        comments: dto.comments?.trim() || null,
+        time: dto.time,
+        categoryId,
+      },
     });
-    return t;
   }
 
   async delete(id: string) {
-    await prisma.transaction.delete({
-      where: { id },
-    });
+    await prisma.transaction.delete({ where: { id } });
   }
 
   async getById(id: string) {
-    const t = await prisma.transaction.findUnique({
+    return prisma.transaction.findUnique({
       where: { id },
+      include: { category: true },
     });
-    return t;
   }
 
-  async getAll() {
-    const transactions = await prisma.transaction.findMany({
-      orderBy: { time: "desc" },
+  async getAll(filters: TransactionFilters = {}) {
+    return prisma.transaction.findMany({
+      where: this.buildWhere(filters),
+      include: { category: true },
+      orderBy: [{ time: "desc" }, { createdAt: "desc" }],
     });
-    return transactions;
+  }
+
+  async getOpeningBalanceCents() {
+    const account = await prisma.moneyAccount.upsert({
+      where: { id: PRIMARY_ACCOUNT_ID },
+      create: { id: PRIMARY_ACCOUNT_ID },
+      update: {},
+    });
+    return account.openingBalanceCents;
+  }
+
+  async setOpeningBalanceCents(openingBalanceCents: number) {
+    if (!Number.isSafeInteger(openingBalanceCents)) {
+      throw new TypeError("Opening balance is invalid.");
+    }
+    return prisma.moneyAccount.upsert({
+      where: { id: PRIMARY_ACCOUNT_ID },
+      create: { id: PRIMARY_ACCOUNT_ID, openingBalanceCents },
+      update: { openingBalanceCents },
+    });
+  }
+
+  async getBalanceCents(excludingTransactionId?: string) {
+    const [openingBalanceCents, incoming, outgoing] = await Promise.all([
+      this.getOpeningBalanceCents(),
+      prisma.transaction.aggregate({
+        where: {
+          direction: "IN",
+          id: excludingTransactionId
+            ? { not: excludingTransactionId }
+            : undefined,
+        },
+        _sum: { amountCents: true },
+      }),
+      prisma.transaction.aggregate({
+        where: {
+          direction: "OUT",
+          id: excludingTransactionId
+            ? { not: excludingTransactionId }
+            : undefined,
+        },
+        _sum: { amountCents: true },
+      }),
+    ]);
+
+    return (
+      openingBalanceCents +
+      (incoming._sum.amountCents ?? 0) -
+      (outgoing._sum.amountCents ?? 0)
+    );
+  }
+
+  private async resolveCategory(dto: SaveTransactionDto) {
+    if (dto.categoryId) {
+      const category = await categoriesService.getCategoryById(dto.categoryId);
+      if (category) return category.id;
+    }
+    return (await categoriesService.findOrCreateByName(dto.categoryName)).id;
+  }
+
+  private validate(dto: SaveTransactionDto) {
+    if (!Number.isSafeInteger(dto.amountCents) || dto.amountCents <= 0) {
+      throw new Error(
+        "Amount must be greater than zero and have at most two decimals.",
+      );
+    }
+    if (!dto.title.trim()) throw new Error("Title is required.");
+    if (Number.isNaN(dto.time.getTime())) throw new Error("Date is invalid.");
+  }
+
+  private buildWhere(filters: TransactionFilters) {
+    return {
+      categoryId: filters.categoryId || undefined,
+      direction: filters.direction,
+      time:
+        filters.from || filters.to
+          ? { gte: filters.from, lte: filters.to }
+          : undefined,
+      title: filters.search
+        ? { contains: filters.search.trim(), mode: "insensitive" as const }
+        : undefined,
+    };
   }
 }
 
