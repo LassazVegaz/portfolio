@@ -18,10 +18,10 @@ type CategoryPoint = { category: string; expense: number };
 export default function MoneyCharts({
   monthly,
   categories,
-}: {
+}: Readonly<{
   monthly: MonthlyPoint[];
   categories: CategoryPoint[];
-}) {
+}>) {
   return (
     <div className="grid gap-5 xl:grid-cols-2">
       <section className="admin-panel rounded-2xl p-5">
@@ -43,9 +43,29 @@ export default function MoneyCharts({
               <CartesianGrid stroke="rgba(148,163,184,.12)" vertical={false} />
               <XAxis dataKey="month" stroke="#94a3b8" fontSize={12} />
               <YAxis stroke="#94a3b8" fontSize={12} />
-              <Tooltip formatter={(value) => [`S$${Number(value ?? 0).toFixed(2)}`, ""]} contentStyle={{ background: "#0f1f1a", border: "1px solid rgba(148,163,184,.2)", borderRadius: 12 }} />
-              <Area type="monotone" dataKey="income" stroke="#34d399" fill="url(#income)" />
-              <Area type="monotone" dataKey="expense" stroke="#fb7185" fill="url(#expense)" />
+              <Tooltip
+                formatter={(value) => [
+                  `S$${Number(value ?? 0).toFixed(2)}`,
+                  "",
+                ]}
+                contentStyle={{
+                  background: "#0f1f1a",
+                  border: "1px solid rgba(148,163,184,.2)",
+                  borderRadius: 12,
+                }}
+              />
+              <Area
+                type="monotone"
+                dataKey="income"
+                stroke="#34d399"
+                fill="url(#income)"
+              />
+              <Area
+                type="monotone"
+                dataKey="expense"
+                stroke="#fb7185"
+                fill="url(#expense)"
+              />
             </AreaChart>
           </ResponsiveContainer>
         </div>
@@ -57,10 +77,29 @@ export default function MoneyCharts({
         <div className="mt-5 h-72">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={categories} layout="vertical" margin={{ left: 16 }}>
-              <CartesianGrid stroke="rgba(148,163,184,.12)" horizontal={false} />
+              <CartesianGrid
+                stroke="rgba(148,163,184,.12)"
+                horizontal={false}
+              />
               <XAxis type="number" stroke="#94a3b8" fontSize={12} />
-              <YAxis type="category" dataKey="category" width={90} stroke="#94a3b8" fontSize={12} />
-              <Tooltip formatter={(value) => [`S$${Number(value ?? 0).toFixed(2)}`, ""]} contentStyle={{ background: "#0f1f1a", border: "1px solid rgba(148,163,184,.2)", borderRadius: 12 }} />
+              <YAxis
+                type="category"
+                dataKey="category"
+                width={90}
+                stroke="#94a3b8"
+                fontSize={12}
+              />
+              <Tooltip
+                formatter={(value) => [
+                  `S$${Number(value ?? 0).toFixed(2)}`,
+                  "",
+                ]}
+                contentStyle={{
+                  background: "#0f1f1a",
+                  border: "1px solid rgba(148,163,184,.2)",
+                  borderRadius: 12,
+                }}
+              />
               <Bar dataKey="expense" fill="#fb7185" radius={[0, 6, 6, 0]} />
             </BarChart>
           </ResponsiveContainer>

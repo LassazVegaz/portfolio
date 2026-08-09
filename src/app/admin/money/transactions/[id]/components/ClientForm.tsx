@@ -8,7 +8,7 @@ import {
   parseMoneyToCents,
 } from "@/features/money/money";
 import { useRouter } from "next/navigation";
-import { FormEvent, useMemo, useState } from "react";
+import { SubmitEventHandler, useMemo, useState } from "react";
 import { createAction, deleteAction, updateAction } from "../actions";
 import { toLocalISOString } from "../utils";
 
@@ -58,10 +58,11 @@ export default function ClientForm(props: Readonly<Props>) {
   }, [amount, direction, props.balanceWithoutTransactionCents]);
 
   const categoryExists = props.categories.some(
-    (category) => category.name.toLowerCase() === categoryName.trim().toLowerCase(),
+    (category) =>
+      category.name.toLowerCase() === categoryName.trim().toLowerCase(),
   );
 
-  const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
+  const onSubmit: SubmitEventHandler<HTMLFormElement> = async (event) => {
     event.preventDefault();
     setPending(true);
     setError(undefined);
@@ -71,10 +72,13 @@ export default function ClientForm(props: Readonly<Props>) {
       ) as Record<string, string>;
       const id = props.transaction?.id;
       if (id) await updateAction(id, entries);
-      else router.push(`/admin/money/transactions/${await createAction(entries)}`);
+      else
+        router.push(`/admin/money/transactions/${await createAction(entries)}`);
       router.refresh();
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Could not save transaction.");
+      setError(
+        cause instanceof Error ? cause.message : "Could not save transaction.",
+      );
     } finally {
       setPending(false);
     }
@@ -101,13 +105,20 @@ export default function ClientForm(props: Readonly<Props>) {
         </div>
         <div className="admin-stat-card">
           <span>Balance after save</span>
-          <strong className={balanceAfterCents < 0 ? "text-rose-300" : "text-emerald-300"}>
+          <strong
+            className={
+              balanceAfterCents < 0 ? "text-rose-300" : "text-emerald-300"
+            }
+          >
             {formatMoney(balanceAfterCents)}
           </strong>
         </div>
       </div>
 
-      <Form onSubmit={onSubmit} className="admin-panel mt-5 grid gap-5 rounded-2xl p-5 sm:p-7">
+      <Form
+        onSubmit={onSubmit}
+        className="admin-panel mt-5 grid gap-5 rounded-2xl p-5 sm:p-7"
+      >
         <div className="grid gap-5 sm:grid-cols-[1fr_9rem]">
           <label className="grid gap-2 text-sm font-medium">
             Amount (SGD)
@@ -127,7 +138,9 @@ export default function ClientForm(props: Readonly<Props>) {
               className="admin-input"
               name="direction"
               value={direction}
-              onChange={(event) => setDirection(event.target.value as MoneyDirection)}
+              onChange={(event) =>
+                setDirection(event.target.value as MoneyDirection)
+              }
             >
               <option value="OUT">Money out</option>
               <option value="IN">Money in</option>
@@ -177,7 +190,9 @@ export default function ClientForm(props: Readonly<Props>) {
             type="datetime-local"
             name="time"
             required
-            defaultValue={toLocalISOString(props.transaction?.time ?? new Date())}
+            defaultValue={toLocalISOString(
+              props.transaction?.time ?? new Date(),
+            )}
           />
         </label>
 
@@ -191,18 +206,35 @@ export default function ClientForm(props: Readonly<Props>) {
           />
         </label>
 
-        {error && <p role="alert" className="text-sm text-rose-300">{error}</p>}
+        {error && (
+          <p role="alert" className="text-sm text-rose-300">
+            {error}
+          </p>
+        )}
         <div className="flex flex-wrap justify-between gap-3 pt-2">
-          <button type="button" className="admin-secondary-button" onClick={() => router.back()}>
+          <button
+            type="button"
+            className="admin-secondary-button"
+            onClick={() => router.back()}
+          >
             Cancel
           </button>
           <div className="flex gap-3">
             {!props.isNew && (
-              <button type="button" className="admin-danger-button" onClick={onDelete} disabled={pending}>
+              <button
+                type="button"
+                className="admin-danger-button"
+                onClick={onDelete}
+                disabled={pending}
+              >
                 Delete
               </button>
             )}
-            <button className="admin-primary-button" disabled={pending}>
+            <button
+              type="submit"
+              className="admin-primary-button"
+              disabled={pending}
+            >
               {pending ? "Saving…" : "Save transaction"}
             </button>
           </div>

@@ -1,3 +1,4 @@
+import cn from "classnames";
 import FloatingAction from "@/components/FloatingAction";
 import TopNavigator from "@/components/HomeButton";
 import PageContainer from "@/components/PageContainer";
@@ -24,15 +25,16 @@ const dateAt = (value: string | undefined, endOfDay = false) => {
 
 export default async function TransactionsPage({
   searchParams,
-}: {
+}: Readonly<{
   searchParams: Promise<SearchParams>;
-}) {
+}>) {
   const query = await searchParams;
   const page = Math.max(1, Number.parseInt(first(query.page) ?? "1", 10) || 1);
   const direction = first(query.direction);
   const filters: TransactionFilters = {
     categoryId: first(query.category),
-    direction: direction === "IN" || direction === "OUT" ? direction : undefined,
+    direction:
+      direction === "IN" || direction === "OUT" ? direction : undefined,
     from: dateAt(first(query.from)),
     to: dateAt(first(query.to), true),
     search: first(query.search),
@@ -91,7 +93,8 @@ export default async function TransactionsPage({
   const pageHref = (targetPage: number) => {
     const params = new URLSearchParams();
     for (const [key, value] of Object.entries(query)) {
-      if (key !== "page" && typeof value === "string" && value) params.set(key, value);
+      if (key !== "page" && typeof value === "string" && value)
+        params.set(key, value);
     }
     params.set("page", String(targetPage));
     return `/admin/money/transactions?${params}` as Route;
@@ -106,34 +109,84 @@ export default async function TransactionsPage({
             <p className="admin-eyebrow">SGD ledger</p>
             <h1 className="mt-2 text-3xl font-semibold">Transactions</h1>
           </div>
-          <Link href="/admin/money/settings" className="admin-secondary-button hidden md:inline-flex">
+          <Link
+            href="/admin/money/settings"
+            className="admin-secondary-button hidden md:inline-flex"
+          >
             Opening balance
           </Link>
         </div>
 
         <section className="mt-7 hidden gap-4 md:grid md:grid-cols-4">
           <Stat label="Current balance" value={formatMoney(balanceCents)} />
-          <Stat label="Filtered income" value={formatMoney(incomeCents)} tone="positive" />
-          <Stat label="Filtered spending" value={formatMoney(expenseCents)} tone="negative" />
-          <Stat label="Filtered net" value={formatMoney(incomeCents - expenseCents)} />
+          <Stat
+            label="Filtered income"
+            value={formatMoney(incomeCents)}
+            tone="positive"
+          />
+          <Stat
+            label="Filtered spending"
+            value={formatMoney(expenseCents)}
+            tone="negative"
+          />
+          <Stat
+            label="Filtered net"
+            value={formatMoney(incomeCents - expenseCents)}
+          />
         </section>
 
         <form className="admin-panel mt-5 hidden gap-4 rounded-2xl p-5 md:grid lg:grid-cols-6">
-          <input className="admin-input lg:col-span-2" name="search" placeholder="Search title" defaultValue={first(query.search)} />
-          <select className="admin-input" name="category" defaultValue={first(query.category) ?? ""}>
+          <input
+            className="admin-input lg:col-span-2"
+            name="search"
+            placeholder="Search title"
+            defaultValue={first(query.search)}
+          />
+          <select
+            className="admin-input"
+            name="category"
+            defaultValue={first(query.category) ?? ""}
+          >
             <option value="">All categories</option>
-            {categories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}
+            {categories.map((category) => (
+              <option key={category.id} value={category.id}>
+                {category.name}
+              </option>
+            ))}
           </select>
-          <select className="admin-input" name="direction" defaultValue={direction ?? ""}>
+          <select
+            className="admin-input"
+            name="direction"
+            defaultValue={direction ?? ""}
+          >
             <option value="">In and out</option>
             <option value="IN">Money in</option>
             <option value="OUT">Money out</option>
           </select>
-          <input className="admin-input" type="date" name="from" aria-label="From date" defaultValue={first(query.from)} />
-          <input className="admin-input" type="date" name="to" aria-label="To date" defaultValue={first(query.to)} />
+          <input
+            className="admin-input"
+            type="date"
+            name="from"
+            aria-label="From date"
+            defaultValue={first(query.from)}
+          />
+          <input
+            className="admin-input"
+            type="date"
+            name="to"
+            aria-label="To date"
+            defaultValue={first(query.to)}
+          />
           <div className="flex gap-3 lg:col-span-6">
-            <button className="admin-primary-button">Apply filters</button>
-            <Link href="/admin/money/transactions" className="admin-secondary-button">Clear</Link>
+            <button type="submit" className="admin-primary-button">
+              Apply filters
+            </button>
+            <Link
+              href="/admin/money/transactions"
+              className="admin-secondary-button"
+            >
+              Clear
+            </Link>
           </div>
         </form>
 
@@ -143,38 +196,130 @@ export default async function TransactionsPage({
 
         <section className="admin-panel mt-5 overflow-hidden rounded-2xl">
           <div className="hidden grid-cols-[1.6fr_.8fr_.8fr_.8fr] gap-4 border-b border-white/10 px-5 py-3 text-xs uppercase tracking-wider text-slate-500 md:grid">
-            <span>Transaction</span><span>Category</span><span>Date</span><span className="text-right">Amount</span>
+            <span>Transaction</span>
+            <span>Category</span>
+            <span>Date</span>
+            <span className="text-right">Amount</span>
           </div>
           <div className="hidden md:block">
-            {descendingPage.map((transaction) => <TransactionRow key={transaction.id} transaction={transaction} />)}
+            {descendingPage.map((transaction) => (
+              <TransactionRow key={transaction.id} transaction={transaction} />
+            ))}
           </div>
           <div className="divide-y divide-white/10 md:hidden">
-            {ascendingPage.map((transaction) => <MobileTransaction key={transaction.id} transaction={transaction} />)}
+            {ascendingPage.map((transaction) => (
+              <MobileTransaction
+                key={transaction.id}
+                transaction={transaction}
+              />
+            ))}
           </div>
-          {transactions.length === 0 && <p className="p-8 text-center text-sm text-slate-400">No transactions match these filters.</p>}
+          {transactions.length === 0 && (
+            <p className="p-8 text-center text-sm text-slate-400">
+              No transactions match these filters.
+            </p>
+          )}
         </section>
 
         <div className="mt-5 flex items-center justify-between text-sm">
-          <Link className={`admin-secondary-button ${safePage === 1 ? "pointer-events-none opacity-40" : ""}`} href={pageHref(Math.max(1, safePage - 1))}>Previous</Link>
-          <span className="text-slate-400">Page {safePage} of {totalPages}</span>
-          <Link className={`admin-secondary-button ${safePage === totalPages ? "pointer-events-none opacity-40" : ""}`} href={pageHref(Math.min(totalPages, safePage + 1))}>Next</Link>
+          <Link
+            className={`admin-secondary-button ${safePage === 1 ? "pointer-events-none opacity-40" : ""}`}
+            href={pageHref(Math.max(1, safePage - 1))}
+          >
+            Previous
+          </Link>
+          <span className="text-slate-400">
+            Page {safePage} of {totalPages}
+          </span>
+          <Link
+            className={`admin-secondary-button ${safePage === totalPages ? "pointer-events-none opacity-40" : ""}`}
+            href={pageHref(Math.min(totalPages, safePage + 1))}
+          >
+            Next
+          </Link>
         </div>
 
-        <FloatingAction href={"/admin/money/transactions/new" as Route}>+</FloatingAction>
+        <FloatingAction href={"/admin/money/transactions/new" as Route}>
+          +
+        </FloatingAction>
       </PageContainer>
     </main>
   );
 }
 
-function Stat({ label, value, tone }: { label: string; value: string; tone?: "positive" | "negative" }) {
-  return <div className="admin-stat-card"><span>{label}</span><strong className={tone === "positive" ? "text-emerald-300" : tone === "negative" ? "text-rose-300" : ""}>{value}</strong></div>;
+function Stat({
+  label,
+  value,
+  tone,
+}: Readonly<{
+  label: string;
+  value: string;
+  tone?: "positive" | "negative";
+}>) {
+  return (
+    <div className="admin-stat-card">
+      <span>{label}</span>
+      <strong
+        className={cn({
+          "text-emerald-300": tone === "positive",
+          "text-rose-300": tone === "negative",
+        })}
+      >
+        {value}
+      </strong>
+    </div>
+  );
 }
 
-type RowTransaction = Awaited<ReturnType<typeof transactionsService.getAll>>[number];
-function TransactionRow({ transaction }: { transaction: RowTransaction }) {
-  return <Link href={`/admin/money/transactions/${transaction.id}`} className="grid grid-cols-[1.6fr_.8fr_.8fr_.8fr] gap-4 border-b border-white/5 px-5 py-4 text-sm hover:bg-white/5"><span className="font-medium">{transaction.title}</span><span className="text-slate-400">{transaction.category.name}</span><span className="text-slate-400">{transaction.time.toLocaleDateString("en-SG")}</span><span className={`text-right font-semibold ${transaction.direction === "IN" ? "text-emerald-300" : "text-rose-300"}`}>{transaction.direction === "IN" ? "+" : "−"}{formatMoney(transaction.amountCents)}</span></Link>;
+type RowTransaction = Awaited<
+  ReturnType<typeof transactionsService.getAll>
+>[number];
+function TransactionRow({
+  transaction,
+}: Readonly<{ transaction: RowTransaction }>) {
+  return (
+    <Link
+      href={`/admin/money/transactions/${transaction.id}`}
+      className="grid grid-cols-[1.6fr_.8fr_.8fr_.8fr] gap-4 border-b border-white/5 px-5 py-4 text-sm hover:bg-white/5"
+    >
+      <span className="font-medium">{transaction.title}</span>
+      <span className="text-slate-400">{transaction.category.name}</span>
+      <span className="text-slate-400">
+        {transaction.time.toLocaleDateString("en-SG")}
+      </span>
+      <span
+        className={`text-right font-semibold ${transaction.direction === "IN" ? "text-emerald-300" : "text-rose-300"}`}
+      >
+        {transaction.direction === "IN" ? "+" : "−"}
+        {formatMoney(transaction.amountCents)}
+      </span>
+    </Link>
+  );
 }
 
-function MobileTransaction({ transaction }: { transaction: RowTransaction }) {
-  return <Link href={`/admin/money/transactions/${transaction.id}`} className="flex items-center justify-between gap-4 px-4 py-4"><div className="min-w-0"><p className="truncate font-medium">{transaction.title}</p><p className="mt-1 text-xs text-slate-500">{transaction.time.toLocaleString("en-SG", { dateStyle: "medium", timeStyle: "short" })}</p></div><span className={`shrink-0 font-semibold ${transaction.direction === "IN" ? "text-emerald-300" : "text-rose-300"}`}>{transaction.direction === "IN" ? "+" : "−"}{formatMoney(transaction.amountCents)}</span></Link>;
+function MobileTransaction({
+  transaction,
+}: Readonly<{ transaction: RowTransaction }>) {
+  return (
+    <Link
+      href={`/admin/money/transactions/${transaction.id}`}
+      className="flex items-center justify-between gap-4 px-4 py-4"
+    >
+      <div className="min-w-0">
+        <p className="truncate font-medium">{transaction.title}</p>
+        <p className="mt-1 text-xs text-slate-500">
+          {transaction.time.toLocaleString("en-SG", {
+            dateStyle: "medium",
+            timeStyle: "short",
+          })}
+        </p>
+      </div>
+      <span
+        className={`shrink-0 font-semibold ${transaction.direction === "IN" ? "text-emerald-300" : "text-rose-300"}`}
+      >
+        {transaction.direction === "IN" ? "+" : "−"}
+        {formatMoney(transaction.amountCents)}
+      </span>
+    </Link>
+  );
 }
