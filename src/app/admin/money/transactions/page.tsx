@@ -1,4 +1,3 @@
-import cn from "classnames";
 import FloatingAction from "@/components/FloatingAction";
 import TopNavigator from "@/components/HomeButton";
 import PageContainer from "@/components/PageContainer";
@@ -10,6 +9,8 @@ import transactionsService, {
 import Link from "next/link";
 import { Route } from "next";
 import MoneyCharts from "./MoneyCharts";
+import Stat from "./components/Stat";
+import { MobileTransaction, TransactionRow } from "./components/Mobile";
 
 const PAGE_SIZE = 12;
 type SearchParams = Record<string, string | string[] | undefined>;
@@ -244,82 +245,5 @@ export default async function TransactionsPage({
         </FloatingAction>
       </PageContainer>
     </main>
-  );
-}
-
-function Stat({
-  label,
-  value,
-  tone,
-}: Readonly<{
-  label: string;
-  value: string;
-  tone?: "positive" | "negative";
-}>) {
-  return (
-    <div className="admin-stat-card">
-      <span>{label}</span>
-      <strong
-        className={cn({
-          "text-emerald-300": tone === "positive",
-          "text-rose-300": tone === "negative",
-        })}
-      >
-        {value}
-      </strong>
-    </div>
-  );
-}
-
-type RowTransaction = Awaited<
-  ReturnType<typeof transactionsService.getAll>
->[number];
-function TransactionRow({
-  transaction,
-}: Readonly<{ transaction: RowTransaction }>) {
-  return (
-    <Link
-      href={`/admin/money/transactions/${transaction.id}`}
-      className="grid grid-cols-[1.6fr_.8fr_.8fr_.8fr] gap-4 border-b border-white/5 px-5 py-4 text-sm hover:bg-white/5"
-    >
-      <span className="font-medium">{transaction.title}</span>
-      <span className="text-slate-400">{transaction.category.name}</span>
-      <span className="text-slate-400">
-        {transaction.time.toLocaleDateString("en-SG")}
-      </span>
-      <span
-        className={`text-right font-semibold ${transaction.direction === "IN" ? "text-emerald-300" : "text-rose-300"}`}
-      >
-        {transaction.direction === "IN" ? "+" : "−"}
-        {formatMoney(transaction.amountCents)}
-      </span>
-    </Link>
-  );
-}
-
-function MobileTransaction({
-  transaction,
-}: Readonly<{ transaction: RowTransaction }>) {
-  return (
-    <Link
-      href={`/admin/money/transactions/${transaction.id}`}
-      className="flex items-center justify-between gap-4 px-4 py-4"
-    >
-      <div className="min-w-0">
-        <p className="truncate font-medium">{transaction.title}</p>
-        <p className="mt-1 text-xs text-slate-500">
-          {transaction.time.toLocaleString("en-SG", {
-            dateStyle: "medium",
-            timeStyle: "short",
-          })}
-        </p>
-      </div>
-      <span
-        className={`shrink-0 font-semibold ${transaction.direction === "IN" ? "text-emerald-300" : "text-rose-300"}`}
-      >
-        {transaction.direction === "IN" ? "+" : "−"}
-        {formatMoney(transaction.amountCents)}
-      </span>
-    </Link>
   );
 }
