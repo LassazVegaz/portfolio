@@ -37,6 +37,7 @@ export class CategoriesService {
         name: UNCLASSIFIED_CATEGORY_NAME,
         normalizedName,
         isSystem: true,
+        parentId: null,
       },
     });
   }
@@ -69,7 +70,8 @@ export class CategoriesService {
       },
     });
     return (
-      existing ?? prisma.category.create({ data: { name, normalizedName } })
+      existing ??
+      prisma.category.create({ data: { name, normalizedName, parentId: null } })
     );
   }
 
@@ -166,3 +168,8 @@ export class CategoriesService {
 
 const categoriesService = new CategoriesService();
 export default categoriesService;
+
+/**
+ * NOTES:
+ * When creating categories don't leave parentId to undefined. This is to keep the DB consistent
+ */
