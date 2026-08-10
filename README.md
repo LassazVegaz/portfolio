@@ -15,15 +15,6 @@ The private `/admin` area now includes a maintainable SGD ledger with:
 - filtered statistics, cash-flow and spending charts, and paginated transactions;
 - a compact oldest-first mobile ledger and an adaptive desktop dashboard.
 
-### First deployment
-
-1. Copy the variables from `.env.example` into the local/deployment environment. Keep `AUTH_SECRET` stable and private.
-2. Run `pnpm prisma db push` against the intended MongoDB database, then deploy.
-3. Sign in once with `ADMIN_BOOTSTRAP_USERNAME` and `ADMIN_BOOTSTRAP_PASSWORD`. This creates the first `AdminUser` with a bcrypt hash.
-4. Remove the two `ADMIN_BOOTSTRAP_*` variables and manage credentials from `/admin/profile` thereafter.
-
-The money schema intentionally starts fresh: transaction amounts, directions, and categories are required, and amounts are stored as integer cents.
-
 ### Security notes
 
 - Every admin route is protected by `proxy.ts`; every mutating server action also performs its own authentication check.
