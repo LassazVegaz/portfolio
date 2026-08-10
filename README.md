@@ -23,6 +23,8 @@ The private `/admin` area now includes a maintainable SGD ledger with:
 
 ## Plan
 
+- Improve styling
+  - use TailwindCSS theme to name frequently used TailwindCSS classes (eg: primary color, secondary color, page gap)
 - Improve money feature
   - Transaction source/destination (new feature)
     - every transaction should have a source/destination
