@@ -96,7 +96,7 @@ The private `/admin` area now includes a maintainable SGD ledger with:
         - show bars for each category with their budget on the side
         - y axis is the money
         - budget bars can be hidden
-    - statistics
+    - numbers
       - show following numbers
         - total money out
         - total money in
@@ -116,7 +116,7 @@ The private `/admin` area now includes a maintainable SGD ledger with:
       - filters. categories filter is on the left side
       - line chart
       - bar chart
-      - statistics
+      - numbers
       - table
     - all charts, statistics area and table are collapsible
 - this application does not have live data. Therefore the DB structure can be changed without worrying about existing data
