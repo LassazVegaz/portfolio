@@ -26,25 +26,27 @@ The private `/admin` area now includes a maintainable SGD ledger with:
 - Improve styling
   - use TailwindCSS theme to name frequently used TailwindCSS classes (eg: primary color, secondary color, page gap)
 - Improve money feature
-  - Transaction source/destination (new feature)
-    - every transaction should have a source/destination
-    - these sources/destination can be managed separately
-    - source/transaction properties
+  - Transaction instruments (new feature)
+    - every transaction should have a source/destination (instrument)
+    - these instruments can be managed separately
+    - instruments properties
       - name (required)
       - is credit card (default is false)
     - in "money" settings, user can select which source/destination is the default
+    - intruments do not have their own balances. Instead they all use Money Account balance
+    - credit cards bill payments are not tracked in this app
   - transactions
     - parent categories cannot be selected as the categroy for a transaction except for the default "unclassified" category
-  - category budget
-    - parent categories and sub categories should have budgets
-    - sum of the budget of of sub categories should be equal to the parent category budget
+  - category budget (new feature)
+    - parent categories and sub categories should have budgets for a period of month
+    - sum of the budget of of sub categories should not exceed the parent category budget
   - dashboard (transaction page) desktop version
     - filters
       - money in or out: default is out
       - categories
         - a left side panel should show all the available categories
         - the panel should take the remaining height of the screen
-        - overflowing content should scrollable
+        - overflowing content should be scrollable
         - categories are grouped based on the parent category
         - all categories are first sorted in parent category alphabetic order. Then sub categories alphabetic order
         - there is an option to show/hide sub categories
@@ -58,16 +60,13 @@ The private `/admin` area now includes a maintainable SGD ledger with:
         - from and to dates should have a datepicker. install a library if required
         - from and to dates are inclusive
         - there are predefined date ranges:
-          - 1 week: one week from today. today is inclusive.
-          - 1 month: similar to above
-          - 3 months: similar
-          - 1 year: similar
-          - this week: last Monday - today
-          - last week: last complete week from Monday - Sunday
-          - this month: similar to "this week"
-          - last month: similar to "last week"
-          - this year: similar to "this week"
-          - last year: similar to "last week"
+          - today
+          - this week
+          - last week
+          - this month
+          - last month
+          - this year
+          - last year
         - when a predefined range is selected, the date range fields should be updated automatically and UI cue should be displayed to indicate which predefined option was selected.
         - if the date range is changed using "to" and "from" fields, unselect the selected predefined range
         - the panel is collapsible
@@ -88,7 +87,7 @@ The private `/admin` area now includes a maintainable SGD ledger with:
         - show lines for selected category
         - y axis is money
         - x axis is the date. compress dates based on the selected date range
-        - if sub categories are hidden, accumulate all sub categories to the parent category
+        - if sub categories are hidden, accumulate all sub categories to the selected parent category
         - hide this chart if the date range only includes one day
         - if none of the categories are selected, accumulate all money into one line
       - bar chart
@@ -98,25 +97,31 @@ The private `/admin` area now includes a maintainable SGD ledger with:
         - budget bars can be hidden
     - numbers
       - show following numbers
-        - total money out
-        - total money in
-        - total money in substracts total money out
-        - if more than one category is selected
+        - total money
+        - if any category is selected
           - total money in each category
           - remaining budget or overflown amount
           - remaining budget or overflown amount as a percentage
+        - provides an option to show cashflow. For an exact month and current month periods, this option is enabled by default
+        - If cashflow need to be shown, display following details
+          - display money in and out both
+          - display savings for that period
+          - display savings as a percentage of money in
+          - display money out as a percentage of money in
     - table
       - show transactions in a paginated view
       - include following properties
         - amount
         - money in or out
+        - category
         - date
+        - percentage it is taking from the allocated budget of that category
       - clicking on a record open the relevant transaction page
     - order of the dashboard from top to bottom
       - filters. categories filter is on the left side
+      - numbers
       - line chart
       - bar chart
-      - numbers
       - table
     - all charts, statistics area and table are collapsible
 - this application does not have live data. Therefore the DB structure can be changed without worrying about existing data
