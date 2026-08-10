@@ -20,6 +20,7 @@ type Category = {
   name: string;
   parentId: string | null;
   isSystem: boolean;
+  monthlyBudgetCents: number;
 };
 
 type ClientFormProps = {
@@ -28,7 +29,11 @@ type ClientFormProps = {
   categories: Pick<Category, "id" | "name">[];
 };
 
-type FormEntries = { [k in keyof Pick<Category, "name" | "parentId">]: string };
+type FormEntries = {
+  name: string;
+  parentId: string;
+  monthlyBudget: string;
+};
 
 const _onSaveClick = async (form: HTMLFormElement, id?: string) => {
   const formData = new FormData(form);
@@ -36,6 +41,7 @@ const _onSaveClick = async (form: HTMLFormElement, id?: string) => {
   const data = {
     name: entries.name,
     parentId: entries.parentId === "" ? null : entries.parentId,
+    monthlyBudget: entries.monthlyBudget,
   };
 
   if (id) await updateAction(id, data);
@@ -67,6 +73,7 @@ export default function ClientForm(props: Readonly<ClientFormProps>) {
   }, [props.category, props.isNew, router]);
 
   const onDeleteClick = useCallback(async () => {
+    if (!confirm(`Delete ${props.category?.name}?`)) return;
     setPending(true);
     try {
       await deleteAction(props.category!.id);
@@ -80,7 +87,14 @@ export default function ClientForm(props: Readonly<ClientFormProps>) {
   }, [props.category, router]);
 
   return (
-    <Form ref={form} className="admin-panel mt-8 grid gap-5 rounded-2xl p-6">
+    <Form
+      ref={form}
+      onSubmit={(event) => {
+        event.preventDefault();
+        void onSaveClick();
+      }}
+      className="admin-panel mt-8 grid gap-5 rounded-2xl p-6"
+    >
       <FieldContainer label="Name">
         <InputField
           type="text"
@@ -109,18 +123,36 @@ export default function ClientForm(props: Readonly<ClientFormProps>) {
         </SelectField>
       </FieldContainer>
 
+      <FieldContainer label="Monthly budget (SGD)">
+        <InputField
+          type="text"
+          inputMode="decimal"
+          name="monthlyBudget"
+          defaultValue={((props.category?.monthlyBudgetCents ?? 0) / 100).toFixed(2)}
+          required
+          disabled={props.category?.isSystem}
+          className="admin-input"
+        />
+      </FieldContainer>
+
+      <p className="text-sm leading-6 text-admin-muted">
+        Subcategory budgets together cannot exceed their parent category budget.
+        Dashboard budgets are prorated for partial-month date ranges.
+      </p>
+
       <div className="flex justify-between mt-10">
         <FormButton type="button" disabled={pending} onClick={router.back}>
           Cancel
         </FormButton>
-        <FormButton
-          type="submit"
-          disabled={pending}
-          className="text-btn-blue border-btn-blue"
-          onClick={onSaveClick}
-        >
-          Save
-        </FormButton>
+        {!props.category?.isSystem && (
+          <FormButton
+            type="submit"
+            disabled={pending}
+            className="text-btn-blue border-btn-blue"
+          >
+            Save
+          </FormButton>
+        )}
         {props.isNew === false && !props.category?.isSystem && (
           <FormButton
             type="button"

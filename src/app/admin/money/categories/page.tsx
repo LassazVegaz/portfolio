@@ -4,6 +4,7 @@ import PageContainer from "@/components/PageContainer";
 import categoriesService from "@/services/categories.service";
 import Link from "next/link";
 import { Route } from "next";
+import { formatMoney } from "@/features/money/money";
 
 export default async function CategoriesPage() {
   const categories = await categoriesService.getAllCategories();
@@ -37,15 +38,23 @@ export default async function CategoriesPage() {
                     <span className="admin-badge">Default</span>
                   )}
                 </Link>
+                {!category.isSystem && (
+                  <p className="mt-2 text-xs text-admin-muted">
+                    {formatMoney(category.monthlyBudgetCents)} monthly budget
+                  </p>
+                )}
                 {children.length > 0 && (
-                  <div className="mt-4 flex flex-wrap gap-2">
+                  <div className="mt-4 grid gap-2">
                     {children.map((child) => (
                       <Link
                         key={child.id}
                         href={`/admin/money/categories/${child.id}`}
-                        className="admin-chip"
+                        className="flex items-center justify-between rounded-lg border border-admin-line bg-white/4 px-3 py-2 text-sm hover:border-admin-accent/40"
                       >
                         {child.name}
+                        <span className="text-xs text-admin-muted">
+                          {formatMoney(child.monthlyBudgetCents)}
+                        </span>
                       </Link>
                     ))}
                   </div>

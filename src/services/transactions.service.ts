@@ -12,11 +12,11 @@ export type SaveTransactionDto = {
   comments: string | null;
   time: Date;
   categoryId?: string | null;
-  categoryName?: string | null;
+  instrumentId: string;
 };
 
 export type TransactionFilters = {
-  categoryId?: string;
+  categoryIds?: string[];
   direction?: TransactionDirection;
   from?: Date;
   to?: Date;
@@ -26,7 +26,10 @@ export type TransactionFilters = {
 export class TransactionsService {
   async create(dto: SaveTransactionDto) {
     this.validate(dto);
-    const categoryId = await this.resolveCategory(dto);
+    const [categoryId] = await Promise.all([
+      this.resolveCategory(dto),
+      this.requireInstrument(dto.instrumentId),
+    ]);
     return prisma.transaction.create({
       data: {
         amountCents: dto.amountCents,
@@ -35,13 +38,17 @@ export class TransactionsService {
         comments: dto.comments?.trim() || null,
         time: dto.time,
         categoryId,
+        instrumentId: dto.instrumentId,
       },
     });
   }
 
   async update(id: string, dto: SaveTransactionDto) {
     this.validate(dto);
-    const categoryId = await this.resolveCategory(dto);
+    const [categoryId] = await Promise.all([
+      this.resolveCategory(dto),
+      this.requireInstrument(dto.instrumentId),
+    ]);
     return prisma.transaction.update({
       where: { id },
       data: {
@@ -51,6 +58,7 @@ export class TransactionsService {
         comments: dto.comments?.trim() || null,
         time: dto.time,
         categoryId,
+        instrumentId: dto.instrumentId,
       },
     });
   }
@@ -62,14 +70,17 @@ export class TransactionsService {
   async getById(id: string) {
     return prisma.transaction.findUnique({
       where: { id },
-      include: { category: true },
+      include: { category: true, instrument: true },
     });
   }
 
   async getAll(filters: TransactionFilters = {}) {
     return prisma.transaction.findMany({
       where: this.buildWhere(filters),
-      include: { category: true },
+      include: {
+        category: { include: { parent: true } },
+        instrument: true,
+      },
       orderBy: [{ time: "desc" }, { createdAt: "desc" }],
     });
   }
@@ -126,10 +137,15 @@ export class TransactionsService {
 
   private async resolveCategory(dto: SaveTransactionDto) {
     if (dto.categoryId) {
-      const category = await categoriesService.getCategoryById(dto.categoryId);
-      if (category) return category.id;
+      return (await categoriesService.requireSelectableCategory(dto.categoryId)).id;
     }
-    return (await categoriesService.findOrCreateByName(dto.categoryName)).id;
+    return (await categoriesService.ensureUnclassified()).id;
+  }
+
+  private async requireInstrument(id: string) {
+    const instrument = await prisma.instrument.findUnique({ where: { id } });
+    if (!instrument) throw new Error("Choose a valid transaction instrument.");
+    return instrument;
   }
 
   private validate(dto: SaveTransactionDto) {
@@ -140,11 +156,14 @@ export class TransactionsService {
     }
     if (!dto.title.trim()) throw new Error("Title is required.");
     if (Number.isNaN(dto.time.getTime())) throw new Error("Date is invalid.");
+    if (!dto.instrumentId) throw new Error("Instrument is required.");
   }
 
   private buildWhere(filters: TransactionFilters) {
     return {
-      categoryId: filters.categoryId || undefined,
+      categoryId: filters.categoryIds?.length
+        ? { in: filters.categoryIds }
+        : undefined,
       direction: filters.direction,
       time:
         filters.from || filters.to

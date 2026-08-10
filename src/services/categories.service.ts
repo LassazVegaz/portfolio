@@ -7,6 +7,7 @@ export const UNCLASSIFIED_CATEGORY_NAME = "Unclassified";
 export type CreateCategoryDto = {
   name: string;
   parentId: string | null;
+  monthlyBudgetCents: number;
 };
 export type UpdateCategoryDto = Partial<CreateCategoryDto>;
 
@@ -45,34 +46,20 @@ export class CategoriesService {
   async createCategory(dto: CreateCategoryDto) {
     const name = cleanName(dto.name);
     if (!name) throw new Error("Category name is required.");
-    if (dto.parentId) await this.validateParent(dto.parentId);
+    this.validateBudgetValue(dto.monthlyBudgetCents);
+    if (dto.parentId) {
+      await this.validateParent(dto.parentId);
+      await this.validateChildBudget(dto.parentId, dto.monthlyBudgetCents);
+    }
 
     return prisma.category.create({
       data: {
         name,
         normalizedName: normalizeName(name),
         parentId: dto.parentId,
+        monthlyBudgetCents: dto.monthlyBudgetCents,
       },
     });
-  }
-
-  async findOrCreateByName(nameInput?: string | null) {
-    const name = cleanName(nameInput ?? "");
-    if (!name) return this.ensureUnclassified();
-
-    const normalizedName = normalizeName(name);
-    const existing = await prisma.category.findFirst({
-      where: {
-        OR: [
-          { normalizedName },
-          { name: { equals: name, mode: "insensitive" } },
-        ],
-      },
-    });
-    return (
-      existing ??
-      prisma.category.create({ data: { name, normalizedName, parentId: null } })
-    );
   }
 
   async updateCategory(id: string, dto: UpdateCategoryDto) {
@@ -84,6 +71,25 @@ export class CategoriesService {
       throw new Error("A category cannot be its own parent.");
     if (dto.parentId) await this.validateParent(dto.parentId);
 
+    const monthlyBudgetCents =
+      dto.monthlyBudgetCents ?? existing.monthlyBudgetCents;
+    this.validateBudgetValue(monthlyBudgetCents);
+    const parentId =
+      dto.parentId === undefined ? existing.parentId : dto.parentId;
+    if (parentId) {
+      if (await this.hasChildCategories(id)) {
+        throw new Error("A parent category cannot become a subcategory.");
+      }
+      await this.validateChildBudget(parentId, monthlyBudgetCents, id);
+    } else {
+      const childrenBudget = await this.getChildrenBudget(id);
+      if (childrenBudget > monthlyBudgetCents) {
+        throw new Error(
+          "The parent budget cannot be less than the sum of its subcategory budgets.",
+        );
+      }
+    }
+
     const name = dto.name === undefined ? undefined : cleanName(dto.name);
     if (name !== undefined && !name)
       throw new Error("Category name is required.");
@@ -94,6 +100,7 @@ export class CategoriesService {
         name,
         normalizedName: name ? normalizeName(name) : undefined,
         parentId: dto.parentId,
+        monthlyBudgetCents: dto.monthlyBudgetCents,
       },
     });
   }
@@ -123,8 +130,31 @@ export class CategoriesService {
   async getAllCategories() {
     await this.ensureUnclassified();
     return prisma.category.findMany({
+      include: { _count: { select: { children: true, transactions: true } } },
       orderBy: [{ isSystem: "desc" }, { name: "asc" }],
     });
+  }
+
+  async getSelectableCategories() {
+    await this.ensureUnclassified();
+    return prisma.category.findMany({
+      where: {
+        OR: [{ isSystem: true }, { parentId: { not: null } }],
+      },
+      include: { parent: true },
+      orderBy: [{ parentId: "asc" }, { name: "asc" }],
+    });
+  }
+
+  async requireSelectableCategory(id: string) {
+    const category = await prisma.category.findUnique({
+      where: { id },
+    });
+    if (!category) throw new Error("Category not found.");
+    if (!category.isSystem && !category.parentId) {
+      throw new Error("Choose a subcategory instead of a parent category.");
+    }
+    return category;
   }
 
   async getAvailableParents(currentId?: string) {
@@ -163,6 +193,43 @@ export class CategoriesService {
       throw new Error("Unclassified cannot have subcategories.");
     if (parent.parentId)
       throw new Error("Subcategories cannot have subcategories.");
+    if ((await prisma.transaction.count({ where: { categoryId: parentId } })) > 0) {
+      throw new Error(
+        "Move the parent category's transactions before adding a subcategory.",
+      );
+    }
+  }
+
+  private validateBudgetValue(monthlyBudgetCents: number) {
+    if (!Number.isSafeInteger(monthlyBudgetCents) || monthlyBudgetCents < 0) {
+      throw new Error("Monthly budget must be zero or a valid positive amount.");
+    }
+  }
+
+  private async getChildrenBudget(parentId: string, exceptId?: string) {
+    const result = await prisma.category.aggregate({
+      where: {
+        parentId,
+        id: exceptId ? { not: exceptId } : undefined,
+      },
+      _sum: { monthlyBudgetCents: true },
+    });
+    return result._sum.monthlyBudgetCents ?? 0;
+  }
+
+  private async validateChildBudget(
+    parentId: string,
+    monthlyBudgetCents: number,
+    exceptId?: string,
+  ) {
+    const parent = await this.getCategoryById(parentId);
+    if (!parent) throw new Error("Parent category not found.");
+    const siblingsBudget = await this.getChildrenBudget(parentId, exceptId);
+    if (siblingsBudget + monthlyBudgetCents > parent.monthlyBudgetCents) {
+      throw new Error(
+        "Subcategory budgets cannot exceed the parent category's monthly budget.",
+      );
+    }
   }
 }
 

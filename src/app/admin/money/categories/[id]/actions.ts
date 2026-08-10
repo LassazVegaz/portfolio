@@ -1,10 +1,8 @@
 "use server";
 
 import authService from "@/services/auth-service";
-import categoriesService, {
-  CreateCategoryDto,
-  UpdateCategoryDto,
-} from "@/services/categories.service";
+import { parseMoneyToCents } from "@/features/money/money";
+import categoriesService from "@/services/categories.service";
 import { revalidatePath } from "next/cache";
 
 export const deleteAction = async (id: string) => {
@@ -14,8 +12,21 @@ export const deleteAction = async (id: string) => {
   revalidatePath("/admin/money/transactions");
 };
 
-export const createAction = async (params: CreateCategoryDto) => {
+type CategoryInput = {
+  name: string;
+  parentId: string | null;
+  monthlyBudget: string;
+};
+
+const parse = (params: CategoryInput) => ({
+  name: params.name,
+  parentId: params.parentId,
+  monthlyBudgetCents: parseMoneyToCents(params.monthlyBudget),
+});
+
+export const createAction = async (input: CategoryInput) => {
   await authService.requireAuthenticatedUser();
+  const params = parse(input);
   if (await categoriesService.nameExists(params.name)) {
     throw new Error("A category with that name already exists.");
   }
@@ -24,8 +35,9 @@ export const createAction = async (params: CreateCategoryDto) => {
   return created.id;
 };
 
-export const updateAction = async (id: string, params: UpdateCategoryDto) => {
+export const updateAction = async (id: string, input: CategoryInput) => {
   await authService.requireAuthenticatedUser();
+  const params = parse(input);
   if (params.name && (await categoriesService.nameExists(params.name, id))) {
     throw new Error("A category with that name already exists.");
   }

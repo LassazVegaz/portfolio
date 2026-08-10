@@ -12,7 +12,8 @@ const transactionSchema = z.object({
   title: z.string().trim().min(1).max(120),
   comments: z.string().trim().max(500),
   time: z.string().min(1),
-  categoryName: z.string().trim().max(80),
+  categoryId: z.string().min(1),
+  instrumentId: z.string().min(1),
 });
 
 const parseEntries = (entries: Record<string, string>) => {
@@ -25,7 +26,8 @@ const parseEntries = (entries: Record<string, string>) => {
     title: parsed.title,
     comments: parsed.comments || null,
     time,
-    categoryName: parsed.categoryName,
+    categoryId: parsed.categoryId,
+    instrumentId: parsed.instrumentId,
   };
 };
 

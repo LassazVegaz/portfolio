@@ -11,8 +11,9 @@ The private `/admin` area now includes a maintainable SGD ledger with:
 - profile and password management with session invalidation;
 - exact integer-cent money calculations, opening balance, and IN/OUT entries;
 - top-level categories, one level of subcategories, and a protected Unclassified category;
-- category suggestions and automatic creation while entering a transaction;
-- filtered statistics, cash-flow and spending charts, and paginated transactions;
+- transaction instruments with a configurable default and a shared account balance;
+- monthly parent/subcategory budgets with enforced allocation limits;
+- advanced, saveable filters plus budget, cash-flow, and category reporting;
 - a compact oldest-first mobile ledger and an adaptive desktop dashboard.
 
 ### Security notes
@@ -21,7 +22,9 @@ The private `/admin` area now includes a maintainable SGD ledger with:
 - Admin responses are private and non-cacheable. Baseline framing, MIME-sniffing, referrer, and permissions headers are configured in `next.config.ts`.
 - For internet exposure, enable rate limiting for `/admin/login` at the hosting/WAF layer. In-memory counters are not reliable in a serverless deployment.
 
-## Plan
+## Implemented money plan
+
+The following scope has been implemented:
 
 - Improve styling
   - use TailwindCSS theme to name frequently used TailwindCSS classes (eg: primary color, secondary color, page gap)

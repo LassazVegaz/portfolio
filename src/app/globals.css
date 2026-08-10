@@ -41,21 +41,26 @@ body::-webkit-scrollbar-thumb {
   --color-admin-page: #07110d;
   --color-admin-surface: #0d1b16;
   --color-admin-accent: #6ee7b7;
+  --color-admin-ink: #eef8f3;
+  --color-admin-muted: #92a79d;
+  --color-admin-line: rgba(148, 163, 184, 0.13);
+  --spacing-page: 1.25rem;
+  --radius-admin: 1rem;
 }
 
 .admin-shell {
-  color: #eef8f3;
+  color: var(--color-admin-ink);
   background:
     radial-gradient(circle at 90% -10%, rgba(52, 211, 153, 0.14), transparent 34rem),
     linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
     linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px),
-    #07110d;
+    var(--color-admin-page);
   background-size: auto, 64px 64px, 64px 64px, auto;
 }
 
 .admin-panel {
-  background: rgba(13, 27, 22, 0.92);
-  border: 1px solid rgba(148, 163, 184, 0.13);
+  background: color-mix(in srgb, var(--color-admin-surface) 92%, transparent);
+  border: 1px solid var(--color-admin-line);
   box-shadow: 0 18px 60px rgba(0, 0, 0, 0.18);
 }
 
@@ -65,7 +70,7 @@ body::-webkit-scrollbar-thumb {
   justify-content: space-between;
   gap: 1rem;
   padding-bottom: 1rem;
-  border-bottom: 1px solid rgba(148, 163, 184, 0.13);
+  border-bottom: 1px solid var(--color-admin-line);
 }
 
 .admin-nav-link {
@@ -86,7 +91,7 @@ body::-webkit-scrollbar-thumb {
 }
 
 .admin-eyebrow {
-  color: #6ee7b7;
+  color: var(--color-admin-accent);
   font-size: 0.7rem;
   font-weight: 750;
   letter-spacing: 0.16em;
@@ -97,7 +102,7 @@ body::-webkit-scrollbar-thumb {
   width: 100%;
   min-height: 2.75rem;
   padding: 0.65rem 0.8rem;
-  color: #eef8f3;
+  color: var(--color-admin-ink);
   background: rgba(3, 10, 7, 0.5);
   border: 1px solid rgba(148, 163, 184, 0.22);
   border-radius: 0.75rem;
@@ -131,7 +136,7 @@ body::-webkit-scrollbar-thumb {
 
 .admin-primary-button {
   color: #052e22;
-  background: #6ee7b7;
+  background: var(--color-admin-accent);
 }
 
 .admin-secondary-button {
@@ -163,13 +168,13 @@ body::-webkit-scrollbar-thumb {
   display: grid;
   gap: 0.55rem;
   padding: 1.1rem;
-  background: rgba(13, 27, 22, 0.92);
-  border: 1px solid rgba(148, 163, 184, 0.13);
+  background: color-mix(in srgb, var(--color-admin-surface) 92%, transparent);
+  border: 1px solid var(--color-admin-line);
   border-radius: 1rem;
 }
 
 .admin-stat-card span {
-  color: #82958c;
+  color: var(--color-admin-muted);
   font-size: 0.72rem;
 }
 
