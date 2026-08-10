@@ -1,110 +1,122 @@
 "use client";
 
+import { formatMoney } from "@/features/money/money";
+import { useState } from "react";
 import {
-  Area,
-  AreaChart,
   Bar,
   BarChart,
   CartesianGrid,
+  Legend,
+  Line,
+  LineChart,
   ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis,
 } from "recharts";
 
-type MonthlyPoint = { month: string; income: number; expense: number };
-type CategoryPoint = { category: string; expense: number };
+export type MoneyLinePoint = { period: string } & Record<string, string | number>;
+export type MoneyLineSeries = { key: string; label: string; color: string };
+export type MoneyBarPoint = { category: string; actualCents: number; budgetCents: number };
+
+const tooltipStyle = {
+  background: "#0f1f1a",
+  border: "1px solid rgba(148,163,184,.2)",
+  borderRadius: 12,
+};
+
+const moneyTooltip = (value: unknown) => [
+  formatMoney(Number(value ?? 0)),
+  "",
+];
 
 export default function MoneyCharts({
-  monthly,
-  categories,
+  lineData,
+  lineSeries,
+  barData,
+  showLine,
 }: Readonly<{
-  monthly: MonthlyPoint[];
-  categories: CategoryPoint[];
+  lineData: MoneyLinePoint[];
+  lineSeries: MoneyLineSeries[];
+  barData: MoneyBarPoint[];
+  showLine: boolean;
 }>) {
-  return (
-    <div className="grid gap-5 xl:grid-cols-2">
-      <section className="admin-panel rounded-2xl p-5">
-        <h2 className="font-semibold">Cash flow by month</h2>
-        <p className="mt-1 text-xs text-slate-400">Income versus expenses</p>
-        <div className="mt-5 h-72">
-          <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={monthly}>
-              <defs>
-                <linearGradient id="income" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#34d399" stopOpacity={0.4} />
-                  <stop offset="95%" stopColor="#34d399" stopOpacity={0} />
-                </linearGradient>
-                <linearGradient id="expense" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#fb7185" stopOpacity={0.35} />
-                  <stop offset="95%" stopColor="#fb7185" stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid stroke="rgba(148,163,184,.12)" vertical={false} />
-              <XAxis dataKey="month" stroke="#94a3b8" fontSize={12} />
-              <YAxis stroke="#94a3b8" fontSize={12} />
-              <Tooltip
-                formatter={(value) => [
-                  `S$${Number(value ?? 0).toFixed(2)}`,
-                  "",
-                ]}
-                contentStyle={{
-                  background: "#0f1f1a",
-                  border: "1px solid rgba(148,163,184,.2)",
-                  borderRadius: 12,
-                }}
-              />
-              <Area
-                type="monotone"
-                dataKey="income"
-                stroke="#34d399"
-                fill="url(#income)"
-              />
-              <Area
-                type="monotone"
-                dataKey="expense"
-                stroke="#fb7185"
-                fill="url(#expense)"
-              />
-            </AreaChart>
-          </ResponsiveContainer>
-        </div>
-      </section>
+  const [showBudgets, setShowBudgets] = useState(true);
 
-      <section className="admin-panel rounded-2xl p-5">
-        <h2 className="font-semibold">Spending by category</h2>
-        <p className="mt-1 text-xs text-slate-400">Top expense categories</p>
-        <div className="mt-5 h-72">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={categories} layout="vertical" margin={{ left: 16 }}>
-              <CartesianGrid
-                stroke="rgba(148,163,184,.12)"
-                horizontal={false}
+  return (
+    <div className="grid gap-page">
+      {showLine && (
+        <details open className="admin-panel rounded-admin">
+          <summary className="cursor-pointer px-page py-4 font-semibold">
+            Money over time
+          </summary>
+          <div className="h-80 border-t border-admin-line p-page pl-2">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={lineData}>
+                <CartesianGrid stroke="rgba(148,163,184,.12)" vertical={false} />
+                <XAxis dataKey="period" stroke="#92a79d" fontSize={12} />
+                <YAxis
+                  stroke="#92a79d"
+                  fontSize={12}
+                  tickFormatter={(value) => `S$${Math.round(Number(value) / 100)}`}
+                />
+                <Tooltip formatter={moneyTooltip} contentStyle={tooltipStyle} />
+                <Legend />
+                {lineSeries.map((series) => (
+                  <Line
+                    key={series.key}
+                    type="monotone"
+                    dataKey={series.key}
+                    name={series.label}
+                    stroke={series.color}
+                    strokeWidth={2}
+                    dot={lineData.length < 32}
+                    connectNulls
+                  />
+                ))}
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </details>
+      )}
+
+      {barData.length > 1 && (
+        <details open className="admin-panel rounded-admin">
+          <summary className="cursor-pointer px-page py-4 font-semibold">
+            Categories versus budget
+          </summary>
+          <div className="border-t border-admin-line p-page">
+            <label className="mb-4 flex items-center gap-2 text-xs text-admin-muted">
+              <input
+                type="checkbox"
+                checked={showBudgets}
+                onChange={(event) => setShowBudgets(event.target.checked)}
+                className="accent-admin-accent"
               />
-              <XAxis type="number" stroke="#94a3b8" fontSize={12} />
-              <YAxis
-                type="category"
-                dataKey="category"
-                width={90}
-                stroke="#94a3b8"
-                fontSize={12}
-              />
-              <Tooltip
-                formatter={(value) => [
-                  `S$${Number(value ?? 0).toFixed(2)}`,
-                  "",
-                ]}
-                contentStyle={{
-                  background: "#0f1f1a",
-                  border: "1px solid rgba(148,163,184,.2)",
-                  borderRadius: 12,
-                }}
-              />
-              <Bar dataKey="expense" fill="#fb7185" radius={[0, 6, 6, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      </section>
+              Show budget bars
+            </label>
+            <div className="h-80">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={barData}>
+                  <CartesianGrid stroke="rgba(148,163,184,.12)" vertical={false} />
+                  <XAxis dataKey="category" stroke="#92a79d" fontSize={12} />
+                  <YAxis
+                    stroke="#92a79d"
+                    fontSize={12}
+                    tickFormatter={(value) => `S$${Math.round(Number(value) / 100)}`}
+                  />
+                  <Tooltip formatter={moneyTooltip} contentStyle={tooltipStyle} />
+                  <Legend />
+                  <Bar dataKey="actualCents" name="Actual" fill="#fb7185" radius={[6, 6, 0, 0]} />
+                  {showBudgets && (
+                    <Bar dataKey="budgetCents" name="Budget" fill="#6ee7b7" radius={[6, 6, 0, 0]} />
+                  )}
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </details>
+      )}
     </div>
   );
 }

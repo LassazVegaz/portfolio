@@ -13,7 +13,7 @@ export default function BalanceForm({
   return (
     <form
       action={action}
-      className="admin-panel mt-8 grid gap-5 rounded-2xl p-6"
+      className="admin-panel grid gap-5 rounded-admin p-page"
     >
       <label className="grid gap-2 text-sm font-medium">
         Opening balance (SGD)

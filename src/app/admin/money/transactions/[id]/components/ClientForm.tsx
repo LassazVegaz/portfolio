@@ -19,13 +19,17 @@ type TransactionFormValue = {
   title: string;
   comments: string | null;
   time: Date;
-  categoryName: string;
+  categoryId: string;
+  instrumentId: string;
 };
 
 type Props = {
   isNew: boolean;
   transaction?: TransactionFormValue | null;
-  categories: { id: string; name: string }[];
+  categories: { id: string; name: string; parentName: string | null }[];
+  defaultCategoryId: string;
+  instruments: { id: string; name: string; isCreditCard: boolean }[];
+  defaultInstrumentId: string;
   currentBalanceCents: number;
   balanceWithoutTransactionCents: number;
 };
@@ -38,9 +42,6 @@ export default function ClientForm(props: Readonly<Props>) {
   );
   const [direction, setDirection] = useState<MoneyDirection>(
     props.transaction?.direction ?? "OUT",
-  );
-  const [categoryName, setCategoryName] = useState(
-    props.transaction?.categoryName ?? "",
   );
   const [error, setError] = useState<string>();
 
@@ -56,11 +57,6 @@ export default function ClientForm(props: Readonly<Props>) {
       return props.balanceWithoutTransactionCents;
     }
   }, [amount, direction, props.balanceWithoutTransactionCents]);
-
-  const categoryExists = props.categories.some(
-    (category) =>
-      category.name.toLowerCase() === categoryName.trim().toLowerCase(),
-  );
 
   const onSubmit: SubmitEventHandler<HTMLFormElement> = async (event) => {
     event.preventDefault();
@@ -162,25 +158,45 @@ export default function ClientForm(props: Readonly<Props>) {
 
         <label className="grid gap-2 text-sm font-medium">
           Category
-          <input
+          <select
             className="admin-input"
-            name="categoryName"
-            list="category-options"
-            value={categoryName}
-            maxLength={80}
-            onChange={(event) => setCategoryName(event.target.value)}
-            placeholder="Unclassified"
-          />
-          <datalist id="category-options">
+            name="categoryId"
+            defaultValue={props.transaction?.categoryId ?? props.defaultCategoryId}
+            required
+          >
             {props.categories.map((category) => (
-              <option key={category.id} value={category.name} />
+              <option key={category.id} value={category.id}>
+                {category.parentName
+                  ? `${category.parentName} / ${category.name}`
+                  : category.name}
+              </option>
             ))}
-          </datalist>
-          {categoryName.trim() && !categoryExists && (
-            <span className="text-xs text-amber-200">
-              “{categoryName.trim()}” will be created as a top-level category.
-            </span>
-          )}
+          </select>
+          <span className="text-xs text-admin-muted">
+            Transactions can use subcategories or Unclassified, never a parent category.
+          </span>
+        </label>
+
+        <label className="grid gap-2 text-sm font-medium">
+          Source or destination
+          <select
+            className="admin-input"
+            name="instrumentId"
+            defaultValue={
+              props.transaction?.instrumentId ?? props.defaultInstrumentId
+            }
+            required
+          >
+            {props.instruments.map((instrument) => (
+              <option key={instrument.id} value={instrument.id}>
+                {instrument.name}
+                {instrument.isCreditCard ? " · credit card" : ""}
+              </option>
+            ))}
+          </select>
+          <span className="text-xs text-admin-muted">
+            Instruments describe how money moved; they do not keep separate balances.
+          </span>
         </label>
 
         <label className="grid gap-2 text-sm font-medium">

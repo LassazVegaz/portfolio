@@ -14,7 +14,8 @@ export default function MoneyPage() {
       <div className="grid grid-cols-2 gap-4 items-center">
         <AppCard href="/admin/money/transactions">Transactions</AppCard>
         <AppCard href="/admin/money/categories">Categories</AppCard>
-        <AppCard href="/admin/money/settings">Opening Balance</AppCard>
+        <AppCard href="/admin/money/instruments">Instruments</AppCard>
+        <AppCard href="/admin/money/settings">Settings</AppCard>
       </div>
     </PageContainer>
     </main>

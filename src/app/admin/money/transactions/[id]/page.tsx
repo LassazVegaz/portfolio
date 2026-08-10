@@ -2,6 +2,7 @@ import TopNavigator from "@/components/HomeButton";
 import PageContainer from "@/components/PageContainer";
 import categoriesService from "@/services/categories.service";
 import transactionsService from "@/services/transactions.service";
+import instrumentsService from "@/services/instruments.service";
 import { notFound } from "next/navigation";
 import ClientForm from "./components/ClientForm";
 
@@ -13,9 +14,16 @@ export default async function TransactionPage(
   const transaction = isNew ? null : await transactionsService.getById(id);
   if (!isNew && !transaction) notFound();
 
-  const [categories, currentBalanceCents, balanceWithoutTransactionCents] =
+  const defaultInstrument = await instrumentsService.getDefault();
+  const [
+    categories,
+    instruments,
+    currentBalanceCents,
+    balanceWithoutTransactionCents,
+  ] =
     await Promise.all([
-      categoriesService.getAllCategories(),
+      categoriesService.getSelectableCategories(),
+      instrumentsService.getAll(),
       transactionsService.getBalanceCents(),
       transactionsService.getBalanceCents(transaction?.id),
     ]);
@@ -39,11 +47,25 @@ export default async function TransactionPage(
                   title: transaction.title,
                   comments: transaction.comments,
                   time: transaction.time,
-                  categoryName: transaction.category.name,
+                  categoryId: transaction.categoryId,
+                  instrumentId: transaction.instrumentId,
                 }
               : null
           }
-          categories={categories.map(({ id: categoryId, name }) => ({ id: categoryId, name }))}
+          categories={categories.map(({ id: categoryId, name, parent }) => ({
+            id: categoryId,
+            name,
+            parentName: parent?.name ?? null,
+          }))}
+          defaultCategoryId={
+            categories.find(({ isSystem }) => isSystem)?.id ?? categories[0].id
+          }
+          instruments={instruments.map(({ id: instrumentId, name, isCreditCard }) => ({
+            id: instrumentId,
+            name,
+            isCreditCard,
+          }))}
+          defaultInstrumentId={defaultInstrument.id}
           currentBalanceCents={currentBalanceCents}
           balanceWithoutTransactionCents={balanceWithoutTransactionCents}
         />
