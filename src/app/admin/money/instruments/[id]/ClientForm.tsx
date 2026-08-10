@@ -25,7 +25,7 @@ export default function ClientForm({
     setError(undefined);
     const data = new FormData(event.currentTarget);
     const input = {
-      name: String(data.get("name") ?? ""),
+      name: String((data.get("name") as string) ?? ""),
       isCreditCard: data.get("isCreditCard") === "on",
     };
     try {
@@ -36,7 +36,9 @@ export default function ClientForm({
         router.push(`/admin/money/instruments/${await createAction(input)}`);
       }
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Could not save instrument.");
+      setError(
+        cause instanceof Error ? cause.message : "Could not save instrument.",
+      );
     } finally {
       setPending(false);
     }
@@ -50,13 +52,18 @@ export default function ClientForm({
       await deleteAction(instrument.id);
       router.push("/admin/money/instruments");
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Could not delete instrument.");
+      setError(
+        cause instanceof Error ? cause.message : "Could not delete instrument.",
+      );
       setPending(false);
     }
   };
 
   return (
-    <Form onSubmit={onSubmit} className="admin-panel mt-page grid gap-5 rounded-admin p-page">
+    <Form
+      onSubmit={onSubmit}
+      className="admin-panel mt-page grid gap-5 rounded-admin p-page"
+    >
       <label className="grid gap-2 text-sm font-medium">
         Name
         <input
@@ -78,8 +85,8 @@ export default function ClientForm({
         This instrument is a credit card
       </label>
       <p className="text-sm leading-6 text-admin-muted">
-        Instruments share the primary money balance. Credit-card bill payments are
-        deliberately not recorded as separate transactions.
+        Instruments share the primary money balance. Credit-card bill payments
+        are deliberately not recorded as separate transactions.
       </p>
       {instrument && (
         <p className="text-xs text-admin-muted">
@@ -89,16 +96,29 @@ export default function ClientForm({
       )}
       {error && <p className="text-sm text-rose-300">{error}</p>}
       <div className="flex flex-wrap justify-between gap-3">
-        <button type="button" className="admin-secondary-button" onClick={() => router.back()}>
+        <button
+          type="button"
+          className="admin-secondary-button"
+          onClick={() => router.back()}
+        >
           Cancel
         </button>
         <div className="flex gap-3">
           {instrument && (
-            <button type="button" className="admin-danger-button" onClick={onDelete} disabled={pending}>
+            <button
+              type="button"
+              className="admin-danger-button"
+              onClick={onDelete}
+              disabled={pending}
+            >
               Delete
             </button>
           )}
-          <button type="submit" className="admin-primary-button" disabled={pending}>
+          <button
+            type="submit"
+            className="admin-primary-button"
+            disabled={pending}
+          >
             {pending ? "Saving…" : "Save instrument"}
           </button>
         </div>

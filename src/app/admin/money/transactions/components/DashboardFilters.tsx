@@ -48,7 +48,8 @@ export type CurrentFilters = {
   showCashflow: boolean;
 };
 
-const unique = (values: string[]) => [...new Set(values)].slice(0, MAX_CATEGORIES);
+const unique = (values: string[]) =>
+  [...new Set(values)].slice(0, MAX_CATEGORIES);
 
 export default function DashboardFilters({
   categories,
@@ -130,7 +131,9 @@ export default function DashboardFilters({
       const room = MAX_CATEGORIES - withoutGroup.length;
       const nextChildren = childIds.slice(0, room);
       if (nextChildren.length < childIds.length) {
-        setError(`The first ${nextChildren.length} subcategories were selected (maximum ${MAX_CATEGORIES}).`);
+        setError(
+          `The first ${nextChildren.length} subcategories were selected (maximum ${MAX_CATEGORIES}).`,
+        );
       }
       return [...withoutGroup, ...nextChildren];
     });
@@ -142,14 +145,17 @@ export default function DashboardFilters({
       const expanded: string[] = [];
       for (const id of selected) {
         const children = childrenByParent.get(id) ?? [];
-        expanded.push(...(children.length ? children.map((child) => child.id) : [id]));
+        expanded.push(
+          ...(children.length ? children.map((child) => child.id) : [id]),
+        );
       }
       setSelected(unique(expanded));
     } else {
       setSelected(
         unique(
           selected.map(
-            (id) => categories.find((category) => category.id === id)?.parentId ?? id,
+            (id) =>
+              categories.find((category) => category.id === id)?.parentId ?? id,
           ),
         ),
       );
@@ -201,7 +207,11 @@ export default function DashboardFilters({
   });
 
   const save = async () => {
-    if (!isValidMoneyDateInput(from) || !isValidMoneyDateInput(to) || from > to) {
+    if (
+      !isValidMoneyDateInput(from) ||
+      !isValidMoneyDateInput(to) ||
+      from > to
+    ) {
       setError("Choose a valid date range with the start before the end.");
       return;
     }
@@ -222,7 +232,9 @@ export default function DashboardFilters({
       setSavedOpen(true);
       router.refresh();
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Could not save filter.");
+      setError(
+        cause instanceof Error ? cause.message : "Could not save filter.",
+      );
     } finally {
       setPending(false);
     }
@@ -248,7 +260,9 @@ export default function DashboardFilters({
 
   return (
     <details open className="admin-panel rounded-admin">
-      <summary className="cursor-pointer px-page py-4 font-semibold">Filters</summary>
+      <summary className="cursor-pointer px-page py-4 font-semibold">
+        Filters
+      </summary>
       <div className="grid border-t border-admin-line lg:grid-cols-[18rem_1fr]">
         <aside className="border-b border-admin-line p-4 lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto lg:border-r lg:border-b-0">
           <div className="sticky top-0 z-10 bg-admin-surface pb-3">
@@ -260,8 +274,14 @@ export default function DashboardFilters({
               aria-label="Search categories"
             />
             <div className="mt-3 flex items-center justify-between text-xs text-admin-muted">
-              <span>{selected.length} / {MAX_CATEGORIES} selected</span>
-              <button type="button" onClick={() => setSelected([])} className="hover:text-admin-accent">
+              <span>
+                {selected.length} / {MAX_CATEGORIES} selected
+              </span>
+              <button
+                type="button"
+                onClick={() => setSelected([])}
+                className="hover:text-admin-accent"
+              >
                 Clear
               </button>
             </div>
@@ -269,7 +289,9 @@ export default function DashboardFilters({
               <input
                 type="checkbox"
                 checked={showSubcategories}
-                onChange={(event) => changeSubcategoryVisibility(event.target.checked)}
+                onChange={(event) =>
+                  changeSubcategoryVisibility(event.target.checked)
+                }
                 className="accent-admin-accent"
               />
               Show subcategories
@@ -278,7 +300,9 @@ export default function DashboardFilters({
           <div className="grid gap-1">
             {visibleRoots.map((root) => {
               const children = childrenByParent.get(root.id) ?? [];
-              const selectedChildren = children.filter((child) => selected.includes(child.id)).length;
+              const selectedChildren = children.filter((child) =>
+                selected.includes(child.id),
+              ).length;
               const rootSelected = selected.includes(root.id);
               const cue = children.length
                 ? selectedChildren === children.length
@@ -297,7 +321,9 @@ export default function DashboardFilters({
                     className="flex w-full items-center gap-2 rounded-lg px-2 py-2 text-left text-sm font-semibold hover:bg-white/5"
                     aria-label={`${root.name}: ${cue} selected`}
                   >
-                    <span className={`grid size-4 place-items-center rounded border text-[10px] ${cue === "none" ? "border-admin-line" : "border-admin-accent text-admin-accent"}`}>
+                    <span
+                      className={`grid size-4 place-items-center rounded border text-[10px] ${cue === "none" ? "border-admin-line" : "border-admin-accent text-admin-accent"}`}
+                    >
                       {cue === "all" ? "✓" : cue === "some" ? "−" : ""}
                     </span>
                     {root.name}
@@ -305,11 +331,18 @@ export default function DashboardFilters({
                   {showSubcategories && children.length > 0 && (
                     <div className="ml-6 grid gap-1 border-l border-admin-line pl-2">
                       {children
-                        .filter((child) =>
-                          !search.trim() || child.name.toLocaleLowerCase().includes(search.trim().toLocaleLowerCase()),
+                        .filter(
+                          (child) =>
+                            !search.trim() ||
+                            child.name
+                              .toLocaleLowerCase()
+                              .includes(search.trim().toLocaleLowerCase()),
                         )
                         .map((child) => (
-                          <label key={child.id} className="flex cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 text-sm text-admin-muted hover:bg-white/5 hover:text-admin-ink">
+                          <label
+                            key={child.id}
+                            className="flex cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 text-sm text-admin-muted hover:bg-white/5 hover:text-admin-ink"
+                          >
                             <input
                               type="checkbox"
                               checked={selected.includes(child.id)}
@@ -331,13 +364,24 @@ export default function DashboardFilters({
           <div className="grid gap-4 sm:grid-cols-2">
             <label className="grid gap-2 text-sm font-medium">
               Money direction
-              <select className="admin-input" value={direction} onChange={(event) => setDirection(event.target.value as MoneyDirection)}>
+              <select
+                className="admin-input"
+                value={direction}
+                onChange={(event) =>
+                  setDirection(event.target.value as MoneyDirection)
+                }
+              >
                 <option value="OUT">Money out</option>
                 <option value="IN">Money in</option>
               </select>
             </label>
             <label className="flex items-end gap-3 pb-3 text-sm font-medium">
-              <input type="checkbox" checked={showCashflow} onChange={(event) => setShowCashflow(event.target.checked)} className="size-4 accent-admin-accent" />
+              <input
+                type="checkbox"
+                checked={showCashflow}
+                onChange={(event) => setShowCashflow(event.target.checked)}
+                className="size-4 accent-admin-accent"
+              />
               Include cashflow numbers (money in and out)
             </label>
           </div>
@@ -350,7 +394,11 @@ export default function DashboardFilters({
                   type="button"
                   key={preset}
                   onClick={() => selectPreset(preset)}
-                  className={rangePreset === preset ? "admin-primary-button" : "admin-secondary-button"}
+                  className={
+                    rangePreset === preset
+                      ? "admin-primary-button"
+                      : "admin-secondary-button"
+                  }
                 >
                   {MONEY_DATE_RANGE_LABELS[preset]}
                 </button>
@@ -361,21 +409,45 @@ export default function DashboardFilters({
           <div className="grid gap-4 sm:grid-cols-2">
             <label className="grid gap-2 text-sm font-medium">
               From (inclusive)
-              <input className="admin-input" type="date" value={from} max={to} onChange={(event) => setManualDate("from", event.target.value)} />
+              <input
+                className="admin-input"
+                type="date"
+                value={from}
+                max={to}
+                onChange={(event) => setManualDate("from", event.target.value)}
+              />
             </label>
             <label className="grid gap-2 text-sm font-medium">
               To (inclusive)
-              <input className="admin-input" type="date" value={to} min={from} onChange={(event) => setManualDate("to", event.target.value)} />
+              <input
+                className="admin-input"
+                type="date"
+                value={to}
+                min={from}
+                onChange={(event) => setManualDate("to", event.target.value)}
+              />
             </label>
           </div>
 
-          {error && <p role="alert" className="text-sm text-amber-200">{error}</p>}
+          {error && (
+            <p role="alert" className="text-sm text-amber-200">
+              {error}
+            </p>
+          )}
 
           <div className="flex flex-wrap gap-3">
-            <button type="button" className="admin-primary-button" onClick={() => navigate(active())}>
+            <button
+              type="button"
+              className="admin-primary-button"
+              onClick={() => navigate(active())}
+            >
               Apply filters
             </button>
-            <button type="button" className="admin-secondary-button" onClick={() => setSavedOpen(true)}>
+            <button
+              type="button"
+              className="admin-secondary-button"
+              onClick={() => setSavedOpen(true)}
+            >
               Saved filters ({savedFilters.length})
             </button>
           </div>
@@ -388,7 +460,12 @@ export default function DashboardFilters({
               placeholder="Optional name — Filter 1, Filter 2… if blank"
               maxLength={80}
             />
-            <button type="button" className="admin-secondary-button" onClick={save} disabled={pending}>
+            <button
+              type="button"
+              className="admin-secondary-button"
+              onClick={save}
+              disabled={pending}
+            >
               {pending ? "Saving…" : "Save current filter"}
             </button>
           </div>
@@ -396,11 +473,21 @@ export default function DashboardFilters({
       </div>
 
       {savedOpen && (
-        <div className="fixed inset-0 z-50 grid place-items-center bg-black/70 p-4" role="dialog" aria-modal="true" aria-label="Saved filters">
+        <dialog
+          className="fixed inset-0 z-50 grid place-items-center bg-black/70 p-4"
+          aria-modal="true"
+          aria-label="Saved filters"
+        >
           <div className="admin-panel max-h-[80vh] w-full max-w-xl overflow-y-auto rounded-admin p-page">
             <div className="flex items-center justify-between gap-4">
               <h2 className="text-xl font-semibold">Saved filters</h2>
-              <button type="button" className="admin-secondary-button" onClick={() => setSavedOpen(false)}>Close</button>
+              <button
+                type="button"
+                className="admin-secondary-button"
+                onClick={() => setSavedOpen(false)}
+              >
+                Close
+              </button>
             </div>
             <div className="mt-page grid gap-3">
               {savedFilters.map((filter) => (
@@ -411,10 +498,14 @@ export default function DashboardFilters({
                   onChanged={() => router.refresh()}
                 />
               ))}
-              {savedFilters.length === 0 && <p className="py-8 text-center text-sm text-admin-muted">No saved filters yet.</p>}
+              {savedFilters.length === 0 && (
+                <p className="py-8 text-center text-sm text-admin-muted">
+                  No saved filters yet.
+                </p>
+              )}
             </div>
           </div>
-        </div>
+        </dialog>
       )}
     </details>
   );
@@ -440,7 +531,9 @@ function SavedFilterRow({
       await renameFilterAction(filter.id, name);
       onChanged();
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Could not rename filter.");
+      setError(
+        cause instanceof Error ? cause.message : "Could not rename filter.",
+      );
     } finally {
       setPending(false);
     }
@@ -452,7 +545,9 @@ function SavedFilterRow({
       await deleteFilterAction(filter.id);
       onChanged();
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Could not delete filter.");
+      setError(
+        cause instanceof Error ? cause.message : "Could not delete filter.",
+      );
       setPending(false);
     }
   };
@@ -460,16 +555,37 @@ function SavedFilterRow({
   return (
     <div className="rounded-xl border border-admin-line p-3">
       <div className="grid gap-2 sm:grid-cols-[1fr_auto_auto]">
-        <input className="admin-input" value={name} onChange={(event) => setName(event.target.value)} maxLength={80} />
-        <button type="button" className="admin-secondary-button" onClick={rename} disabled={pending || name.trim() === filter.name}>
+        <input
+          className="admin-input"
+          value={name}
+          onChange={(event) => setName(event.target.value)}
+          maxLength={80}
+        />
+        <button
+          type="button"
+          className="admin-secondary-button"
+          onClick={rename}
+          disabled={pending || name.trim() === filter.name}
+        >
           Rename
         </button>
-        <button type="button" className="admin-danger-button" onClick={remove} disabled={pending} aria-label={`Delete ${filter.name}`}>
+        <button
+          type="button"
+          className="admin-danger-button"
+          onClick={remove}
+          disabled={pending}
+          aria-label={`Delete ${filter.name}`}
+        >
           Delete
         </button>
       </div>
-      <button type="button" onClick={onApply} className="mt-2 w-full rounded-lg px-3 py-2 text-left text-sm text-admin-muted hover:bg-white/5 hover:text-admin-accent">
-        Apply · {filter.direction === "OUT" ? "money out" : "money in"} · {filter.categoryIds.length || "all"} categories
+      <button
+        type="button"
+        onClick={onApply}
+        className="mt-2 w-full rounded-lg px-3 py-2 text-left text-sm text-admin-muted hover:bg-white/5 hover:text-admin-accent"
+      >
+        Apply · {filter.direction === "OUT" ? "money out" : "money in"} ·{" "}
+        {filter.categoryIds.length || "all"} categories
       </button>
       {error && <p className="mt-2 text-xs text-rose-300">{error}</p>}
     </div>

@@ -37,8 +37,10 @@ type SearchParams = Record<string, string | string[] | undefined>;
 const first = (value: string | string[] | undefined) =>
   Array.isArray(value) ? value[0] : value;
 
-const many = (value: string | string[] | undefined) =>
-  value ? (Array.isArray(value) ? value : [value]) : [];
+const many = (value: string | string[] | undefined) => {
+  if (!value) return [];
+  return Array.isArray(value) ? value : [value];
+};
 
 export default async function TransactionsPage({
   searchParams,
@@ -48,7 +50,9 @@ export default async function TransactionsPage({
   const query = await searchParams;
   const page = Math.max(1, Number.parseInt(first(query.page) ?? "1", 10) || 1);
   const requestedPreset = first(query.range);
-  const rangePreset: MoneyDateRangePreset | null = isMoneyDatePreset(requestedPreset)
+  const rangePreset: MoneyDateRangePreset | null = isMoneyDatePreset(
+    requestedPreset,
+  )
     ? requestedPreset
     : first(query.from) || first(query.to)
       ? null
@@ -65,7 +69,8 @@ export default async function TransactionsPage({
     requestedFrom <= requestedTo;
   const from = hasValidCustomRange ? requestedFrom : fallbackRange.from;
   const to = hasValidCustomRange ? requestedTo : fallbackRange.to;
-  const direction: MoneyDirection = first(query.direction) === "IN" ? "IN" : "OUT";
+  const direction: MoneyDirection =
+    first(query.direction) === "IN" ? "IN" : "OUT";
   const showSubcategories = first(query.subcategories) !== "hide";
   const requestedCashflow = first(query.cashflow);
   const showCashflow =
@@ -84,9 +89,14 @@ export default async function TransactionsPage({
     .filter((id) => allCategories.some((category) => category.id === id))
     .slice(0, 10);
   const sortedCategories = [...allCategories].sort((left, right) => {
-    const leftParent = allCategories.find(({ id }) => id === left.parentId)?.name ?? left.name;
-    const rightParent = allCategories.find(({ id }) => id === right.parentId)?.name ?? right.name;
-    return leftParent.localeCompare(rightParent) || left.name.localeCompare(right.name);
+    const leftParent =
+      allCategories.find(({ id }) => id === left.parentId)?.name ?? left.name;
+    const rightParent =
+      allCategories.find(({ id }) => id === right.parentId)?.name ?? right.name;
+    return (
+      leftParent.localeCompare(rightParent) ||
+      left.name.localeCompare(right.name)
+    );
   });
   const groupResult = getCategoryGroups(
     sortedCategories,
@@ -139,7 +149,8 @@ export default async function TransactionsPage({
     const params = new URLSearchParams();
     for (const [key, value] of Object.entries(query)) {
       if (key === "page") continue;
-      if (Array.isArray(value)) value.forEach((item) => params.append(key, item));
+      if (Array.isArray(value))
+        value.forEach((item) => params.append(key, item));
       else if (value) params.set(key, value);
     }
     params.set("page", String(targetPage));
@@ -155,7 +166,10 @@ export default async function TransactionsPage({
             <p className="admin-eyebrow">SGD ledger</p>
             <h1 className="mt-2 text-3xl font-semibold">Transactions</h1>
           </div>
-          <Link href="/admin/money/settings" className="admin-secondary-button hidden md:inline-flex">
+          <Link
+            href="/admin/money/settings"
+            className="admin-secondary-button hidden md:inline-flex"
+          >
             Money settings
           </Link>
         </div>
@@ -163,12 +177,14 @@ export default async function TransactionsPage({
         <div className="mt-page hidden md:block">
           <DashboardFilters
             key={`${direction}:${categoryIds.join(",")}:${showSubcategories}:${rangePreset}:${from}:${to}:${showCashflow}`}
-            categories={sortedCategories.map(({ id, name, parentId, isSystem }) => ({
-              id,
-              name,
-              parentId,
-              isSystem,
-            }))}
+            categories={sortedCategories.map(
+              ({ id, name, parentId, isSystem }) => ({
+                id,
+                name,
+                parentId,
+                isSystem,
+              }),
+            )}
             savedFilters={savedFilters.map((filter) => ({
               id: filter.id,
               name: filter.name,
@@ -192,27 +208,62 @@ export default async function TransactionsPage({
           />
         </div>
 
-        <details open className="admin-panel mt-page hidden rounded-admin md:block">
-          <summary className="cursor-pointer px-page py-4 font-semibold">Numbers</summary>
+        <details
+          open
+          className="admin-panel mt-page hidden rounded-admin md:block"
+        >
+          <summary className="cursor-pointer px-page py-4 font-semibold">
+            Numbers
+          </summary>
           <div className="grid gap-4 border-t border-admin-line p-page md:grid-cols-2 xl:grid-cols-4">
             <Stat label="Current balance" value={formatMoney(balanceCents)} />
             <Stat
-              label={showCashflow ? "Savings" : direction === "IN" ? "Total money in" : "Total money out"}
-              value={formatMoney(showCashflow ? savingsCents : directionTotalCents)}
-              tone={showCashflow && savingsCents < 0 ? "negative" : direction === "IN" || savingsCents >= 0 ? "positive" : undefined}
+              label={
+                showCashflow
+                  ? "Savings"
+                  : direction === "IN"
+                    ? "Total money in"
+                    : "Total money out"
+              }
+              value={formatMoney(
+                showCashflow ? savingsCents : directionTotalCents,
+              )}
+              tone={
+                showCashflow && savingsCents < 0
+                  ? "negative"
+                  : direction === "IN" || savingsCents >= 0
+                    ? "positive"
+                    : undefined
+              }
             />
             {showCashflow && (
               <>
-                <Stat label="Money in" value={formatMoney(incomeCents)} tone="positive" />
-                <Stat label="Money out" value={formatMoney(expenseCents)} tone="negative" />
+                <Stat
+                  label="Money in"
+                  value={formatMoney(incomeCents)}
+                  tone="positive"
+                />
+                <Stat
+                  label="Money out"
+                  value={formatMoney(expenseCents)}
+                  tone="negative"
+                />
                 <Stat
                   label="Savings rate"
-                  value={incomeCents ? `${((savingsCents / incomeCents) * 100).toFixed(1)}%` : "—"}
+                  value={
+                    incomeCents
+                      ? `${((savingsCents / incomeCents) * 100).toFixed(1)}%`
+                      : "—"
+                  }
                   tone={savingsCents < 0 ? "negative" : "positive"}
                 />
                 <Stat
                   label="Money out / money in"
-                  value={incomeCents ? `${((expenseCents / incomeCents) * 100).toFixed(1)}%` : "—"}
+                  value={
+                    incomeCents
+                      ? `${((expenseCents / incomeCents) * 100).toFixed(1)}%`
+                      : "—"
+                  }
                 />
               </>
             )}
@@ -229,7 +280,13 @@ export default async function TransactionsPage({
                   <span>{summary.name}</span>
                   <strong>{formatMoney(totalCents)}</strong>
                   {direction === "OUT" && (
-                    <small className={summary.remainingCents < 0 ? "text-rose-300" : "text-admin-muted"}>
+                    <small
+                      className={
+                        summary.remainingCents < 0
+                          ? "text-rose-300"
+                          : "text-admin-muted"
+                      }
+                    >
                       {summary.budgetCents > 0
                         ? `${summary.remainingCents < 0 ? "Over" : "Remaining"} ${formatMoney(Math.abs(summary.remainingCents))} (${Math.abs(summary.remainingPercentage ?? 0).toFixed(1)}%)`
                         : "No monthly budget"}
@@ -247,18 +304,23 @@ export default async function TransactionsPage({
             lineSeries={lineChart.series}
             barData={
               direction === "OUT"
-                ? categorySummaries.map(({ name, actualCents, budgetCents }) => ({
-                    category: name,
-                    actualCents,
-                    budgetCents,
-                  }))
+                ? categorySummaries.map(
+                    ({ name, actualCents, budgetCents }) => ({
+                      category: name,
+                      actualCents,
+                      budgetCents,
+                    }),
+                  )
                 : []
             }
             showLine={!isSingleDayRange(from, to)}
           />
         </div>
 
-        <details open className="admin-panel mt-page overflow-hidden rounded-admin">
+        <details
+          open
+          className="admin-panel mt-page overflow-hidden rounded-admin"
+        >
           <summary className="hidden cursor-pointer px-page py-4 font-semibold md:block">
             Transactions ({transactions.length})
           </summary>
@@ -277,7 +339,10 @@ export default async function TransactionsPage({
           </div>
           <div className="divide-y divide-admin-line md:hidden">
             {ascendingPage.map((transaction) => (
-              <MobileTransaction key={transaction.id} transaction={transaction} />
+              <MobileTransaction
+                key={transaction.id}
+                transaction={transaction}
+              />
             ))}
           </div>
           {transactions.length === 0 && (
@@ -294,7 +359,9 @@ export default async function TransactionsPage({
           >
             Previous
           </Link>
-          <span className="text-admin-muted">Page {safePage} of {totalPages}</span>
+          <span className="text-admin-muted">
+            Page {safePage} of {totalPages}
+          </span>
           <Link
             className={`admin-secondary-button ${safePage === totalPages ? "pointer-events-none opacity-40" : ""}`}
             href={pageHref(Math.min(totalPages, safePage + 1))}
@@ -303,7 +370,9 @@ export default async function TransactionsPage({
           </Link>
         </div>
 
-        <FloatingAction href={"/admin/money/transactions/new" as Route}>+</FloatingAction>
+        <FloatingAction href={"/admin/money/transactions/new" as Route}>
+          +
+        </FloatingAction>
       </PageContainer>
     </main>
   );
