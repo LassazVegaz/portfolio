@@ -1,9 +1,8 @@
 import "server-only";
+import { PRIMARY_MONEY_ACCOUNT_ID } from "@/features/money/default-records";
 import prisma from "./prisma-service";
 import categoriesService from "./categories.service";
 import { TransactionDirection } from "@prisma/client";
-
-const PRIMARY_ACCOUNT_ID = "primary";
 
 export type SaveTransactionDto = {
   amountCents: number;
@@ -11,7 +10,7 @@ export type SaveTransactionDto = {
   title: string;
   comments: string | null;
   time: Date;
-  categoryId?: string | null;
+  categoryId: string;
   instrumentId: string;
 };
 
@@ -26,8 +25,8 @@ export type TransactionFilters = {
 export class TransactionsService {
   async create(dto: SaveTransactionDto) {
     this.validate(dto);
-    const [categoryId] = await Promise.all([
-      this.resolveCategory(dto),
+    await Promise.all([
+      categoriesService.requireSelectableCategory(dto.categoryId),
       this.requireInstrument(dto.instrumentId),
     ]);
     return prisma.transaction.create({
@@ -37,7 +36,7 @@ export class TransactionsService {
         title: dto.title.trim(),
         comments: dto.comments?.trim() || null,
         time: dto.time,
-        categoryId,
+        categoryId: dto.categoryId,
         instrumentId: dto.instrumentId,
       },
     });
@@ -45,8 +44,8 @@ export class TransactionsService {
 
   async update(id: string, dto: SaveTransactionDto) {
     this.validate(dto);
-    const [categoryId] = await Promise.all([
-      this.resolveCategory(dto),
+    await Promise.all([
+      categoriesService.requireSelectableCategory(dto.categoryId),
       this.requireInstrument(dto.instrumentId),
     ]);
     return prisma.transaction.update({
@@ -57,7 +56,7 @@ export class TransactionsService {
         title: dto.title.trim(),
         comments: dto.comments?.trim() || null,
         time: dto.time,
-        categoryId,
+        categoryId: dto.categoryId,
         instrumentId: dto.instrumentId,
       },
     });
@@ -86,10 +85,9 @@ export class TransactionsService {
   }
 
   async getOpeningBalanceCents() {
-    const account = await prisma.moneyAccount.upsert({
-      where: { id: PRIMARY_ACCOUNT_ID },
-      create: { id: PRIMARY_ACCOUNT_ID },
-      update: {},
+    const account = await prisma.moneyAccount.findUniqueOrThrow({
+      where: { id: PRIMARY_MONEY_ACCOUNT_ID },
+      select: { openingBalanceCents: true },
     });
     return account.openingBalanceCents;
   }
@@ -98,10 +96,9 @@ export class TransactionsService {
     if (!Number.isSafeInteger(openingBalanceCents)) {
       throw new TypeError("Opening balance is invalid.");
     }
-    return prisma.moneyAccount.upsert({
-      where: { id: PRIMARY_ACCOUNT_ID },
-      create: { id: PRIMARY_ACCOUNT_ID, openingBalanceCents },
-      update: { openingBalanceCents },
+    return prisma.moneyAccount.update({
+      where: { id: PRIMARY_MONEY_ACCOUNT_ID },
+      data: { openingBalanceCents },
     });
   }
 
@@ -133,13 +130,6 @@ export class TransactionsService {
       (incoming._sum.amountCents ?? 0) -
       (outgoing._sum.amountCents ?? 0)
     );
-  }
-
-  private async resolveCategory(dto: SaveTransactionDto) {
-    if (dto.categoryId) {
-      return (await categoriesService.requireSelectableCategory(dto.categoryId)).id;
-    }
-    return (await categoriesService.ensureUnclassified()).id;
   }
 
   private async requireInstrument(id: string) {

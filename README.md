@@ -16,6 +16,20 @@ The private `/admin` area now includes a maintainable SGD ledger with:
 - advanced, saveable filters plus budget, cash-flow, and category reporting;
 - a compact oldest-first mobile ledger and an adaptive desktop dashboard.
 
+### Database setup
+
+After applying the Prisma schema to a new database, seed the required money
+records once:
+
+```bash
+pnpm prisma db push
+pnpm db:seed
+```
+
+The seed creates the Unclassified category, Cash instrument, and primary money
+account. The application assumes these records exist and does not recreate or
+repair them at runtime.
+
 ### Security notes
 
 - Every admin route is protected by `proxy.ts`; every mutating server action also performs its own authentication check.

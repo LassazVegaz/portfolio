@@ -6,8 +6,10 @@ import Link from "next/link";
 import { Route } from "next";
 
 export default async function InstrumentsPage() {
-  const defaultInstrument = await instrumentsService.getDefault();
-  const instruments = await instrumentsService.getAll();
+  const [defaultInstrument, instruments] = await Promise.all([
+    instrumentsService.getDefault(),
+    instrumentsService.getAll(),
+  ]);
 
   return (
     <main className="admin-shell min-h-screen">
@@ -18,7 +20,9 @@ export default async function InstrumentsPage() {
             <p className="admin-eyebrow">Sources and destinations</p>
             <h1 className="mt-2 text-3xl font-semibold">Instruments</h1>
           </div>
-          <span className="text-sm text-admin-muted">{instruments.length} total</span>
+          <span className="text-sm text-admin-muted">
+            {instruments.length} total
+          </span>
         </div>
         <div className="mt-page grid gap-3">
           {instruments.map((instrument) => (
@@ -30,15 +34,21 @@ export default async function InstrumentsPage() {
               <div>
                 <div className="flex items-center gap-2 font-semibold">
                   {instrument.name}
-                  {instrument.id === defaultInstrument.id && <span className="admin-badge">Default</span>}
-                  {instrument.isCreditCard && <span className="admin-chip">Credit card</span>}
+                  {instrument.id === defaultInstrument.id && (
+                    <span className="admin-badge">Default</span>
+                  )}
+                  {instrument.isCreditCard && (
+                    <span className="admin-chip">Credit card</span>
+                  )}
                 </div>
                 <p className="mt-1 text-xs text-admin-muted">
                   {instrument._count.transactions} transaction
                   {instrument._count.transactions === 1 ? "" : "s"}
                 </p>
               </div>
-              <span aria-hidden="true" className="text-admin-muted">→</span>
+              <span aria-hidden="true" className="text-admin-muted">
+                →
+              </span>
             </Link>
           ))}
         </div>
