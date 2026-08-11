@@ -1,8 +1,11 @@
 import "server-only";
 
+import { UNCLASSIFIED_CATEGORY_NAME } from "@/features/money/default-records";
+import {
+  cleanMoneyName,
+  normalizeMoneyName,
+} from "@/features/money/names";
 import prisma from "./prisma-service";
-
-export const UNCLASSIFIED_CATEGORY_NAME = "Unclassified";
 
 export type CreateCategoryDto = {
   name: string;
@@ -11,40 +14,9 @@ export type CreateCategoryDto = {
 };
 export type UpdateCategoryDto = Partial<CreateCategoryDto>;
 
-const normalizeName = (name: string) =>
-  name.trim().replace(/\s+/g, " ").toLocaleLowerCase("en-US");
-
-const cleanName = (name: string) => name.trim().replace(/\s+/g, " ");
-
 export class CategoriesService {
-  async ensureUnclassified() {
-    const normalizedName = normalizeName(UNCLASSIFIED_CATEGORY_NAME);
-    const existing = await prisma.category.findFirst({
-      where: {
-        OR: [
-          { normalizedName },
-          { name: { equals: UNCLASSIFIED_CATEGORY_NAME, mode: "insensitive" } },
-        ],
-      },
-    });
-    if (existing) {
-      return prisma.category.update({
-        where: { id: existing.id },
-        data: { normalizedName, isSystem: true, parentId: null },
-      });
-    }
-    return prisma.category.create({
-      data: {
-        name: UNCLASSIFIED_CATEGORY_NAME,
-        normalizedName,
-        isSystem: true,
-        parentId: null,
-      },
-    });
-  }
-
   async createCategory(dto: CreateCategoryDto) {
-    const name = cleanName(dto.name);
+    const name = cleanMoneyName(dto.name);
     if (!name) throw new Error("Category name is required.");
     this.validateBudgetValue(dto.monthlyBudgetCents);
     if (dto.parentId) {
@@ -55,7 +27,7 @@ export class CategoriesService {
     return prisma.category.create({
       data: {
         name,
-        normalizedName: normalizeName(name),
+        normalizedName: normalizeMoneyName(name),
         parentId: dto.parentId,
         monthlyBudgetCents: dto.monthlyBudgetCents,
       },
@@ -90,7 +62,8 @@ export class CategoriesService {
       }
     }
 
-    const name = dto.name === undefined ? undefined : cleanName(dto.name);
+    const name =
+      dto.name === undefined ? undefined : cleanMoneyName(dto.name);
     if (name !== undefined && !name)
       throw new Error("Category name is required.");
 
@@ -98,7 +71,7 @@ export class CategoriesService {
       where: { id },
       data: {
         name,
-        normalizedName: name ? normalizeName(name) : undefined,
+        normalizedName: name ? normalizeMoneyName(name) : undefined,
         parentId: dto.parentId,
         monthlyBudgetCents: dto.monthlyBudgetCents,
       },
@@ -111,7 +84,11 @@ export class CategoriesService {
     if (category.isSystem)
       throw new Error("The Unclassified category cannot be deleted.");
 
-    const unclassified = await this.ensureUnclassified();
+    const unclassified = await prisma.category.findUniqueOrThrow({
+      where: {
+        normalizedName: normalizeMoneyName(UNCLASSIFIED_CATEGORY_NAME),
+      },
+    });
     await prisma.transaction.updateMany({
       where: { categoryId: id },
       data: { categoryId: unclassified.id },
@@ -128,7 +105,6 @@ export class CategoriesService {
   }
 
   async getAllCategories() {
-    await this.ensureUnclassified();
     return prisma.category.findMany({
       include: { _count: { select: { children: true, transactions: true } } },
       orderBy: [{ isSystem: "desc" }, { name: "asc" }],
@@ -136,7 +112,6 @@ export class CategoriesService {
   }
 
   async getSelectableCategories() {
-    await this.ensureUnclassified();
     return prisma.category.findMany({
       where: {
         OR: [{ isSystem: true }, { parentId: { not: null } }],
@@ -176,10 +151,7 @@ export class CategoriesService {
     return (
       (await prisma.category.count({
         where: {
-          OR: [
-            { normalizedName: normalizeName(name) },
-            { name: { equals: cleanName(name), mode: "insensitive" } },
-          ],
+          normalizedName: normalizeMoneyName(name),
           id: exceptId ? { not: exceptId } : undefined,
         },
       })) > 0

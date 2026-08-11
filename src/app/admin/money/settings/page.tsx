@@ -6,11 +6,12 @@ import instrumentsService from "@/services/instruments.service";
 import DefaultInstrumentForm from "./DefaultInstrumentForm";
 
 export default async function MoneySettingsPage() {
-  const defaultInstrument = await instrumentsService.getDefault();
-  const [openingBalanceCents, instruments] = await Promise.all([
-    transactionsService.getOpeningBalanceCents(),
-    instrumentsService.getAll(),
-  ]);
+  const [openingBalanceCents, instruments, defaultInstrument] =
+    await Promise.all([
+      transactionsService.getOpeningBalanceCents(),
+      instrumentsService.getAll(),
+      instrumentsService.getDefault(),
+    ]);
   return (
     <main className="admin-shell min-h-screen">
       <PageContainer className="mx-auto max-w-2xl">

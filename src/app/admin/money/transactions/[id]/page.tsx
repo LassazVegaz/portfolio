@@ -14,16 +14,17 @@ export default async function TransactionPage(
   const transaction = isNew ? null : await transactionsService.getById(id);
   if (!isNew && !transaction) notFound();
 
-  const defaultInstrument = await instrumentsService.getDefault();
   const [
     categories,
     instruments,
+    defaultInstrument,
     currentBalanceCents,
     balanceWithoutTransactionCents,
   ] =
     await Promise.all([
       categoriesService.getSelectableCategories(),
       instrumentsService.getAll(),
+      instrumentsService.getDefault(),
       transactionsService.getBalanceCents(),
       transactionsService.getBalanceCents(transaction?.id),
     ]);
@@ -58,7 +59,7 @@ export default async function TransactionPage(
             parentName: parent?.name ?? null,
           }))}
           defaultCategoryId={
-            categories.find(({ isSystem }) => isSystem)?.id ?? categories[0].id
+            categories.find(({ isSystem }) => isSystem)!.id
           }
           instruments={instruments.map(({ id: instrumentId, name, isCreditCard }) => ({
             id: instrumentId,

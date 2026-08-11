@@ -1,10 +1,11 @@
 import "server-only";
 
+import {
+  cleanMoneyName,
+  normalizeMoneyName,
+} from "@/features/money/names";
 import { MoneyDateRangePreset, TransactionDirection } from "@prisma/client";
 import prisma from "./prisma-service";
-
-const cleanName = (name: string) => name.trim().replace(/\s+/g, " ");
-const normalizeName = (name: string) => cleanName(name).toLocaleLowerCase("en-US");
 
 export type SaveMoneyFilterDto = {
   name?: string;
@@ -35,7 +36,7 @@ export class SavedMoneyFiltersService {
         ...dto,
         categoryIds: [...new Set(dto.categoryIds)],
         name,
-        normalizedName: normalizeName(name),
+        normalizedName: normalizeMoneyName(name),
         adminUserId,
       },
     });
@@ -49,7 +50,7 @@ export class SavedMoneyFiltersService {
     const name = await this.requireUniqueName(adminUserId, nameInput, id);
     return prisma.savedMoneyFilter.update({
       where: { id },
-      data: { name, normalizedName: normalizeName(name) },
+      data: { name, normalizedName: normalizeMoneyName(name) },
     });
   }
 
@@ -84,13 +85,13 @@ export class SavedMoneyFiltersService {
     value: string,
     exceptId?: string,
   ) {
-    const name = cleanName(value);
+    const name = cleanMoneyName(value);
     if (!name) throw new Error("Filter name is required.");
     if (name.length > 80) throw new Error("Filter name is too long.");
     const exists = await prisma.savedMoneyFilter.count({
       where: {
         adminUserId,
-        normalizedName: normalizeName(name),
+        normalizedName: normalizeMoneyName(name),
         id: exceptId ? { not: exceptId } : undefined,
       },
     });

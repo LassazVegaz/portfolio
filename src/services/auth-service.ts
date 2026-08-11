@@ -113,26 +113,6 @@ class AuthService {
       sessionCookieOptions,
     );
   }
-
-  private async bootstrapFirstAdmin(username: string, password: string) {
-    const bootstrapUsername = process.env.ADMIN_BOOTSTRAP_USERNAME;
-    const bootstrapPassword = process.env.ADMIN_BOOTSTRAP_PASSWORD;
-    if (
-      !bootstrapUsername ||
-      !bootstrapPassword ||
-      username !== bootstrapUsername ||
-      password !== bootstrapPassword
-    ) {
-      return null;
-    }
-
-    return prisma.adminUser.create({
-      data: {
-        username,
-        passwordHash: await hash(password, PASSWORD_ROUNDS),
-      },
-    });
-  }
 }
 
 const authService = new AuthService();
