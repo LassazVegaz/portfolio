@@ -9,7 +9,8 @@
     "start": "next start",
     "lint": "eslint",
     "db:seed": "tsx prisma/seed.ts",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "format": "prettier . --write"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",
@@ -35,6 +36,8 @@
     "babel-plugin-react-compiler": "1.0.0",
     "eslint": "^9.39.5",
     "eslint-config-next": "16.3.0",
+    "eslint-config-prettier": "^10.1.8",
+    "prettier": "^3.9.6",
     "prisma": "^6.19.3",
     "sass": "^1.102.0",
     "tailwindcss": "^4.3.3",
