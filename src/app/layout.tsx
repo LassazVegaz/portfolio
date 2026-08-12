@@ -10,7 +10,14 @@ export const metadata: Metadata = {
   applicationName: "Lasindu Nuwanga Portfolio",
   creator: "Lasindu Nuwanga Weerasinghe",
   authors: [{ name: "Lasindu Nuwanga Weerasinghe" }],
-  keywords: ["Lasindu Weerasinghe", "Senior Software Engineer", ".NET", "TypeScript", "AWS", "Microservices"],
+  keywords: [
+    "Lasindu Weerasinghe",
+    "Senior Software Engineer",
+    ".NET",
+    "TypeScript",
+    "AWS",
+    "Microservices",
+  ],
 };
 
 export const viewport: Viewport = {

@@ -32,7 +32,7 @@ class Calculator {
   calculateTargetPU(
     changedFieldName: keyof TargetInputs,
     changedValue: number,
-    primaryValues: PrimaryValues
+    primaryValues: PrimaryValues,
   ): number {
     const calculator = this.targetPUCalculators[changedFieldName];
     return calculator(changedValue, primaryValues);
@@ -40,7 +40,7 @@ class Calculator {
 
   calculateTargetValues(
     primaryValues: PrimaryValues,
-    targetPU: number
+    targetPU: number,
   ): TargetValues {
     const { unitBuyingPrice, quantity, totalBuyingPrice, buyingFees } =
       primaryValues;
@@ -98,7 +98,7 @@ export const primaryValuesCalculator: Record<
 
 export const calculatePrimaryValues = (
   changedField: keyof PrimaryInputs,
-  primaryValues: PrimaryValues
+  primaryValues: PrimaryValues,
 ) => {
   primaryValuesCalculator[changedField](primaryValues);
   const fees = calculateFees({

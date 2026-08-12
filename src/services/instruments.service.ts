@@ -1,10 +1,7 @@
 import "server-only";
 
 import { PRIMARY_MONEY_ACCOUNT_ID } from "@/features/money/default-records";
-import {
-  cleanMoneyName,
-  normalizeMoneyName,
-} from "@/features/money/names";
+import { cleanMoneyName, normalizeMoneyName } from "@/features/money/names";
 import prisma from "./prisma-service";
 
 export type SaveInstrumentDto = {
@@ -67,7 +64,9 @@ export class InstrumentsService {
       throw new Error("An instrument used by transactions cannot be deleted.");
     }
     if (accountCount > 0) {
-      throw new Error("Choose another default instrument before deleting this one.");
+      throw new Error(
+        "Choose another default instrument before deleting this one.",
+      );
     }
     await prisma.instrument.delete({ where: { id } });
   }

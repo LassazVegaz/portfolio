@@ -19,7 +19,9 @@ export default async function CategoriesPage() {
             <p className="admin-eyebrow">Organise transactions</p>
             <h1 className="mt-2 text-3xl font-semibold">Categories</h1>
           </div>
-          <span className="text-sm text-slate-400">{categories.length} total</span>
+          <span className="text-sm text-slate-400">
+            {categories.length} total
+          </span>
         </div>
 
         <div className="mt-8 grid gap-4 md:grid-cols-2">
@@ -28,7 +30,10 @@ export default async function CategoriesPage() {
               (candidate) => candidate.parentId === category.id,
             );
             return (
-              <section key={category.id} className="admin-panel rounded-2xl p-5">
+              <section
+                key={category.id}
+                className="admin-panel rounded-2xl p-5"
+              >
                 <Link
                   href={`/admin/money/categories/${category.id}`}
                   className="flex items-center justify-between font-semibold hover:text-emerald-300"
@@ -63,7 +68,9 @@ export default async function CategoriesPage() {
             );
           })}
         </div>
-        <FloatingAction href={"/admin/money/categories/new" as Route}>+</FloatingAction>
+        <FloatingAction href={"/admin/money/categories/new" as Route}>
+          +
+        </FloatingAction>
       </PageContainer>
     </main>
   );

@@ -19,7 +19,8 @@ const transactionSchema = z.object({
 const parseEntries = (entries: Record<string, string>) => {
   const parsed = transactionSchema.parse(entries);
   const time = new Date(parsed.time);
-  if (Number.isNaN(time.getTime())) throw new Error("Choose a valid date and time.");
+  if (Number.isNaN(time.getTime()))
+    throw new Error("Choose a valid date and time.");
   return {
     amountCents: parseMoneyToCents(parsed.amount),
     direction: parsed.direction,

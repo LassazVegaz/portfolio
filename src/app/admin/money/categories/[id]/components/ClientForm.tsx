@@ -9,11 +9,7 @@ import {
   SelectOption,
 } from "@/components/FormFields";
 import Form from "@/components/Form";
-import {
-  createAction,
-  updateAction,
-  deleteAction,
-} from "../actions";
+import { createAction, updateAction, deleteAction } from "../actions";
 
 type Category = {
   id: string;
@@ -128,7 +124,9 @@ export default function ClientForm(props: Readonly<ClientFormProps>) {
           type="text"
           inputMode="decimal"
           name="monthlyBudget"
-          defaultValue={((props.category?.monthlyBudgetCents ?? 0) / 100).toFixed(2)}
+          defaultValue={(
+            (props.category?.monthlyBudgetCents ?? 0) / 100
+          ).toFixed(2)}
           required
           disabled={props.category?.isSystem}
           className="admin-input"

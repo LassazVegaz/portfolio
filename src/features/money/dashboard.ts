@@ -58,7 +58,9 @@ export const getCategoryGroups = (
   const groups: CategoryGroup[] = [];
   for (const category of categories) {
     if (!selected.has(category.id)) continue;
-    const children = categories.filter(({ parentId }) => parentId === category.id);
+    const children = categories.filter(
+      ({ parentId }) => parentId === category.id,
+    );
     groups.push({
       id: category.id,
       name: category.name,
@@ -72,7 +74,9 @@ export const getCategoryGroups = (
 
   return {
     groups,
-    filteredCategoryIds: [...new Set(groups.flatMap(({ categoryIds }) => categoryIds))],
+    filteredCategoryIds: [
+      ...new Set(groups.flatMap(({ categoryIds }) => categoryIds)),
+    ],
     hasCategorySelection: true,
   };
 };
@@ -161,6 +165,8 @@ export const buildCategorySummaries = (
       budgetCents,
       remainingCents: budgetCents - actualCents,
       remainingPercentage:
-        budgetCents > 0 ? ((budgetCents - actualCents) / budgetCents) * 100 : null,
+        budgetCents > 0
+          ? ((budgetCents - actualCents) / budgetCents) * 100
+          : null,
     };
   });

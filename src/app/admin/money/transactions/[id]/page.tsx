@@ -20,14 +20,13 @@ export default async function TransactionPage(
     defaultInstrument,
     currentBalanceCents,
     balanceWithoutTransactionCents,
-  ] =
-    await Promise.all([
-      categoriesService.getSelectableCategories(),
-      instrumentsService.getAll(),
-      instrumentsService.getDefault(),
-      transactionsService.getBalanceCents(),
-      transactionsService.getBalanceCents(transaction?.id),
-    ]);
+  ] = await Promise.all([
+    categoriesService.getSelectableCategories(),
+    instrumentsService.getAll(),
+    instrumentsService.getDefault(),
+    transactionsService.getBalanceCents(),
+    transactionsService.getBalanceCents(transaction?.id),
+  ]);
 
   return (
     <main className="admin-shell min-h-screen pb-10">
@@ -58,14 +57,14 @@ export default async function TransactionPage(
             name,
             parentName: parent?.name ?? null,
           }))}
-          defaultCategoryId={
-            categories.find(({ isSystem }) => isSystem)!.id
-          }
-          instruments={instruments.map(({ id: instrumentId, name, isCreditCard }) => ({
-            id: instrumentId,
-            name,
-            isCreditCard,
-          }))}
+          defaultCategoryId={categories.find(({ isSystem }) => isSystem)!.id}
+          instruments={instruments.map(
+            ({ id: instrumentId, name, isCreditCard }) => ({
+              id: instrumentId,
+              name,
+              isCreditCard,
+            }),
+          )}
           defaultInstrumentId={defaultInstrument.id}
           currentBalanceCents={currentBalanceCents}
           balanceWithoutTransactionCents={balanceWithoutTransactionCents}

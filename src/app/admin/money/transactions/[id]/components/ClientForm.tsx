@@ -161,7 +161,9 @@ export default function ClientForm(props: Readonly<Props>) {
           <select
             className="admin-input"
             name="categoryId"
-            defaultValue={props.transaction?.categoryId ?? props.defaultCategoryId}
+            defaultValue={
+              props.transaction?.categoryId ?? props.defaultCategoryId
+            }
             required
           >
             {props.categories.map((category) => (
@@ -173,7 +175,8 @@ export default function ClientForm(props: Readonly<Props>) {
             ))}
           </select>
           <span className="text-xs text-admin-muted">
-            Transactions can use subcategories or Unclassified, never a parent category.
+            Transactions can use subcategories or Unclassified, never a parent
+            category.
           </span>
         </label>
 
@@ -195,7 +198,8 @@ export default function ClientForm(props: Readonly<Props>) {
             ))}
           </select>
           <span className="text-xs text-admin-muted">
-            Instruments describe how money moved; they do not keep separate balances.
+            Instruments describe how money moved; they do not keep separate
+            balances.
           </span>
         </label>
 

@@ -1,10 +1,7 @@
 import "server-only";
 
 import { UNCLASSIFIED_CATEGORY_NAME } from "@/features/money/default-records";
-import {
-  cleanMoneyName,
-  normalizeMoneyName,
-} from "@/features/money/names";
+import { cleanMoneyName, normalizeMoneyName } from "@/features/money/names";
 import prisma from "./prisma-service";
 
 export type CreateCategoryDto = {
@@ -62,8 +59,7 @@ export class CategoriesService {
       }
     }
 
-    const name =
-      dto.name === undefined ? undefined : cleanMoneyName(dto.name);
+    const name = dto.name === undefined ? undefined : cleanMoneyName(dto.name);
     if (name !== undefined && !name)
       throw new Error("Category name is required.");
 
@@ -165,7 +161,9 @@ export class CategoriesService {
       throw new Error("Unclassified cannot have subcategories.");
     if (parent.parentId)
       throw new Error("Subcategories cannot have subcategories.");
-    if ((await prisma.transaction.count({ where: { categoryId: parentId } })) > 0) {
+    if (
+      (await prisma.transaction.count({ where: { categoryId: parentId } })) > 0
+    ) {
       throw new Error(
         "Move the parent category's transactions before adding a subcategory.",
       );
@@ -174,7 +172,9 @@ export class CategoriesService {
 
   private validateBudgetValue(monthlyBudgetCents: number) {
     if (!Number.isSafeInteger(monthlyBudgetCents) || monthlyBudgetCents < 0) {
-      throw new Error("Monthly budget must be zero or a valid positive amount.");
+      throw new Error(
+        "Monthly budget must be zero or a valid positive amount.",
+      );
     }
   }
 

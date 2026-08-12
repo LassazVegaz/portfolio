@@ -118,7 +118,9 @@ export const isExactMonthRange = (from: string, to: string) => {
   return (
     start.getUTCDate() === 1 &&
     end.getUTCDate() ===
-      new Date(Date.UTC(end.getUTCFullYear(), end.getUTCMonth() + 1, 0)).getUTCDate() &&
+      new Date(
+        Date.UTC(end.getUTCFullYear(), end.getUTCMonth() + 1, 0),
+      ).getUTCDate() &&
     start.getUTCFullYear() === end.getUTCFullYear() &&
     start.getUTCMonth() === end.getUTCMonth()
   );

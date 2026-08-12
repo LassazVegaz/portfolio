@@ -39,8 +39,12 @@ export const saveFilterAction = async (input: SavedFilterInput) => {
     categoryIds: parsed.categoryIds,
     showSubcategories: parsed.showSubcategories,
     rangePreset,
-    from: rangePreset ? null : (parseMoneyDateStart(parsed.from ?? undefined) ?? null),
-    to: rangePreset ? null : (parseMoneyDateEnd(parsed.to ?? undefined) ?? null),
+    from: rangePreset
+      ? null
+      : (parseMoneyDateStart(parsed.from ?? undefined) ?? null),
+    to: rangePreset
+      ? null
+      : (parseMoneyDateEnd(parsed.to ?? undefined) ?? null),
     showCashflow: parsed.showCashflow,
   });
   revalidatePath("/admin/money/transactions");

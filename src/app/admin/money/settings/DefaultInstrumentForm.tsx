@@ -15,7 +15,10 @@ export default function DefaultInstrumentForm({
     {},
   );
   return (
-    <form action={action} className="admin-panel grid gap-5 rounded-admin p-page">
+    <form
+      action={action}
+      className="admin-panel grid gap-5 rounded-admin p-page"
+    >
       <div>
         <h2 className="font-semibold">Default instrument</h2>
         <p className="mt-1 text-sm text-admin-muted">
@@ -29,13 +32,20 @@ export default function DefaultInstrumentForm({
       >
         {instruments.map((instrument) => (
           <option key={instrument.id} value={instrument.id}>
-            {instrument.name}{instrument.isCreditCard ? " · credit card" : ""}
+            {instrument.name}
+            {instrument.isCreditCard ? " · credit card" : ""}
           </option>
         ))}
       </select>
       {state.error && <p className="text-sm text-rose-300">{state.error}</p>}
-      {state.success && <p className="text-sm text-emerald-300">{state.success}</p>}
-      <button type="submit" className="admin-primary-button justify-self-start" disabled={pending}>
+      {state.success && (
+        <p className="text-sm text-emerald-300">{state.success}</p>
+      )}
+      <button
+        type="submit"
+        className="admin-primary-button justify-self-start"
+        disabled={pending}
+      >
         {pending ? "Saving…" : "Save default instrument"}
       </button>
     </form>

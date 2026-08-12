@@ -32,7 +32,8 @@ export function TransactionRow({
         {transaction.time.toLocaleDateString("en-SG")}
       </span>
       <span className="text-admin-muted">
-        {transaction.direction === "OUT" && transaction.category.monthlyBudgetCents > 0
+        {transaction.direction === "OUT" &&
+        transaction.category.monthlyBudgetCents > 0
           ? `${((transaction.amountCents / transaction.category.monthlyBudgetCents) * 100).toFixed(1)}%`
           : "—"}
       </span>

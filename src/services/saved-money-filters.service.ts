@@ -1,9 +1,6 @@
 import "server-only";
 
-import {
-  cleanMoneyName,
-  normalizeMoneyName,
-} from "@/features/money/names";
+import { cleanMoneyName, normalizeMoneyName } from "@/features/money/names";
 import { MoneyDateRangePreset, TransactionDirection } from "@prisma/client";
 import prisma from "./prisma-service";
 

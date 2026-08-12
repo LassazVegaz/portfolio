@@ -15,9 +15,16 @@ import {
   YAxis,
 } from "recharts";
 
-export type MoneyLinePoint = { period: string } & Record<string, string | number>;
+export type MoneyLinePoint = { period: string } & Record<
+  string,
+  string | number
+>;
 export type MoneyLineSeries = { key: string; label: string; color: string };
-export type MoneyBarPoint = { category: string; actualCents: number; budgetCents: number };
+export type MoneyBarPoint = {
+  category: string;
+  actualCents: number;
+  budgetCents: number;
+};
 
 const tooltipStyle = {
   background: "#0f1f1a",
@@ -25,10 +32,7 @@ const tooltipStyle = {
   borderRadius: 12,
 };
 
-const moneyTooltip = (value: unknown) => [
-  formatMoney(Number(value ?? 0)),
-  "",
-];
+const moneyTooltip = (value: unknown) => [formatMoney(Number(value ?? 0)), ""];
 
 export default function MoneyCharts({
   lineData,
@@ -53,12 +57,17 @@ export default function MoneyCharts({
           <div className="h-80 border-t border-admin-line p-page pl-2">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={lineData}>
-                <CartesianGrid stroke="rgba(148,163,184,.12)" vertical={false} />
+                <CartesianGrid
+                  stroke="rgba(148,163,184,.12)"
+                  vertical={false}
+                />
                 <XAxis dataKey="period" stroke="#92a79d" fontSize={12} />
                 <YAxis
                   stroke="#92a79d"
                   fontSize={12}
-                  tickFormatter={(value) => `S$${Math.round(Number(value) / 100)}`}
+                  tickFormatter={(value) =>
+                    `S$${Math.round(Number(value) / 100)}`
+                  }
                 />
                 <Tooltip formatter={moneyTooltip} contentStyle={tooltipStyle} />
                 <Legend />
@@ -98,18 +107,36 @@ export default function MoneyCharts({
             <div className="h-80">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={barData}>
-                  <CartesianGrid stroke="rgba(148,163,184,.12)" vertical={false} />
+                  <CartesianGrid
+                    stroke="rgba(148,163,184,.12)"
+                    vertical={false}
+                  />
                   <XAxis dataKey="category" stroke="#92a79d" fontSize={12} />
                   <YAxis
                     stroke="#92a79d"
                     fontSize={12}
-                    tickFormatter={(value) => `S$${Math.round(Number(value) / 100)}`}
+                    tickFormatter={(value) =>
+                      `S$${Math.round(Number(value) / 100)}`
+                    }
                   />
-                  <Tooltip formatter={moneyTooltip} contentStyle={tooltipStyle} />
+                  <Tooltip
+                    formatter={moneyTooltip}
+                    contentStyle={tooltipStyle}
+                  />
                   <Legend />
-                  <Bar dataKey="actualCents" name="Actual" fill="#fb7185" radius={[6, 6, 0, 0]} />
+                  <Bar
+                    dataKey="actualCents"
+                    name="Actual"
+                    fill="#fb7185"
+                    radius={[6, 6, 0, 0]}
+                  />
                   {showBudgets && (
-                    <Bar dataKey="budgetCents" name="Budget" fill="#6ee7b7" radius={[6, 6, 0, 0]} />
+                    <Bar
+                      dataKey="budgetCents"
+                      name="Budget"
+                      fill="#6ee7b7"
+                      radius={[6, 6, 0, 0]}
+                    />
                   )}
                 </BarChart>
               </ResponsiveContainer>

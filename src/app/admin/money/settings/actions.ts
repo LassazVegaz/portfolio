@@ -24,7 +24,10 @@ export const updateOpeningBalanceAction = async (
     revalidatePath("/admin/money/transactions");
     return { success: "Opening balance updated." };
   } catch (error) {
-    return { error: error instanceof Error ? error.message : "Could not update balance." };
+    return {
+      error:
+        error instanceof Error ? error.message : "Could not update balance.",
+    };
   }
 };
 
@@ -44,7 +47,8 @@ export const updateDefaultInstrumentAction = async (
     return { success: "Default instrument updated." };
   } catch (error) {
     return {
-      error: error instanceof Error ? error.message : "Could not update instrument.",
+      error:
+        error instanceof Error ? error.message : "Could not update instrument.",
     };
   }
 };

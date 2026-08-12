@@ -52,7 +52,9 @@ export default async function InstrumentsPage() {
             </Link>
           ))}
         </div>
-        <FloatingAction href={"/admin/money/instruments/new" as Route}>+</FloatingAction>
+        <FloatingAction href={"/admin/money/instruments/new" as Route}>
+          +
+        </FloatingAction>
       </PageContainer>
     </main>
   );
