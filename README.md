@@ -4,141 +4,93 @@ My awesome portfolio with hidden tools 😂😂
 
 ## Money workspace
 
-The private `/admin` area now includes a maintainable SGD ledger with:
+The private `/admin/money` workspace has separate transaction, category,
+instrument, settings, and dashboard pages. The ledger and editing forms adapt
+to mobile screens; the dashboard uses a desktop layout.
 
-- database-backed admin credentials and bcrypt password hashing;
-- signed, expiring, HTTP-only sessions verified by the edge proxy;
-- profile and password management with session invalidation;
-- exact integer-cent money calculations, opening balance, and IN/OUT entries;
-- top-level categories, one level of subcategories, and a protected Unclassified category;
-- transaction instruments with a configurable default and a shared account balance;
-- monthly parent/subcategory budgets with enforced allocation limits;
-- advanced, saveable filters plus budget, cash-flow, and category reporting;
-- a compact oldest-first mobile ledger and an adaptive desktop dashboard.
+### Transactions
+
+- Create, edit, and delete money-in and money-out entries in SGD.
+- Record amount, direction, title, category, instrument, Singapore date/time,
+  payer/payee, reference, and notes. Creation and update timestamps are automatic.
+- View both directions together by default, across all dates.
+- Combine search (title, notes, payer/payee, reference), direction, category,
+  instrument, inclusive Singapore date bounds, and minimum/maximum amounts.
+- Selecting a parent category includes its subcategories. Archived categories
+  remain available in historical filters.
+- Sort by newest, oldest, highest amount, or lowest amount. Database pagination
+  loads 25 entries per page; income, expense, and net totals cover all matches.
+- Store integer cents; validate positive transaction amounts and the database's
+  32-bit amount limit. Opening balances can be negative. Enter amounts without
+  grouping commas, with at most two decimal places.
+
+### Categories and instruments
+
+Categories have a name, description, supported direction (in, out, or both),
+optional parent, monthly spending budget, and archive status. Flat categories
+and subcategories can receive transactions; a category with children is a
+reporting group. Each subcategory has its own direction setting. Child budgets
+cannot exceed the parent's allocation.
+
+Archive categories to stop new assignments while preserving transaction history.
+Existing entries can retain their archived category when edited. Archive children
+before their parent; restore the parent before restoring children. A category
+with transactions or children cannot be deleted. The protected Unclassified
+category is always available.
+
+Instruments describe the source/destination (such as cash or a card), with a
+configurable default. They share one opening balance and ledger balance, rather
+than maintaining separate account balances. Credit-card bill payments are not
+recorded again as expenses.
+
+### Dashboard
+
+`/admin/money/dashboard` retains saved category/date/direction filters, cash-flow
+statistics, prorated budgets, charts, and a transaction table. Saved filters
+belong to the signed-in admin. The responsive ledger is at
+`/admin/money/transactions`; its filters are retained in the URL.
 
 ### Database setup
 
-After applying the Prisma schema to a new database, seed the required money
-records once:
+Configure `DATABASE_URL` for MongoDB and `AUTH_SECRET` as described in
+`.env.example`. After pulling schema changes, regenerate the client and apply
+the schema to the development database:
 
 ```bash
+pnpm install
+pnpm prisma generate
 pnpm prisma db push
 pnpm db:seed
 ```
 
-The seed creates the Unclassified category, Cash instrument, and primary money
-account. The application assumes these records exist and does not recreate or
-repair them at runtime.
+MongoDB must support transactions (for example, an Atlas deployment or a replica
+set). Prisma uses `db push` for this MongoDB schema, not SQL migrations. No live
+data migration is included. If reusing old development fixtures, recreate them
+with the new category fields populated.
+
+The seed creates Unclassified, Cash, and the primary money account. The
+application assumes those records exist; reads never create or repair them.
+Seeding money records does not create an admin user.
+
+### Verification
+
+```bash
+pnpm test:money
+pnpm exec tsc --noEmit
+pnpm lint
+pnpm build
+```
+
+The money tests cover cent precision and limits, Singapore date/time boundaries,
+filter validation and pagination URLs, category assignment/archive rules, and
+budget proration. They run without a database. For a database-backed smoke test,
+seed a development database, sign in, create income and expense categories and
+transactions, combine the ledger filters, edit an entry, then archive its
+category and verify that history is retained. Check the ledger and forms at a
+narrow viewport and the dashboard at a desktop viewport.
 
 ### Security notes
 
 - Every admin route is protected by `proxy.ts`; every mutating server action also performs its own authentication check.
 - Admin responses are private and non-cacheable. Baseline framing, MIME-sniffing, referrer, and permissions headers are configured in `next.config.ts`.
 - For internet exposure, enable rate limiting for `/admin/login` at the hosting/WAF layer. In-memory counters are not reliable in a serverless deployment.
-
-## Implemented money plan
-
-The following scope has been implemented:
-
-- Improve styling
-  - use TailwindCSS theme to name frequently used TailwindCSS classes (eg: primary color, secondary color, page gap)
-- Improve money feature
-  - Transaction instruments (new feature)
-    - every transaction should have a source/destination (instrument)
-    - these instruments can be managed separately
-    - instruments properties
-      - name (required)
-      - is credit card (default is false)
-    - in "money" settings, user can select which source/destination is the default
-    - intruments do not have their own balances. Instead they all use Money Account balance
-    - credit cards bill payments are not tracked in this app
-  - transactions
-    - parent categories cannot be selected as the categroy for a transaction except for the default "unclassified" category
-  - category budget (new feature)
-    - parent categories and sub categories should have budgets for a period of month
-    - sum of the budget of of sub categories should not exceed the parent category budget
-  - dashboard (transaction page) desktop version
-    - filters
-      - money in or out: default is out
-      - categories
-        - a left side panel should show all the available categories
-        - the panel should take the remaining height of the screen
-        - overflowing content should be scrollable
-        - categories are grouped based on the parent category
-        - all categories are first sorted in parent category alphabetic order. Then sub categories alphabetic order
-        - there is an option to show/hide sub categories
-        - all categories are selectable
-        - maximum number of categories that can be selected is 10
-        - if sub categories are shown and a parent categroy is selected, its first 10 sub categories will be selected automatically
-        - show a UI cue at parent categories whether all or some or none of the sub categories are selected. This is irrelevant if sub categories are hidden
-        - there is a search bar at the top of the panel to searh categories
-        - show the selected number of categories in the panel
-      - date range
-        - from and to dates should have a datepicker. install a library if required
-        - from and to dates are inclusive
-        - there are predefined date ranges:
-          - today
-          - this week
-          - last week
-          - this month
-          - last month
-          - this year
-          - last year
-        - when a predefined range is selected, the date range fields should be updated automatically and UI cue should be displayed to indicate which predefined option was selected.
-        - if the date range is changed using "to" and "from" fields, unselect the selected predefined range
-        - the panel is collapsible
-    - save filters (new feature)
-      - filters can be saved and they should include following
-        - categories selected
-        - sub categories are hidden or shown
-        - if a predefined date range is selected, the selected range option but not "from" and "to" dates
-        - if a predined date range is not selected, "from" and "to" dates
-        - name: a name for the filter. provide a default unique filter name in the pattern "filter {number}"
-        - money in or out
-      - saved filters can be viewed in a popup
-        - there should be a delete icon for each saved filter to delete them
-        - clicking on a saved filter apply the filter and close the popup
-      - saved filter names can be changed
-    - charts
-      - line chart
-        - show lines for selected category
-        - y axis is money
-        - x axis is the date. compress dates based on the selected date range
-        - if sub categories are hidden, accumulate all sub categories to the selected parent category
-        - hide this chart if the date range only includes one day
-        - if none of the categories are selected, accumulate all money into one line
-      - bar chart
-        - only show this chart if more than one category is selected
-        - show bars for each category with their budget on the side
-        - y axis is the money
-        - budget bars can be hidden
-    - numbers
-      - show following numbers
-        - total money
-        - if any category is selected
-          - total money in each category
-          - remaining budget or overflown amount
-          - remaining budget or overflown amount as a percentage
-        - provides an option to show cashflow. For an exact month and current month periods, this option is enabled by default
-        - If cashflow need to be shown, display following details
-          - display money in and out both
-          - display savings for that period
-          - display savings as a percentage of money in
-          - display money out as a percentage of money in
-    - table
-      - show transactions in a paginated view
-      - include following properties
-        - amount
-        - money in or out
-        - category
-        - date
-        - percentage it is taking from the allocated budget of that category
-      - clicking on a record open the relevant transaction page
-    - order of the dashboard from top to bottom
-      - filters. categories filter is on the left side
-      - numbers
-      - line chart
-      - bar chart
-      - table
-    - all charts, statistics area and table are collapsible
-- this application does not have live data. Therefore the DB structure can be changed without worrying about existing data

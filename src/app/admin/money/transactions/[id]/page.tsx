@@ -20,14 +20,13 @@ export default async function TransactionPage(
     defaultInstrument,
     currentBalanceCents,
     balanceWithoutTransactionCents,
-  ] =
-    await Promise.all([
-      categoriesService.getSelectableCategories(),
-      instrumentsService.getAll(),
-      instrumentsService.getDefault(),
-      transactionsService.getBalanceCents(),
-      transactionsService.getBalanceCents(transaction?.id),
-    ]);
+  ] = await Promise.all([
+    categoriesService.getSelectableCategories(transaction?.categoryId),
+    instrumentsService.getAll(),
+    instrumentsService.getDefault(),
+    transactionsService.getBalanceCents(),
+    transactionsService.getBalanceCents(transaction?.id),
+  ]);
 
   return (
     <main className="admin-shell min-h-screen pb-10">
@@ -47,25 +46,31 @@ export default async function TransactionPage(
                   direction: transaction.direction,
                   title: transaction.title,
                   comments: transaction.comments,
+                  counterparty: transaction.counterparty,
+                  reference: transaction.reference,
                   time: transaction.time,
                   categoryId: transaction.categoryId,
                   instrumentId: transaction.instrumentId,
                 }
               : null
           }
-          categories={categories.map(({ id: categoryId, name, parent }) => ({
-            id: categoryId,
-            name,
-            parentName: parent?.name ?? null,
-          }))}
-          defaultCategoryId={
-            categories.find(({ isSystem }) => isSystem)!.id
-          }
-          instruments={instruments.map(({ id: instrumentId, name, isCreditCard }) => ({
-            id: instrumentId,
-            name,
-            isCreditCard,
-          }))}
+          categories={categories.map(
+            ({ id: categoryId, name, parent, usage, isArchived }) => ({
+              id: categoryId,
+              name,
+              usage,
+              isArchived,
+              parentName: parent?.name ?? null,
+            }),
+          )}
+          defaultCategoryId={categories.find(({ isSystem }) => isSystem)!.id}
+          instruments={instruments.map(
+            ({ id: instrumentId, name, isCreditCard }) => ({
+              id: instrumentId,
+              name,
+              isCreditCard,
+            }),
+          )}
           defaultInstrumentId={defaultInstrument.id}
           currentBalanceCents={currentBalanceCents}
           balanceWithoutTransactionCents={balanceWithoutTransactionCents}

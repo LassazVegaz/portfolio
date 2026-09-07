@@ -1,3 +1,4 @@
+import { MoneyValidationError } from "./validation-error";
 export const MONEY_DATE_RANGE_PRESETS = [
   "TODAY",
   "THIS_WEEK",
@@ -118,7 +119,9 @@ export const isExactMonthRange = (from: string, to: string) => {
   return (
     start.getUTCDate() === 1 &&
     end.getUTCDate() ===
-      new Date(Date.UTC(end.getUTCFullYear(), end.getUTCMonth() + 1, 0)).getUTCDate() &&
+      new Date(
+        Date.UTC(end.getUTCFullYear(), end.getUTCMonth() + 1, 0),
+      ).getUTCDate() &&
     start.getUTCFullYear() === end.getUTCFullYear() &&
     start.getUTCMonth() === end.getUTCMonth()
   );
@@ -148,3 +151,27 @@ export const getBudgetForDateRange = (
 
   return Math.round(budget);
 };
+
+/** datetime-local values in this ledger always represent Singapore wall time. */
+export function parseMoneyDateTime(value: string) {
+  if (
+    !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(value) ||
+    !isValidMoneyDateInput(value.slice(0, 10))
+  ) {
+    throw new MoneyValidationError("Choose a valid date and time.");
+  }
+  const date = new Date(`${value}:00${SINGAPORE_OFFSET}`);
+  if (Number.isNaN(date.getTime()) || formatMoneyDateTimeInput(date) !== value)
+    throw new MoneyValidationError("Choose a valid date and time.");
+  return date;
+}
+
+export function formatMoneyDateTimeInput(date: Date) {
+  const time = new Intl.DateTimeFormat("en-GB", {
+    timeZone: SINGAPORE_TIME_ZONE,
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+  }).format(date);
+  return `${formatMoneyDateInput(date)}T${time}`;
+}

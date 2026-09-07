@@ -39,22 +39,26 @@ export const saveFilterAction = async (input: SavedFilterInput) => {
     categoryIds: parsed.categoryIds,
     showSubcategories: parsed.showSubcategories,
     rangePreset,
-    from: rangePreset ? null : (parseMoneyDateStart(parsed.from ?? undefined) ?? null),
-    to: rangePreset ? null : (parseMoneyDateEnd(parsed.to ?? undefined) ?? null),
+    from: rangePreset
+      ? null
+      : (parseMoneyDateStart(parsed.from ?? undefined) ?? null),
+    to: rangePreset
+      ? null
+      : (parseMoneyDateEnd(parsed.to ?? undefined) ?? null),
     showCashflow: parsed.showCashflow,
   });
-  revalidatePath("/admin/money/transactions");
+  revalidatePath("/admin/money/dashboard");
   return { id: saved.id, name: saved.name };
 };
 
 export const renameFilterAction = async (id: string, name: string) => {
   const user = await authService.requireAuthenticatedUser();
   await savedMoneyFiltersService.rename(user.id, id, name);
-  revalidatePath("/admin/money/transactions");
+  revalidatePath("/admin/money/dashboard");
 };
 
 export const deleteFilterAction = async (id: string) => {
   const user = await authService.requireAuthenticatedUser();
   await savedMoneyFiltersService.delete(user.id, id);
-  revalidatePath("/admin/money/transactions");
+  revalidatePath("/admin/money/dashboard");
 };

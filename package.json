@@ -9,7 +9,8 @@
     "start": "next start",
     "lint": "eslint",
     "db:seed": "tsx prisma/seed.ts",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "test:money": "tsx --test tests/money.test.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",
