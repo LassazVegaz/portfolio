@@ -40,6 +40,9 @@ model Category {
   id                 String        @id @default(auto()) @map("_id") @db.ObjectId
   name               String
   normalizedName     String        @unique
+  description        String?
+  usage              CategoryUsage @default(BOTH)
+  isArchived         Boolean       @default(false)
   isSystem           Boolean       @default(false)
   parentId           String?       @db.ObjectId
   parent             Category?     @relation("CategoryHierarchy", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
@@ -56,6 +59,8 @@ model Transaction {
   direction    TransactionDirection
   title        String
   time         DateTime             @default(now())
+  counterparty String?
+  reference    String?
   comments     String?
   category     Category             @relation(fields: [categoryId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   categoryId   String               @db.ObjectId
@@ -67,6 +72,12 @@ model Transaction {
   @@index([time])
   @@index([categoryId])
   @@index([instrumentId])
+}
+
+enum CategoryUsage {
+  IN
+  OUT
+  BOTH
 }
 
 enum TransactionDirection {

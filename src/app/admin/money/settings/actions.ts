@@ -20,8 +20,7 @@ export const updateOpeningBalanceAction = async (
     await transactionsService.setOpeningBalanceCents(
       parseMoneyToCents(value, true),
     );
-    revalidatePath("/admin/money");
-    revalidatePath("/admin/money/transactions");
+    revalidatePath("/admin/money", "layout");
     return { success: "Opening balance updated." };
   } catch (error) {
     return {

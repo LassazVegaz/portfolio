@@ -193,7 +193,7 @@ export default function DashboardFilters({
     params.set("to", filter.to);
     if (filter.rangePreset) params.set("range", filter.rangePreset);
     params.set("cashflow", filter.showCashflow ? "true" : "false");
-    router.push(`/admin/money/transactions?${params}` as Route);
+    router.push(`/admin/money/dashboard?${params}` as Route);
   };
 
   const active = (): CurrentFilters => ({

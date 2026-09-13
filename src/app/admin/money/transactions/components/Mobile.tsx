@@ -29,7 +29,9 @@ export function TransactionRow({
           : transaction.category.name}
       </span>
       <span className="text-admin-muted">
-        {transaction.time.toLocaleDateString("en-SG")}
+        {transaction.time.toLocaleDateString("en-SG", {
+          timeZone: "Asia/Singapore",
+        })}
       </span>
       <span className="text-admin-muted">
         {transaction.direction === "OUT" &&
@@ -59,6 +61,7 @@ export function MobileTransaction({
         <p className="truncate font-medium">{transaction.title}</p>
         <p className="mt-1 text-xs text-slate-500">
           {transaction.time.toLocaleString("en-SG", {
+            timeZone: "Asia/Singapore",
             dateStyle: "medium",
             timeStyle: "short",
           })}

@@ -21,7 +21,7 @@ export default async function TransactionPage(
     currentBalanceCents,
     balanceWithoutTransactionCents,
   ] = await Promise.all([
-    categoriesService.getSelectableCategories(),
+    categoriesService.getSelectableCategories(transaction?.categoryId),
     instrumentsService.getAll(),
     instrumentsService.getDefault(),
     transactionsService.getBalanceCents(),
@@ -46,17 +46,23 @@ export default async function TransactionPage(
                   direction: transaction.direction,
                   title: transaction.title,
                   comments: transaction.comments,
+                  counterparty: transaction.counterparty,
+                  reference: transaction.reference,
                   time: transaction.time,
                   categoryId: transaction.categoryId,
                   instrumentId: transaction.instrumentId,
                 }
               : null
           }
-          categories={categories.map(({ id: categoryId, name, parent }) => ({
-            id: categoryId,
-            name,
-            parentName: parent?.name ?? null,
-          }))}
+          categories={categories.map(
+            ({ id: categoryId, name, parent, usage, isArchived }) => ({
+              id: categoryId,
+              name,
+              usage,
+              isArchived,
+              parentName: parent?.name ?? null,
+            }),
+          )}
           defaultCategoryId={categories.find(({ isSystem }) => isSystem)!.id}
           instruments={instruments.map(
             ({ id: instrumentId, name, isCreditCard }) => ({

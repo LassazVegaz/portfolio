@@ -28,6 +28,14 @@ export default async function CategoryPage(
   if (!isNew && !category) notFound();
 
   const categories = await getCategories(isNew ? undefined : id);
+  if (
+    category?.parentId &&
+    !categories.some(({ id }) => id === category.parentId)
+  ) {
+    const parent = await categoriesService.getCategoryById(category.parentId);
+    if (parent)
+      categories.push({ id: parent.id, name: `${parent.name} (archived)` });
+  }
 
   return (
     <main className="admin-shell min-h-screen">

@@ -38,7 +38,7 @@ export const updateAction = async (
   }
   await instrumentsService.update(id, dto);
   revalidatePath("/admin/money/instruments");
-  revalidatePath("/admin/money/transactions");
+  revalidatePath("/admin/money", "layout");
 };
 
 export const deleteAction = async (id: string) => {
