@@ -5,7 +5,6 @@ import { cleanMoneyName, normalizeMoneyName } from "@/features/money/names";
 import { validateCategoryAssignment } from "@/features/money/category-policy";
 import prisma from "./prisma-service";
 import { CategoryUsage, TransactionDirection } from "@prisma/client";
-import { MAX_MONEY_CENTS } from "@/features/money/money";
 import { isObjectId } from "@/features/money/ledger-filters";
 
 export type CreateCategoryDto = {
