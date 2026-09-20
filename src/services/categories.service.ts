@@ -4,7 +4,7 @@ import "server-only";
 import { cleanMoneyName, normalizeMoneyName } from "@/features/money/names";
 import { validateCategoryAssignment } from "@/features/money/category-policy";
 import prisma from "./prisma-service";
-import { CategoryUsage, TransactionDirection } from "@prisma/client";
+import { Category, CategoryUsage, TransactionDirection } from "@prisma/client";
 import { isObjectId } from "@/features/money/ledger-filters";
 
 export type CreateCategoryDto = {
@@ -50,77 +50,107 @@ export class CategoriesService {
         "The Unclassified category cannot be edited.",
       );
     this.validateDetails(dto);
-    if (
-      dto.usage &&
-      dto.usage !== "BOTH" &&
-      (await prisma.transaction.count({
-        where: { categoryId: id, direction: { not: dto.usage } },
-      }))
-    ) {
+    await this.validateUsageChange(id, dto.usage);
+    await this.validateArchiveChange(existing, dto.isArchived);
+    await this.validateParentChange(existing, dto.parentId);
+    await this.validateUpdatedBudget(existing, dto);
+
+    return prisma.category.update({
+      where: { id },
+      data: this.prepareCategoryUpdate(dto),
+    });
+  }
+
+  private async validateUsageChange(id: string, usage?: CategoryUsage) {
+    if (!usage || usage === "BOTH") return;
+    const conflictingTransactions = await prisma.transaction.count({
+      where: { categoryId: id, direction: { not: usage } },
+    });
+    if (conflictingTransactions) {
       throw new MoneyValidationError(
         "This category has transactions in the other direction. Keep it available for both directions.",
       );
     }
-    if (
-      dto.isArchived &&
-      (await prisma.category.count({
-        where: { parentId: id, isArchived: false },
-      }))
-    ) {
-      throw new MoneyValidationError(
-        "Archive the subcategories before archiving their parent.",
-      );
-    }
-    if (dto.parentId === id)
-      throw new MoneyValidationError("A category cannot be its own parent.");
-    if (dto.parentId && dto.parentId !== existing.parentId)
-      await this.validateParent(dto.parentId);
-    if (dto.isArchived === false && existing.parentId) {
-      const parent = await this.getCategoryById(existing.parentId);
-      if (parent?.isArchived)
-        throw new MoneyValidationError("Restore the parent category first.");
-    }
+  }
 
+  private async validateArchiveChange(
+    existing: Category,
+    isArchived?: boolean,
+  ) {
+    if (isArchived) {
+      const activeChildren = await prisma.category.count({
+        where: { parentId: existing.id, isArchived: false },
+      });
+      if (activeChildren) {
+        throw new MoneyValidationError(
+          "Archive the subcategories before archiving their parent.",
+        );
+      }
+    }
+    if (isArchived === false && existing.parentId) {
+      const parent = await this.getCategoryById(existing.parentId);
+      if (parent?.isArchived) {
+        throw new MoneyValidationError("Restore the parent category first.");
+      }
+    }
+  }
+
+  private async validateParentChange(
+    existing: Category,
+    parentId?: string | null,
+  ) {
+    if (parentId === existing.id) {
+      throw new MoneyValidationError("A category cannot be its own parent.");
+    }
+    if (parentId && parentId !== existing.parentId) {
+      await this.validateParent(parentId);
+    }
+  }
+
+  private async validateUpdatedBudget(
+    existing: Category,
+    dto: UpdateCategoryDto,
+  ) {
     const monthlyBudgetCents =
       dto.monthlyBudgetCents ?? existing.monthlyBudgetCents;
-    this.validateBudgetValue(monthlyBudgetCents);
     const parentId =
       dto.parentId === undefined ? existing.parentId : dto.parentId;
+    this.validateBudgetValue(monthlyBudgetCents);
+
     if (parentId) {
-      if (await this.hasChildCategories(id)) {
+      if (await this.hasChildCategories(existing.id)) {
         throw new MoneyValidationError(
           "A parent category cannot become a subcategory.",
         );
       }
-      await this.validateChildBudget(parentId, monthlyBudgetCents, id);
-    } else {
-      const childrenBudget = await this.getChildrenBudget(id);
-      if (childrenBudget > monthlyBudgetCents) {
-        throw new MoneyValidationError(
-          "The parent budget cannot be less than the sum of its subcategory budgets.",
-        );
-      }
+      await this.validateChildBudget(parentId, monthlyBudgetCents, existing.id);
+      return;
     }
+    const childrenBudget = await this.getChildrenBudget(existing.id);
+    if (childrenBudget > monthlyBudgetCents) {
+      throw new MoneyValidationError(
+        "The parent budget cannot be less than the sum of its subcategory budgets.",
+      );
+    }
+  }
 
+  private prepareCategoryUpdate(dto: UpdateCategoryDto) {
     const name = dto.name === undefined ? undefined : cleanMoneyName(dto.name);
-    if (name !== undefined && (!name || name.length > 80))
+    if (name !== undefined && (!name || name.length > 80)) {
       throw new MoneyValidationError("Category name is required.");
-
-    return prisma.category.update({
-      where: { id },
-      data: {
-        name,
-        normalizedName: name ? normalizeMoneyName(name) : undefined,
-        parentId: dto.parentId,
-        monthlyBudgetCents: dto.monthlyBudgetCents,
-        description:
-          dto.description === undefined
-            ? undefined
-            : dto.description?.trim() || null,
-        usage: dto.usage,
-        isArchived: dto.isArchived,
-      },
-    });
+    }
+    return {
+      name,
+      normalizedName: name ? normalizeMoneyName(name) : undefined,
+      parentId: dto.parentId,
+      monthlyBudgetCents: dto.monthlyBudgetCents,
+      description:
+        dto.description === undefined
+          ? undefined
+          : dto.description?.trim() || null,
+      usage: dto.usage,
+      isArchived: dto.isArchived,
+    };
   }
 
   async deleteCategory(id: string) {

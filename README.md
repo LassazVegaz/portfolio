@@ -72,6 +72,46 @@ The seed creates Unclassified, Cash, and the primary money account. The
 application assumes those records exist; reads never create or repair them.
 Seeding money records does not create an admin user.
 
+### Standalone TypeScript scripts
+
+Place executable `.ts` files directly in the root `scripts/` folder. Set
+`SCRIPT_NAME` to the filename, with or without `.ts`, then run:
+
+```bash
+pnpm script
+```
+
+For example, put this in `.env.local` (with your `DATABASE_URL`):
+
+```dotenv
+SCRIPT_NAME=create-default-category
+```
+
+Or select the script in PowerShell:
+
+```powershell
+$env:SCRIPT_NAME = "create-default-category"
+pnpm script
+```
+
+The runner loads environment files before launching the selected script, without
+starting Next.js. Existing shell variables win, followed by
+`.env.<NODE_ENV>.local`, `.env.local`, `.env.<NODE_ENV>`, and `.env` in that order.
+`NODE_ENV` defaults to `development`; test mode skips `.env.local`. Files are
+resolved from the repository root. Extra arguments are passed to the script,
+and script failures produce a nonzero exit code.
+
+`create-default-category.ts` creates the protected, active **Unclassified**
+category for both transaction directions, with an explicit `parentId: null`.
+It uses an upsert, so rerunning it preserves an existing category. It creates no
+instruments, accounts, or admin users. It requires `DATABASE_URL` and a generated
+Prisma client. You can also run it directly with
+`pnpm exec tsx scripts/create-default-category.ts`; it loads the same environment
+files and always disconnects Prisma after the operation.
+
+Run `pnpm test:scripts` to check environment precedence, script selection,
+argument forwarding, and failure exit codes without a database.
+
 ### Verification
 
 ```bash

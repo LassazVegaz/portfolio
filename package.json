@@ -11,7 +11,9 @@
     "db:seed": "tsx prisma/seed.ts",
     "postinstall": "prisma generate",
     "format": "prettier . --write",
-    "test:money": "tsx --test tests/money.test.ts"
+    "test:money": "tsx --test tests/money.test.ts",
+    "script": "tsx scripts/run.ts",
+    "test:scripts": "tsx --test tests/scripts.test.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",
