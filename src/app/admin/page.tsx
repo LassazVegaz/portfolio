@@ -9,10 +9,19 @@ export default async function AdminPage() {
       <TopNavigator links={[]} />
       <Header1>Apps</Header1>
 
-      <div className="grid grid-cols-2 gap-4 items-center">
-        <AppCard href="/admin/stocks-calculator">Stocks Calculator</AppCard>
-        <AppCard href="/admin/rent-rooms">Rent Rooms</AppCard>
-        <AppCard href="/admin/money">Money</AppCard>
+      <div className="grid grid-cols-2 gap-4">
+        <AppCard
+          href="/admin/stocks-calculator"
+          className="self-end justify-self-end"
+        >
+          Stocks Calculator
+        </AppCard>
+        <AppCard href="/admin/rent-rooms" className="self-end">
+          Rent Rooms
+        </AppCard>
+        <AppCard href="/admin/money" className="justify-self-end">
+          Money
+        </AppCard>
         <AppCard href="/admin/profile">Profile</AppCard>
       </div>
     </PageContainer>
