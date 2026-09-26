@@ -11,7 +11,7 @@ export default function MoneyPage() {
 
         <Header1>Money</Header1>
 
-        <div className="grid grid-cols-2 gap-4 items-center">
+        <div className="grid grid-cols-2 gap-4 items-center [&>:nth-child(odd)]:justify-self-end">
           <AppCard href="/admin/money/dashboard">Dashboard</AppCard>
           <AppCard href="/admin/money/transactions">Transactions</AppCard>
           <AppCard href="/admin/money/categories">Categories</AppCard>
