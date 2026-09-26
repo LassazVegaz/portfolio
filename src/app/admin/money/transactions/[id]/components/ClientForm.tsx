@@ -18,14 +18,26 @@ type TransactionFormValue = {
   direction: MoneyDirection;
   title: string;
   comments: string | null;
+  counterparty: string | null;
+  reference: string | null;
   time: Date;
-  categoryName: string;
+  categoryId: string;
+  instrumentId: string;
 };
 
 type Props = {
   isNew: boolean;
   transaction?: TransactionFormValue | null;
-  categories: { id: string; name: string }[];
+  categories: {
+    id: string;
+    name: string;
+    parentName: string | null;
+    usage: "IN" | "OUT" | "BOTH";
+    isArchived: boolean;
+  }[];
+  defaultCategoryId: string;
+  instruments: { id: string; name: string; isCreditCard: boolean }[];
+  defaultInstrumentId: string;
   currentBalanceCents: number;
   balanceWithoutTransactionCents: number;
 };
@@ -39,9 +51,18 @@ export default function ClientForm(props: Readonly<Props>) {
   const [direction, setDirection] = useState<MoneyDirection>(
     props.transaction?.direction ?? "OUT",
   );
-  const [categoryName, setCategoryName] = useState(
-    props.transaction?.categoryName ?? "",
+  const [categoryId, setCategoryId] = useState(
+    props.transaction?.categoryId ?? props.defaultCategoryId,
   );
+  const selectableCategories = props.categories.filter(
+    (category) => category.usage === "BOTH" || category.usage === direction,
+  );
+  const selectedCategoryId = selectableCategories.some(
+    ({ id }) => id === categoryId,
+  )
+    ? categoryId
+    : props.defaultCategoryId;
+  const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string>();
 
   const balanceAfterCents = useMemo(() => {
@@ -57,23 +78,26 @@ export default function ClientForm(props: Readonly<Props>) {
     }
   }, [amount, direction, props.balanceWithoutTransactionCents]);
 
-  const categoryExists = props.categories.some(
-    (category) =>
-      category.name.toLowerCase() === categoryName.trim().toLowerCase(),
-  );
-
   const onSubmit: SubmitEventHandler<HTMLFormElement> = async (event) => {
     event.preventDefault();
+    if (pending) return;
     setPending(true);
     setError(undefined);
+    setSaved(false);
     try {
       const entries = Object.fromEntries(
         new FormData(event.currentTarget).entries(),
       ) as Record<string, string>;
       const id = props.transaction?.id;
-      if (id) await updateAction(id, entries);
-      else
-        router.push(`/admin/money/transactions/${await createAction(entries)}`);
+      if (id) {
+        const result = await updateAction(id, entries);
+        if (!result.success) throw new Error(result.error);
+        setSaved(true);
+      } else {
+        const result = await createAction(entries);
+        if (!result.success) throw new Error(result.error);
+        router.push(`/admin/money/transactions/${result.data}`);
+      }
       router.refresh();
     } catch (cause) {
       setError(
@@ -88,10 +112,15 @@ export default function ClientForm(props: Readonly<Props>) {
     if (!props.transaction || !confirm("Delete this transaction?")) return;
     setPending(true);
     try {
-      await deleteAction(props.transaction.id);
+      const result = await deleteAction(props.transaction.id);
+      if (!result.success) throw new Error(result.error);
       router.push("/admin/money/transactions");
-    } catch {
-      setError("Could not delete transaction.");
+    } catch (cause) {
+      setError(
+        cause instanceof Error
+          ? cause.message
+          : "Could not delete transaction.",
+      );
       setPending(false);
     }
   };
@@ -162,29 +191,53 @@ export default function ClientForm(props: Readonly<Props>) {
 
         <label className="grid gap-2 text-sm font-medium">
           Category
-          <input
+          <select
             className="admin-input"
-            name="categoryName"
-            list="category-options"
-            value={categoryName}
-            maxLength={80}
-            onChange={(event) => setCategoryName(event.target.value)}
-            placeholder="Unclassified"
-          />
-          <datalist id="category-options">
-            {props.categories.map((category) => (
-              <option key={category.id} value={category.name} />
+            name="categoryId"
+            value={selectedCategoryId}
+            onChange={(event) => setCategoryId(event.target.value)}
+            required
+          >
+            {selectableCategories.map((category) => (
+              <option key={category.id} value={category.id}>
+                {category.parentName
+                  ? `${category.parentName} / ${category.name}`
+                  : category.name}
+                {category.isArchived ? " (archived)" : ""}
+              </option>
             ))}
-          </datalist>
-          {categoryName.trim() && !categoryExists && (
-            <span className="text-xs text-amber-200">
-              “{categoryName.trim()}” will be created as a top-level category.
-            </span>
-          )}
+          </select>
+          <span className="text-xs text-admin-muted">
+            Choose a category for this direction. Categories with subcategories
+            are used for grouping.
+          </span>
         </label>
 
         <label className="grid gap-2 text-sm font-medium">
-          Date and time
+          Source or destination
+          <select
+            className="admin-input"
+            name="instrumentId"
+            defaultValue={
+              props.transaction?.instrumentId ?? props.defaultInstrumentId
+            }
+            required
+          >
+            {props.instruments.map((instrument) => (
+              <option key={instrument.id} value={instrument.id}>
+                {instrument.name}
+                {instrument.isCreditCard ? " · credit card" : ""}
+              </option>
+            ))}
+          </select>
+          <span className="text-xs text-admin-muted">
+            Instruments describe how money moved; they do not keep separate
+            balances.
+          </span>
+        </label>
+
+        <label className="grid gap-2 text-sm font-medium">
+          Date and time (Singapore)
           <input
             className="admin-input"
             type="datetime-local"
@@ -196,6 +249,29 @@ export default function ClientForm(props: Readonly<Props>) {
           />
         </label>
 
+        <div className="grid gap-5 sm:grid-cols-2">
+          <label className="grid min-w-0 gap-2 text-sm font-medium">
+            {direction === "IN" ? "Payer" : "Payee"} (optional)
+            <input
+              className="admin-input"
+              name="counterparty"
+              maxLength={120}
+              defaultValue={props.transaction?.counterparty ?? ""}
+              placeholder="Person or business"
+            />
+          </label>
+          <label className="grid min-w-0 gap-2 text-sm font-medium">
+            Reference (optional)
+            <input
+              className="admin-input"
+              name="reference"
+              maxLength={120}
+              defaultValue={props.transaction?.reference ?? ""}
+              placeholder="Receipt, invoice or bank reference"
+            />
+          </label>
+        </div>
+
         <label className="grid gap-2 text-sm font-medium">
           Notes
           <textarea
@@ -206,6 +282,11 @@ export default function ClientForm(props: Readonly<Props>) {
           />
         </label>
 
+        {saved && (
+          <p role="status" className="text-sm text-emerald-300">
+            Transaction saved.
+          </p>
+        )}
         {error && (
           <p role="alert" className="text-sm text-rose-300">
             {error}
@@ -215,6 +296,7 @@ export default function ClientForm(props: Readonly<Props>) {
           <button
             type="button"
             className="admin-secondary-button"
+            disabled={pending}
             onClick={() => router.back()}
           >
             Cancel

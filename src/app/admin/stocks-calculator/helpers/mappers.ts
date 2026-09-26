@@ -20,7 +20,7 @@ const mapCostDetail = (c: FeeDetail): CostDetailOutput => ({
 export const primaryMapper = (
   data: PrimaryValues,
   changedField: keyof PrimaryInputs,
-  changedValue: string
+  changedValue: string,
 ): PrimaryOutputs => ({
   unitBuyingPrice: data.unitBuyingPrice.toFixed(2),
   quantity: data.quantity.toString(),
@@ -41,7 +41,7 @@ export function targetMapper(data: TargetValues): TargetOutputs;
 export function targetMapper(
   data: TargetValues,
   changedField: keyof TargetInputs,
-  changedValue: string
+  changedValue: string,
 ): TargetOutputs;
 
 /**
@@ -50,7 +50,7 @@ export function targetMapper(
 export function targetMapper(
   data: TargetValues,
   changedField?: keyof TargetInputs,
-  changedValue?: string
+  changedValue?: string,
 ): TargetOutputs {
   const result: TargetOutputs = {
     totalTarget: data.totalTarget.toFixed(2),

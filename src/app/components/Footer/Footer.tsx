@@ -6,7 +6,12 @@ const Footer = () => {
       <div className="footer-cta">
         <p className="eyebrow">Have an interesting problem?</p>
         <h2>Let&apos;s build something that matters.</h2>
-        <a href="https://www.linkedin.com/in/lasindu-weerasinghe" target="_blank" rel="noopener noreferrer" className="button button-primary">
+        <a
+          href="https://www.linkedin.com/in/lasindu-weerasinghe"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="button button-primary"
+        >
           Start a conversation <span aria-hidden="true">↗</span>
         </a>
       </div>

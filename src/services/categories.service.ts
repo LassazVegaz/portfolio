@@ -1,130 +1,219 @@
+import { MoneyValidationError } from "@/features/money/validation-error";
 import "server-only";
 
+import { cleanMoneyName, normalizeMoneyName } from "@/features/money/names";
+import { validateCategoryAssignment } from "@/features/money/category-policy";
 import prisma from "./prisma-service";
-
-export const UNCLASSIFIED_CATEGORY_NAME = "Unclassified";
+import { Category, CategoryUsage, TransactionDirection } from "@prisma/client";
+import { isObjectId } from "@/features/money/ledger-filters";
 
 export type CreateCategoryDto = {
   name: string;
+  description: string | null;
+  usage: CategoryUsage;
+  isArchived: boolean;
   parentId: string | null;
+  monthlyBudgetCents: number;
 };
 export type UpdateCategoryDto = Partial<CreateCategoryDto>;
 
-const normalizeName = (name: string) =>
-  name.trim().replace(/\s+/g, " ").toLocaleLowerCase("en-US");
-
-const cleanName = (name: string) => name.trim().replace(/\s+/g, " ");
-
 export class CategoriesService {
-  async ensureUnclassified() {
-    const normalizedName = normalizeName(UNCLASSIFIED_CATEGORY_NAME);
-    const existing = await prisma.category.findFirst({
-      where: {
-        OR: [
-          { normalizedName },
-          { name: { equals: UNCLASSIFIED_CATEGORY_NAME, mode: "insensitive" } },
-        ],
-      },
-    });
-    if (existing) {
-      return prisma.category.update({
-        where: { id: existing.id },
-        data: { normalizedName, isSystem: true, parentId: null },
-      });
-    }
-    return prisma.category.create({
-      data: {
-        name: UNCLASSIFIED_CATEGORY_NAME,
-        normalizedName,
-        isSystem: true,
-        parentId: null,
-      },
-    });
-  }
-
   async createCategory(dto: CreateCategoryDto) {
-    const name = cleanName(dto.name);
-    if (!name) throw new Error("Category name is required.");
-    if (dto.parentId) await this.validateParent(dto.parentId);
+    const name = cleanMoneyName(dto.name);
+    if (!name || name.length > 80)
+      throw new MoneyValidationError("Use a category name of 1–80 characters.");
+    this.validateDetails(dto);
+    this.validateBudgetValue(dto.monthlyBudgetCents);
+    if (dto.parentId) {
+      await this.validateParent(dto.parentId);
+      await this.validateChildBudget(dto.parentId, dto.monthlyBudgetCents);
+    }
 
     return prisma.category.create({
       data: {
         name,
-        normalizedName: normalizeName(name),
+        normalizedName: normalizeMoneyName(name),
         parentId: dto.parentId,
+        monthlyBudgetCents: dto.monthlyBudgetCents,
+        description: dto.description?.trim() || null,
+        usage: dto.usage,
+        isArchived: dto.isArchived,
       },
     });
-  }
-
-  async findOrCreateByName(nameInput?: string | null) {
-    const name = cleanName(nameInput ?? "");
-    if (!name) return this.ensureUnclassified();
-
-    const normalizedName = normalizeName(name);
-    const existing = await prisma.category.findFirst({
-      where: {
-        OR: [
-          { normalizedName },
-          { name: { equals: name, mode: "insensitive" } },
-        ],
-      },
-    });
-    return (
-      existing ??
-      prisma.category.create({ data: { name, normalizedName, parentId: null } })
-    );
   }
 
   async updateCategory(id: string, dto: UpdateCategoryDto) {
     const existing = await this.getCategoryById(id);
-    if (!existing) throw new Error("Category not found.");
+    if (!existing) throw new MoneyValidationError("Category not found.");
     if (existing.isSystem)
-      throw new Error("The Unclassified category cannot be edited.");
-    if (dto.parentId === id)
-      throw new Error("A category cannot be its own parent.");
-    if (dto.parentId) await this.validateParent(dto.parentId);
-
-    const name = dto.name === undefined ? undefined : cleanName(dto.name);
-    if (name !== undefined && !name)
-      throw new Error("Category name is required.");
+      throw new MoneyValidationError(
+        "The Unclassified category cannot be edited.",
+      );
+    this.validateDetails(dto);
+    await this.validateUsageChange(id, dto.usage);
+    await this.validateArchiveChange(existing, dto.isArchived);
+    await this.validateParentChange(existing, dto.parentId);
+    await this.validateUpdatedBudget(existing, dto);
 
     return prisma.category.update({
       where: { id },
-      data: {
-        name,
-        normalizedName: name ? normalizeName(name) : undefined,
-        parentId: dto.parentId,
-      },
+      data: this.prepareCategoryUpdate(dto),
     });
+  }
+
+  private async validateUsageChange(id: string, usage?: CategoryUsage) {
+    if (!usage || usage === "BOTH") return;
+    const conflictingTransactions = await prisma.transaction.count({
+      where: { categoryId: id, direction: { not: usage } },
+    });
+    if (conflictingTransactions) {
+      throw new MoneyValidationError(
+        "This category has transactions in the other direction. Keep it available for both directions.",
+      );
+    }
+  }
+
+  private async validateArchiveChange(
+    existing: Category,
+    isArchived?: boolean,
+  ) {
+    if (isArchived) {
+      const activeChildren = await prisma.category.count({
+        where: { parentId: existing.id, isArchived: false },
+      });
+      if (activeChildren) {
+        throw new MoneyValidationError(
+          "Archive the subcategories before archiving their parent.",
+        );
+      }
+    }
+    if (isArchived === false && existing.parentId) {
+      const parent = await this.getCategoryById(existing.parentId);
+      if (parent?.isArchived) {
+        throw new MoneyValidationError("Restore the parent category first.");
+      }
+    }
+  }
+
+  private async validateParentChange(
+    existing: Category,
+    parentId?: string | null,
+  ) {
+    if (parentId === existing.id) {
+      throw new MoneyValidationError("A category cannot be its own parent.");
+    }
+    if (parentId && parentId !== existing.parentId) {
+      await this.validateParent(parentId);
+    }
+  }
+
+  private async validateUpdatedBudget(
+    existing: Category,
+    dto: UpdateCategoryDto,
+  ) {
+    const monthlyBudgetCents =
+      dto.monthlyBudgetCents ?? existing.monthlyBudgetCents;
+    const parentId =
+      dto.parentId === undefined ? existing.parentId : dto.parentId;
+    this.validateBudgetValue(monthlyBudgetCents);
+
+    if (parentId) {
+      if (await this.hasChildCategories(existing.id)) {
+        throw new MoneyValidationError(
+          "A parent category cannot become a subcategory.",
+        );
+      }
+      await this.validateChildBudget(parentId, monthlyBudgetCents, existing.id);
+      return;
+    }
+    const childrenBudget = await this.getChildrenBudget(existing.id);
+    if (childrenBudget > monthlyBudgetCents) {
+      throw new MoneyValidationError(
+        "The parent budget cannot be less than the sum of its subcategory budgets.",
+      );
+    }
+  }
+
+  private prepareCategoryUpdate(dto: UpdateCategoryDto) {
+    const name = dto.name === undefined ? undefined : cleanMoneyName(dto.name);
+    if (name !== undefined && (!name || name.length > 80)) {
+      throw new MoneyValidationError("Category name is required.");
+    }
+    return {
+      name,
+      normalizedName: name ? normalizeMoneyName(name) : undefined,
+      parentId: dto.parentId,
+      monthlyBudgetCents: dto.monthlyBudgetCents,
+      description:
+        dto.description === undefined
+          ? undefined
+          : dto.description?.trim() || null,
+      usage: dto.usage,
+      isArchived: dto.isArchived,
+    };
   }
 
   async deleteCategory(id: string) {
     const category = await this.getCategoryById(id);
     if (!category) return;
     if (category.isSystem)
-      throw new Error("The Unclassified category cannot be deleted.");
+      throw new MoneyValidationError(
+        "The Unclassified category cannot be deleted.",
+      );
 
-    const unclassified = await this.ensureUnclassified();
-    await prisma.transaction.updateMany({
-      where: { categoryId: id },
-      data: { categoryId: unclassified.id },
-    });
-    await prisma.category.updateMany({
-      where: { parentId: id },
-      data: { parentId: null },
-    });
+    if (
+      (await this.hasChildCategories(id)) ||
+      (await prisma.transaction.count({ where: { categoryId: id } }))
+    ) {
+      throw new MoneyValidationError(
+        "This category is in use. Archive it to preserve its transaction history.",
+      );
+    }
     await prisma.category.delete({ where: { id } });
   }
 
   async getCategoryById(id: string) {
+    if (!isObjectId(id)) return null;
     return prisma.category.findUnique({ where: { id } });
   }
 
   async getAllCategories() {
-    await this.ensureUnclassified();
     return prisma.category.findMany({
+      include: { _count: { select: { children: true, transactions: true } } },
       orderBy: [{ isSystem: "desc" }, { name: "asc" }],
     });
+  }
+
+  async getSelectableCategories(existingCategoryId?: string) {
+    return prisma.category.findMany({
+      where: {
+        children: { none: {} },
+        OR: [
+          { isArchived: false },
+          ...(existingCategoryId ? [{ id: existingCategoryId }] : []),
+        ],
+      },
+      include: { parent: true },
+      orderBy: [{ parentId: "asc" }, { name: "asc" }],
+    });
+  }
+
+  async requireSelectableCategory(
+    id: string,
+    direction: TransactionDirection,
+    existingCategoryId?: string,
+  ) {
+    const category = await prisma.category.findUnique({
+      where: { id },
+      include: { _count: { select: { children: true } } },
+    });
+    if (!category) throw new MoneyValidationError("Category not found.");
+    validateCategoryAssignment(
+      { ...category, childCount: category._count.children },
+      direction,
+      existingCategoryId,
+    );
+    return category;
   }
 
   async getAvailableParents(currentId?: string) {
@@ -133,6 +222,7 @@ export class CategoriesService {
         id: currentId ? { not: currentId } : undefined,
         parentId: null,
         isSystem: false,
+        isArchived: false,
       },
       orderBy: { name: "asc" },
     });
@@ -146,10 +236,7 @@ export class CategoriesService {
     return (
       (await prisma.category.count({
         where: {
-          OR: [
-            { normalizedName: normalizeName(name) },
-            { name: { equals: cleanName(name), mode: "insensitive" } },
-          ],
+          normalizedName: normalizeMoneyName(name),
           id: exceptId ? { not: exceptId } : undefined,
         },
       })) > 0
@@ -158,11 +245,65 @@ export class CategoriesService {
 
   private async validateParent(parentId: string) {
     const parent = await this.getCategoryById(parentId);
-    if (!parent) throw new Error("Parent category not found.");
+    if (!parent) throw new MoneyValidationError("Parent category not found.");
+    if (parent.isArchived)
+      throw new MoneyValidationError(
+        "Restore the parent category before using it.",
+      );
     if (parent.isSystem)
-      throw new Error("Unclassified cannot have subcategories.");
+      throw new MoneyValidationError("Unclassified cannot have subcategories.");
     if (parent.parentId)
       throw new Error("Subcategories cannot have subcategories.");
+    if (
+      (await prisma.transaction.count({ where: { categoryId: parentId } })) > 0
+    ) {
+      throw new Error(
+        "Move the parent category's transactions before adding a subcategory.",
+      );
+    }
+  }
+
+  private validateDetails(dto: UpdateCategoryDto) {
+    if ((dto.description?.length ?? 0) > 500)
+      throw new MoneyValidationError(
+        "Description must be at most 500 characters.",
+      );
+    if (dto.usage && !["IN", "OUT", "BOTH"].includes(dto.usage))
+      throw new MoneyValidationError("Choose a valid category usage.");
+  }
+
+  private validateBudgetValue(monthlyBudgetCents: number) {
+    if (!Number.isSafeInteger(monthlyBudgetCents) || monthlyBudgetCents < 0) {
+      throw new Error(
+        "Monthly budget must be zero or a valid positive amount.",
+      );
+    }
+  }
+
+  private async getChildrenBudget(parentId: string, exceptId?: string) {
+    const result = await prisma.category.aggregate({
+      where: {
+        parentId,
+        id: exceptId ? { not: exceptId } : undefined,
+      },
+      _sum: { monthlyBudgetCents: true },
+    });
+    return result._sum.monthlyBudgetCents ?? 0;
+  }
+
+  private async validateChildBudget(
+    parentId: string,
+    monthlyBudgetCents: number,
+    exceptId?: string,
+  ) {
+    const parent = await this.getCategoryById(parentId);
+    if (!parent) throw new MoneyValidationError("Parent category not found.");
+    const siblingsBudget = await this.getChildrenBudget(parentId, exceptId);
+    if (siblingsBudget + monthlyBudgetCents > parent.monthlyBudgetCents) {
+      throw new MoneyValidationError(
+        "Subcategory budgets cannot exceed the parent category's monthly budget.",
+      );
+    }
   }
 }
 

@@ -12,7 +12,10 @@ const profileSchema = z
       .trim()
       .min(3, "Username must have at least 3 characters.")
       .max(80)
-      .regex(/^[a-zA-Z0-9._-]+$/, "Use letters, numbers, dots, dashes or underscores."),
+      .regex(
+        /^[a-zA-Z0-9._-]+$/,
+        "Use letters, numbers, dots, dashes or underscores.",
+      ),
     currentPassword: z.string().min(1, "Enter your current password."),
     newPassword: z.string().max(200),
     confirmPassword: z.string().max(200),
@@ -49,7 +52,9 @@ export const updateProfileAction = async (
       currentPassword: parsed.data.currentPassword,
       newPassword: parsed.data.newPassword || undefined,
     });
-    return { success: "Profile updated. Other signed-in sessions are now invalid." };
+    return {
+      success: "Profile updated. Other signed-in sessions are now invalid.",
+    };
   } catch (error) {
     if (error instanceof AuthenticationError) return { error: error.message };
     if (

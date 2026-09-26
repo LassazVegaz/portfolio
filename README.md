@@ -4,65 +4,133 @@ My awesome portfolio with hidden tools 😂😂
 
 ## Money workspace
 
-The private `/admin` area now includes a maintainable SGD ledger with:
+The private `/admin/money` workspace has separate transaction, category,
+instrument, settings, and dashboard pages. The ledger and editing forms adapt
+to mobile screens; the dashboard uses a desktop layout.
 
-- database-backed admin credentials and bcrypt password hashing;
-- signed, expiring, HTTP-only sessions verified by the edge proxy;
-- profile and password management with session invalidation;
-- exact integer-cent money calculations, opening balance, and IN/OUT entries;
-- top-level categories, one level of subcategories, and a protected Unclassified category;
-- category suggestions and automatic creation while entering a transaction;
-- filtered statistics, cash-flow and spending charts, and paginated transactions;
-- a compact oldest-first mobile ledger and an adaptive desktop dashboard.
+### Transactions
 
-### First deployment
+- Create, edit, and delete money-in and money-out entries in SGD.
+- Record amount, direction, title, category, instrument, Singapore date/time,
+  payer/payee, reference, and notes. Creation and update timestamps are automatic.
+- View both directions together by default, across all dates.
+- Combine search (title, notes, payer/payee, reference), direction, category,
+  instrument, inclusive Singapore date bounds, and minimum/maximum amounts.
+- Selecting a parent category includes its subcategories. Archived categories
+  remain available in historical filters.
+- Sort by newest, oldest, highest amount, or lowest amount. Database pagination
+  loads 25 entries per page; income, expense, and net totals cover all matches.
+- Store integer cents; validate positive transaction amounts and the database's
+  32-bit amount limit. Opening balances can be negative. Enter amounts without
+  grouping commas, with at most two decimal places.
 
-1. Copy the variables from `.env.example` into the local/deployment environment. Keep `AUTH_SECRET` stable and private.
-2. Run `pnpm prisma db push` against the intended MongoDB database, then deploy.
-3. Sign in once with `ADMIN_BOOTSTRAP_USERNAME` and `ADMIN_BOOTSTRAP_PASSWORD`. This creates the first `AdminUser` with a bcrypt hash.
-4. Remove the two `ADMIN_BOOTSTRAP_*` variables and manage credentials from `/admin/profile` thereafter.
+### Categories and instruments
 
-The money schema intentionally starts fresh: transaction amounts, directions, and categories are required, and amounts are stored as integer cents.
+Categories have a name, description, supported direction (in, out, or both),
+optional parent, monthly spending budget, and archive status. Flat categories
+and subcategories can receive transactions; a category with children is a
+reporting group. Each subcategory has its own direction setting. Child budgets
+cannot exceed the parent's allocation.
+
+Archive categories to stop new assignments while preserving transaction history.
+Existing entries can retain their archived category when edited. Archive children
+before their parent; restore the parent before restoring children. A category
+with transactions or children cannot be deleted. The protected Unclassified
+category is always available.
+
+Instruments describe the source/destination (such as cash or a card), with a
+configurable default. They share one opening balance and ledger balance, rather
+than maintaining separate account balances. Credit-card bill payments are not
+recorded again as expenses.
+
+### Dashboard
+
+`/admin/money/dashboard` retains saved category/date/direction filters, cash-flow
+statistics, prorated budgets, charts, and a transaction table. Saved filters
+belong to the signed-in admin. The responsive ledger is at
+`/admin/money/transactions`; its filters are retained in the URL.
+
+### Database setup
+
+Configure `DATABASE_URL` for MongoDB and `AUTH_SECRET` as described in
+`.env.example`. After pulling schema changes, regenerate the client and apply
+the schema to the development database:
+
+```bash
+pnpm install
+pnpm prisma generate
+pnpm prisma db push
+pnpm db:seed
+```
+
+MongoDB must support transactions (for example, an Atlas deployment or a replica
+set). Prisma uses `db push` for this MongoDB schema, not SQL migrations. No live
+data migration is included. If reusing old development fixtures, recreate them
+with the new category fields populated.
+
+The seed creates Unclassified, Cash, and the primary money account. The
+application assumes those records exist; reads never create or repair them.
+Seeding money records does not create an admin user.
+
+### Standalone TypeScript scripts
+
+Place executable `.ts` files directly in the root `scripts/` folder. Set
+`SCRIPT_NAME` to the filename, with or without `.ts`, then run:
+
+```bash
+pnpm script
+```
+
+For example, put this in `.env.local` (with your `DATABASE_URL`):
+
+```dotenv
+SCRIPT_NAME=create-default-category
+```
+
+Or select the script in PowerShell:
+
+```powershell
+$env:SCRIPT_NAME = "create-default-category"
+pnpm script
+```
+
+The runner loads environment files before launching the selected script, without
+starting Next.js. Existing shell variables win, followed by
+`.env.<NODE_ENV>.local`, `.env.local`, `.env.<NODE_ENV>`, and `.env` in that order.
+`NODE_ENV` defaults to `development`; test mode skips `.env.local`. Files are
+resolved from the repository root. Extra arguments are passed to the script,
+and script failures produce a nonzero exit code.
+
+`create-default-category.ts` creates the protected, active **Unclassified**
+category for both transaction directions, with an explicit `parentId: null`.
+It uses an upsert, so rerunning it preserves an existing category. It creates no
+instruments, accounts, or admin users. It requires `DATABASE_URL` and a generated
+Prisma client. You can also run it directly with
+`pnpm exec tsx scripts/create-default-category.ts`; it loads the same environment
+files and always disconnects Prisma after the operation.
+
+Run `pnpm test:scripts` to check environment precedence, script selection,
+argument forwarding, and failure exit codes without a database.
+
+### Verification
+
+```bash
+pnpm test:money
+pnpm exec tsc --noEmit
+pnpm lint
+pnpm build
+```
+
+The money tests cover cent precision and limits, Singapore date/time boundaries,
+filter validation and pagination URLs, category assignment/archive rules, and
+budget proration. They run without a database. For a database-backed smoke test,
+seed a development database, sign in, create income and expense categories and
+transactions, combine the ledger filters, edit an entry, then archive its
+category and verify that history is retained. Check the ledger and forms at a
+narrow viewport and the dashboard at a desktop viewport.
 
 ### Security notes
 
 - Every admin route is protected by `proxy.ts`; every mutating server action also performs its own authentication check.
 - Admin responses are private and non-cacheable. Baseline framing, MIME-sniffing, referrer, and permissions headers are configured in `next.config.ts`.
 - For internet exposure, enable rate limiting for `/admin/login` at the hosting/WAF layer. In-memory counters are not reliable in a serverless deployment.
-
-## Original plan
-
-- Improve proxy.ts
-  - check if there any anti-patterns in it and fix them.
-  - check if there are security issues in it and fix them.
-- Improve auth
-  - create a page to manage admin profile. This page should include features to change admin user name and password. The password should be hashed and stored in the database. Create a schema in Prisma to store admin user name and password.
-  - change auth-service.ts to compare the hashed passwords and check user name from the DB.
-  - check if there any anti-patterns in auth-service.ts and fix them.
-  - check if there are security issues in auth-service.ts and fix them.
-  - check if auth-service.ts is used in a secured way in the proxy.ts, pages and actions. If there are security issues, fix them.
-  - All pages afer 'admin' and including 'admin' can be accessed only by authenticated users.
-- Improve UI/UX of navigation bar
-- Improve "money" feature. This feature includes storing transactions. All transactions are in SGD. There are categories of transactions. A transaction can belong to only one category. Transactions that do not have a category fall into a category named "unclassified". unclassified category does not have sub categories. This feature start from path 'src\\app\\admin\\money'.
-  - User should be able add, edit, view and delete categories.
-  - Categories should be able to have any number of sub categories except for unlcassified category. A subcategory does not have subcategories.
-  - When adding a transaction, use can mention the category. If the mentioned category does not exist, it should be created when adding the transaction. When use types a category, a suggestion list should be displayed. If the typed category does not exist, a text should be displayed saying that a category will be created.
-  - In addition to category, the user should mention following details when adding a transaction,
-    - transaction amount
-    - whether transacion is in or out
-  - When adding a transaction, following details should be displayed to the user,
-    - current account balance
-    - balance after the adding transaction
-  - There should be a feature to add the initial account balance
-  - Follow similar UI and functions when editing a transaction
-  - Viewing transactions is a crucial part. It should include various statistics shown using numbers and charts. There should be good filters as well.
-  - Transactions adding and editing page has to be mobile friendly and follow responsive design.
-  - Statistics page should follow adaptive design method.
-  - For mobile screen sizes, the statistics page should show a very simple UI with only following details,
-    - Pagination enabled list of transactions
-    - The list is sorted by date in ascending order
-  - None of the pages has to be mobile friendly unless explicitly mentioned to be otherwise
-- For all designs, by default Tailwind CSS should be used. Tailwind CSS theme feature should be used to create common css.
-- If writing Tailwind CSS for a certain component makes it unreadable and hard to maintain, CSS classes or inline-CSS should be used.
-- Install an appropriate charts library for charts
-- Install ssafe libraries for encryption and hashing as required

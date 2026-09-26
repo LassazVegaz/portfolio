@@ -2,6 +2,7 @@ import TopNavigator from "@/components/HomeButton";
 import PageContainer from "@/components/PageContainer";
 import categoriesService from "@/services/categories.service";
 import transactionsService from "@/services/transactions.service";
+import instrumentsService from "@/services/instruments.service";
 import { notFound } from "next/navigation";
 import ClientForm from "./components/ClientForm";
 
@@ -13,12 +14,19 @@ export default async function TransactionPage(
   const transaction = isNew ? null : await transactionsService.getById(id);
   if (!isNew && !transaction) notFound();
 
-  const [categories, currentBalanceCents, balanceWithoutTransactionCents] =
-    await Promise.all([
-      categoriesService.getAllCategories(),
-      transactionsService.getBalanceCents(),
-      transactionsService.getBalanceCents(transaction?.id),
-    ]);
+  const [
+    categories,
+    instruments,
+    defaultInstrument,
+    currentBalanceCents,
+    balanceWithoutTransactionCents,
+  ] = await Promise.all([
+    categoriesService.getSelectableCategories(transaction?.categoryId),
+    instrumentsService.getAll(),
+    instrumentsService.getDefault(),
+    transactionsService.getBalanceCents(),
+    transactionsService.getBalanceCents(transaction?.id),
+  ]);
 
   return (
     <main className="admin-shell min-h-screen pb-10">
@@ -38,12 +46,32 @@ export default async function TransactionPage(
                   direction: transaction.direction,
                   title: transaction.title,
                   comments: transaction.comments,
+                  counterparty: transaction.counterparty,
+                  reference: transaction.reference,
                   time: transaction.time,
-                  categoryName: transaction.category.name,
+                  categoryId: transaction.categoryId,
+                  instrumentId: transaction.instrumentId,
                 }
               : null
           }
-          categories={categories.map(({ id: categoryId, name }) => ({ id: categoryId, name }))}
+          categories={categories.map(
+            ({ id: categoryId, name, parent, usage, isArchived }) => ({
+              id: categoryId,
+              name,
+              usage,
+              isArchived,
+              parentName: parent?.name ?? null,
+            }),
+          )}
+          defaultCategoryId={categories.find(({ isSystem }) => isSystem)!.id}
+          instruments={instruments.map(
+            ({ id: instrumentId, name, isCreditCard }) => ({
+              id: instrumentId,
+              name,
+              isCreditCard,
+            }),
+          )}
+          defaultInstrumentId={defaultInstrument.id}
           currentBalanceCents={currentBalanceCents}
           balanceWithoutTransactionCents={balanceWithoutTransactionCents}
         />

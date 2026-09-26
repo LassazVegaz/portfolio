@@ -81,15 +81,15 @@ export default function ClientSidePage() {
     const expectedProfitPU = profitCalculator.calculateTargetPU(
       name,
       state.current.profitTargetValues[name],
-      state.current.primaryValues
+      state.current.primaryValues,
     );
     state.current.profitTargetValues = profitCalculator.calculateTargetValues(
       state.current.primaryValues,
-      expectedProfitPU
+      expectedProfitPU,
     );
 
     setProfitTarget(
-      targetMapper(state.current.profitTargetValues, name, value)
+      targetMapper(state.current.profitTargetValues, name, value),
     );
   }, []);
 
@@ -98,11 +98,11 @@ export default function ClientSidePage() {
     const bearableLossPU = lossCalculator.calculateTargetPU(
       name,
       state.current.lossTargetValues[name],
-      state.current.primaryValues
+      state.current.primaryValues,
     );
     state.current.lossTargetValues = lossCalculator.calculateTargetValues(
       state.current.primaryValues,
-      bearableLossPU
+      bearableLossPU,
     );
 
     setLossTarget(targetMapper(state.current.lossTargetValues, name, value));
@@ -125,18 +125,18 @@ export default function ClientSidePage() {
     state.current.primaryValues[fieldName] = fieldValue;
     calculatePrimaryValues(fieldName, state.current.primaryValues);
     setPrimaryOutputs(
-      primaryMapper(state.current.primaryValues, fieldName, value)
+      primaryMapper(state.current.primaryValues, fieldName, value),
     );
 
     state.current.profitTargetValues = profitCalculator.calculateTargetValues(
       state.current.primaryValues,
-      state.current.profitTargetValues.targetPU
+      state.current.profitTargetValues.targetPU,
     );
     setProfitTarget(targetMapper(state.current.profitTargetValues));
 
     state.current.lossTargetValues = lossCalculator.calculateTargetValues(
       state.current.primaryValues,
-      state.current.lossTargetValues.targetPU
+      state.current.lossTargetValues.targetPU,
     );
     setLossTarget(targetMapper(state.current.lossTargetValues));
   }, []);

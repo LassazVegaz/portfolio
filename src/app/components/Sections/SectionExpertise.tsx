@@ -27,16 +27,21 @@ const expertise = [
 
 export default function SectionExpertise() {
   return (
-    <section id="expertise" className="expertise section-container section-spacing">
-      <div className="section-label"><span>02</span> Expertise</div>
+    <section
+      id="expertise"
+      className="expertise section-container section-spacing"
+    >
+      <div className="section-label">
+        <span>02</span> Expertise
+      </div>
       <div className="section-heading-row">
         <div>
           <p className="eyebrow">What I bring to a team</p>
           <h2>From the first diagram to production.</h2>
         </div>
         <p>
-          I move comfortably between architecture, implementation, delivery,
-          and the messy edges where systems meet.
+          I move comfortably between architecture, implementation, delivery, and
+          the messy edges where systems meet.
         </p>
       </div>
       <div className="expertise-grid">
@@ -49,7 +54,9 @@ export default function SectionExpertise() {
             <h3>{item.title}</h3>
             <p>{item.description}</p>
             <div className="tag-list">
-              {item.technologies.map((technology) => <span key={technology}>{technology}</span>)}
+              {item.technologies.map((technology) => (
+                <span key={technology}>{technology}</span>
+              ))}
             </div>
           </article>
         ))}
