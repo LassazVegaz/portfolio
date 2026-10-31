@@ -1,0 +1,19 @@
+$primary-color: #44c491;
+
+.primary-btn {
+  background-color: $primary-color;
+  color: black;
+  border-radius: 0.75rem;
+  border: 1px solid $primary-color;
+  transition-duration: 0.5s;
+  padding: calc(var(--spacing) * 2);
+
+  &:hover:not(:disabled) {
+    background-color: transparent;
+    color: $primary-color;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+  }
+}

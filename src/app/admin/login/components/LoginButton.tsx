@@ -1,16 +1,17 @@
 "use client";
 import { useFormStatus } from "react-dom";
+import PrimaryButton from "@/components/PrimaryButton";
 
 export default function LoginButton() {
   const { pending } = useFormStatus();
 
   return (
-    <button
+    <PrimaryButton
       type="submit"
-      className="bg-blue-500 text-white p-2 rounded enabled:cursor-pointer disabled:opacity-50"
+      className="enabled:cursor-pointer"
       disabled={pending}
     >
       {pending ? "Signing in…" : "Sign in"}
-    </button>
+    </PrimaryButton>
   );
 }
