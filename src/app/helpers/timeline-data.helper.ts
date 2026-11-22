@@ -8,6 +8,17 @@ export type TimelinePiece = {
 const timelineData: TimelinePiece[] = [
   {
     title: "Senior Software Engineer",
+    range: "09/2026 to present",
+    company: "Resorts World Sentosa",
+    points: [
+      "Developing .NET APIs, Java APIs, libraries, batch jobs, and a large-scale microservices system in Azure.",
+      "Migrating a desktop application to a web application.",
+      "The application includes day-to-day functions of various roles working on the casino floor.",
+      "Technologies: .NET, TypeScript, Azure, GitHub CI/CD, MS SQL Server, Java",
+    ],
+  },
+  {
+    title: "Senior Software Engineer",
     range: "06/2024 to 04/2026",
     company: "Singapore Economic Development Board (EDB)",
     points: [
